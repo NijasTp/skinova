@@ -1,0 +1,223 @@
+body{
+    font-family: 'Poppins', sans-serif;
+}
+.skinova-logo{
+    position: absolute;
+    width: 150px;
+    left: 4%;
+}
+.login-container {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.login-form-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.login-content {
+    width: 100%;
+    max-width: 400px;
+}
+
+.login-content h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    margin-bottom: 0.5rem;
+    color: #1a1a1a;
+}
+
+
+
+.subtitle {
+    color: #666;
+    margin-bottom: 2rem;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.form-group input {
+    width: 90%;
+    padding: 0.75rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #1a4741;
+    box-shadow: 0 0 0 2px rgba(26, 71, 65, 0.1);
+}
+
+.password-group {
+    position: relative;
+}
+
+.forgot-link {
+    position: absolute;
+    right: 20px;
+    top: -24px;
+    font-size: 0.8rem;
+    color: #64CCC5;
+    text-decoration: none;
+}
+
+.remember-me {
+    margin-bottom: 1.5rem;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.checkbox-container input {
+    width: 16px;
+    height: 16px;
+}
+
+.login-button {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #04364A;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.login-button:hover {
+    background-color: #032633;
+}
+
+.divider {
+    text-align: center;
+    margin: 1.5rem 0;
+    position: relative;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: calc(50% - 1rem);
+    height: 1px;
+    background-color: #e0e0e0;
+}
+
+.divider::before {
+    left: 0;
+}
+
+.divider::after {
+    right: 0;
+}
+
+.divider span {
+    background-color: white;
+    padding: 0 0.5rem;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.google-button {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.google-button:hover {
+    background-color: #f5f5f5;
+}
+
+.google-icon {
+    width: 40px;
+}
+.google-text{
+    color: #1a1a1a;
+    font-size: 0.9rem;
+    font-weight: 600;
+   font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+.signup-prompt {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.signup-link {
+    color: #1a4741;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.signup-link:hover {
+    text-decoration: underline;
+}
+
+.brand-section {
+    background-color: #dbefed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-right: 100px;
+}
+
+.logo-container {
+    max-width: 300px;
+}
+
+.brand-logo {
+    width: 150%;
+}
+
+@media (max-width: 768px) {
+    .login-container {
+        grid-template-columns: 1fr;
+    }
+
+    .forgot-link {
+        right: 40px;
+    }
+    .brand-section {
+        display: none;
+    }
+
+    .login-content {
+        max-width: 100%;
+    }
+}

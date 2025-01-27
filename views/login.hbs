@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="/stylesheets/login.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <img class="skinova-logo" src="/images/skinova text.png" alt="">
+    <div class="login-container">
+        <div class="login-form-section">
+            <div class="login-content">
+                <h1 class="welcome-text">Welcome back!</h1>
+                <p class="subtitle">Enter your Credentials to access your account</p>
+
+                <form action="/user/login" method="POST" class="login-form">
+                    <div class="form-group">
+                        <label for="email">Email address</label>
+                        <input type="email" id="email" name="email" placeholder="Enter your email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="password-group">
+                            <input type="password" id="password" name="password" placeholder="Enter your password"
+                                required>
+                            <a href="/forgot-password" class="forgot-link">forgot password</a>
+                        </div>
+                    </div>
+
+
+                    <button type="submit" class="login-button">Login</button>
+
+                    <div class="divider">
+                        <span>or</span>
+                    </div>
+
+                    {{!-- <button type="button" class="google-button">
+                        <img src="/images/google-logo.png" alt="Google" class="google-icon">
+                        <span class="google-text"> Sign in with Google </span>
+                    </button> --}}
+                    <script src="https://accounts.google.com/gsi/client" async defer></script>
+                    <script>
+                        window.onload = function () {
+                            google.accounts.id.initialize({
+                                client_id: '147865379959-95uep5flk15e1f6eputi0lu4p4sjdqts.apps.googleusercontent.com',
+                                callback: handleCredentialResponse
+                            });
+                            google.accounts.id.renderButton(
+                                document.getElementById("g_id_signin"),
+                                { theme: "outline", size: "large" }  // Adjust button style here
+                            );
+                        };
+
+                        function handleCredentialResponse(response) {
+                            const token = response.credential;
+
+                            // Send the token to your backend
+                            fetch('/auth/google', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ credential: token }),
+                            })
+                                .then((res) => {
+                                    if (true) {
+                                        // Redirect to home page
+                                        window.location.href = '/';  // You can also redirect here, if needed
+                                    } else {
+                                        console.error('Google login failed');
+                                    }
+                                })
+                                .catch((error) => {
+                                    console.error('Error during Google login:', error);
+                                });
+                        }
+                    </script>
+
+                    <div id="g_id_signin"></div>
+                    
+                    <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline"
+                        data-text="sign_in_with" data-size="large" data-logo_alignment="left">
+                    </div>
+
+
+                    <p class="signup-prompt">
+                        Don't have an account?
+                        <a href="/signup" class="signup-link">Sign Up</a>
+                    </p>
+                </form>
+            </div>
+        </div>
+
+        <div class="brand-section">
+            <div class="logo-container">
+                {{!-- <img src="{{brandLogoUrl}}" alt="Skinova Logo" class="brand-logo"> --}}
+                <img src="/images/skinova-full.png" alt="Skinova Logo" class="brand-logo">
+
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+
+
+{{!--  First you Learn than remove "L" --}}
