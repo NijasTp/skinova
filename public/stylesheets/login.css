@@ -18,7 +18,12 @@ body{
     justify-content: center;
     padding: 2rem;
 }
-
+.err-msg{
+    color: red;
+    font-size: 0.9rem;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+}
 .login-content {
     width: 100%;
     max-width: 400px;

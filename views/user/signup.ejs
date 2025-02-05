@@ -1,0 +1,116 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Started Now</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/stylesheets/signup.css">
+</head>
+
+<body>
+    <div class="left-section">
+        <div class="logo-container">
+            <img src="/images/skinova text.png" alt="Logo" class="logo">
+        </div>
+        <div class="signup-container">
+            <h1>Get Started Now</h1>
+
+            <p class="err-msg"><%= error %></p><br>
+            <form action="/signup" method="POST">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" placeholder="Enter your name" >
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email address</label>
+                    <input type="email" id="email" name="email" placeholder="Enter your email" >
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="••••••" >
+                </div>
+
+                <div class="checkbox-container">
+                    <input type="checkbox" id="terms" name="terms" >
+                    <label for="terms">I agree to the <a href="/terms">terms & policy</a></label>
+                </div>
+
+                <button type="submit" class="signup-button">Signup</button>
+            </form>
+
+            <div class="divider">or</div>
+
+            <a href="/auth/google" class="google-button">
+                <img src="/images/google-logo.png" alt="Google icon">
+                Sign in with Google
+            </a>
+
+            <div class="login-link">
+                Have an account? <a href="/login">Sign In</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="right-section">
+        <img src="/images/blue-texture.png" class="blue-texture-img" alt="Background texture">
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.querySelector('form').addEventListener('submit', function (event) {
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const terms = document.getElementById('terms').checked;
+            const errMsg = document.querySelector('.err-msg');
+
+            let messages = [];
+
+            if (!name) {
+            messages.push('Name is required.');
+            } else {
+            const nameRegex = /^[A-Za-z\s]+$/;
+            if (!nameRegex.test(name)) {
+            messages.push('Name can only contain letters and spaces.');
+            }
+            }
+
+            if (!email) {
+            messages.push('Email is required.');
+            } else {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+            messages.push('Invalid email address.');
+            }
+            }
+
+            if (!password) {
+            messages.push('Password is required.');
+            } else {
+            const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+            if (!passwordRegex.test(password)) {
+            messages.push('Password must contain at least one capital letter, one number, and one special character.');
+            }
+            }
+
+            if (!terms) {
+            messages.push('You must agree to the terms and conditions.');
+            }
+
+            if (messages.length > 0) {
+            event.preventDefault();
+            errMsg.innerHTML = messages.join('<br>');
+            }
+        });
+           
+    </script>
+</body>
+
+</html>

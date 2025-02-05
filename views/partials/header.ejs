@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    .dropdown {
+        position: relative;
+        display: inline-block;
+    }
+    .dropdown-menu {
+        display: none;
+        position: absolute;
+        left: -30px;
+        background-color: white;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        z-index: 1;
+    }
+    .dropdown-menu a {
+        color: black;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+    }
+    .dropdown-menu a:hover {
+        background-color: #f1f1f1;
+    }
+    .dropdown:hover .dropdown-menu {
+        display: block;
+    }
+    .logout-form {
+    display: inline; /* Keeps it in line with other links */
+}
+
+    #logoutButton {
+    background: none;
+    border: none;
+    color: black; /* Matches other links */
+    text-decoration: none; /* Removes button underline */
+    font-size: inherit;
+    cursor: pointer;
+    padding-left:13px;
+}
+
+   #logoutButton:hover {
+    text-decoration: underline; /* Adds underline on hover like links */
+}
+
+</style>
+<body>
+    <nav class="navbar">
+    <a href="/" class="logo"><img class="hero-logo" src="/images/skinova text.png" alt="Skinova Logo"></a>
+    <div class="hamburger" onclick="toggleMenu()">
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+<div class="nav-links">
+    <a href="/">HOME</a>
+    <a href="/shop">SHOP</a>
+    <a href="/about">ABOUT</a>
+    <a href="/contact">CONTACT</a>
+    <a href="/cart">CART</a>
+    <a href="/wishlist">WISHLIST</a>
+    <a href="/settings">SETTINGS</a>
+    
+    <% if (user) { %>
+        <div class="dropdown">
+            <a class="dropdown-toggle"><b><%= user.name %></b></a>
+            <div class="dropdown-menu">
+                <a href="/profile">Profile</a>
+                
+                <!-- Logout button styled as a link -->
+                <form action="/logout" method="post" class="logout-form">
+                    <button style="font-size: 14px;" type="submit" id="logoutButton">LOGOUT</button>
+                </form>
+
+            </div>
+        </div>
+    <% } else { %>
+        <a href="/login">LOGIN</a>  
+        <a href="/signup">SIGNUP</a>
+    <% } %>
+</div>
+
+</nav>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.10.5/sweetalert2.all.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const logoutButton = document.getElementById('logoutButton');
+        const logoutForm = document.getElementById('logoutForm');
+
+        if (logoutButton && logoutForm) {
+            logoutButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You will be logged out!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#003545',
+                    cancelButtonColor: '#000000',
+                    confirmButtonText: 'Yes'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        logoutForm.submit();
+                    }
+                });
+            });
+        }
+    });
+</script>
+</body>
+</html>
