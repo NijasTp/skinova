@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Orders</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .order-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .order {
+            border-bottom: 2px solid #ddd;
+            padding: 15px 0;
+        }
+
+        .order-header {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .product {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .product:last-child {
+            border-bottom: none;
+        }
+
+        .product img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+
+        .status {
+            padding: 5px 10px;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .pending {
+            background-color: orange;
+        }
+
+        .confirmed {
+            background-color: blue;
+        }
+
+        .shipped {
+            background-color: teal;
+        }
+
+        .delivered {
+            background-color: green;
+        }
+
+        .cancelled {
+            background-color: red;
+        }
+
+        .return-request {
+            background-color: purple;
+        }
+
+        .returned {
+            background-color: gray;
+        }
+
+        .cancel-button {
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .cancel-button:hover {
+            background-color: darkred;
+        }
+
+        .info-button {
+            background-color: blue;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .info-button:hover {
+            background-color: darkblue;
+        }
+
+        .item-info {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #e7f3fe;
+            border: 1px solid #b3d7ff;
+            border-radius: 5px;
+        }
+
+        .hero-description a {
+            text-decoration: none;
+            color: black;
+        }
+        .hero {
+  display: flex;
+  justify-content: space-between;
+  background-color: #e6f4f4;
+  align-items: center;
+  padding: 4rem 2rem;
+  width: 100%;
+  margin: 0 auto;
+  min-height: 50vh;
+}
+
+.hero-content {
+  max-width: 500px;
+  margin-left: 40%;
+}
+
+.hero-title {
+  font-size: 2rem;
+  line-height: 1.2;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+
+.hero-description {
+  color: #5d6d7e;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.cta-button {
+  display: inline-block;
+  padding: 0.8rem 2rem;
+  background-color: #1a4741;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.cta-button:hover {
+  background-color: #123530;
+}
+
+.hero-image {
+  width: 300px;
+  position: relative;
+  right: 100px;
+
+}
+@media (max-width: 768px) {
+  .hero {
+      flex-direction: column;
+      text-align: center;
+      padding: 2rem;
+  }
+  .hero-image {
+  width: 300px;
+  position: relative;
+  left: 30px;
+
+}
+
+}
+/* Style for sorting dropdown */
+.form-control {
+  padding: 0.5rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 0.375rem;
+  background-color: white;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #1a4741;
+  box-shadow: 0 0 5px rgba(26, 71, 65, 0.5);
+}
+
+/* Style for Apply button */
+.btn-primary {
+  background-color: #1a4741;
+  color: white;
+  padding: 0.5rem 1.5rem;
+  border-radius: 0.375rem;
+  transition: background-color 0.3s ease;
+  font-weight: bold;
+}
+
+.btn-primary:hover {
+  background-color: #123530;
+}
+
+/* Style for Clear All button */
+.btn-danger {
+  background-color: #d9534f;
+  color: white;
+  padding: 0.5rem 1.5rem;
+  border-radius: 0.375rem;
+  transition: background-color 0.3s ease;
+  font-weight: bold;
+}
+
+.btn-danger:hover {
+  background-color: #c9302c;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .form-inline {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+    </style>
+</head>
+
+<body>
+    <%- include('../partials/user/header') %>
+        <main class="hero w-full">
+            <div class="hero-content">
+                <b>
+                    <h1 class="hero-title">ORDERS</h1>
+                </b>
+                <p class="hero-description">
+                    <i> <a href="/">Home</a> <span> > </span> <a href="/orders">Orders</a></i>
+                </p>
+            </div>
+            <img src="/img/skinova cover.png" alt="Skinova Cover" class="hero-image">
+        </main>
+        <div class="order-container">
+            <% if (orders.length> 0) { %>
+                <% orders.forEach(order=> { %>
+                    <div class="order">
+                        <div class="order-header">
+                            Order ID: <%= order.orderId %> | Created On: <%= new Date(order.createdOn).toLocaleDateString() %>
+                        </div>
+                    
+                        <% order.orderedItems.forEach(item => { %>
+                            <% if (item.product) { %> <!-- Ensure product exists -->
+                                <div class="product">
+                                    <a href="/productDetails?id=<%= item.product._id %>"><img src="<%= item.product.productImage && item.product.productImage.length ? item.product.productImage[0] : '/img/default.jpg' %>" alt="Product Image"></a>
+                                    
+                                    <span class="status <%= item.status ? item.status.toLowerCase() : '' %>">
+                                        <%= item.status || 'Unknown' %>
+                                    </span>
+                    
+                                    <button class="btn btn-primary"
+                                        onclick="showInfo('<%= item.itemId %>', '<%= item.product.productName %>')">Show Info</button>
+                    
+                                    
+                    
+                                    <a class="cancel-button" onclick="cancelOrder('<%= item.itemId %>')">Cancel</a>
+                                </div>
+                            <% } else { %> 
+                                <div class="product">
+                                    <span class="text-danger">Product has been removed from the store.</span>
+                                </div>
+                            <% } %>
+                            
+                            <div class="item-info" id="info-<%= item.itemId %>"></div>
+                        <% }); %>
+                    </div>
+                    
+                    <% }); %>
+                        <% } else { %>
+                            <p>No orders found.</p>
+                            <% } %>
+
+        </div>
+        <%- include('../partials/user/footer') %>
+
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script>
+                function cancelOrder(itemId) {
+                    Swal.fire({
+                        title: "Cancel Order",
+                        input: "text",
+                        inputLabel: "Reason for cancellation",
+                        inputPlaceholder: "Enter your reason here...",
+                        showCancelButton: true,
+                        confirmButtonText: "Submit",
+                        cancelButtonText: "Close",
+                        inputValidator: (value) => {
+                            if (!value) {
+                                return "Please enter a reason!";
+                            }
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            fetch(`/cancel-order/${itemId}`, {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify({ reason: result.value })
+                            }).then(response => {
+                                if (response.ok) {
+                                    Swal.fire("Cancelled!", "Your order has been cancelled.", "success")
+                                        .then(() => window.location.reload());
+                                } else {
+                                    Swal.fire("Error", "Something went wrong!", "error");
+                                }
+                            }).catch(error => {
+                                console.error("Error:", error);
+                                Swal.fire("Error", "Failed to cancel the order.", "error");
+                            });
+                        }
+                    });
+                }
+                function showInfo(itemId, productName) {
+                    const infoDiv = document.getElementById(`info-${itemId}`);
+                    if (infoDiv.style.display === "none" || infoDiv.style.display === "") {
+                        infoDiv.style.display = "block";
+                        infoDiv.innerHTML = `Item ID: ${itemId} <br> Product Name: ${productName}`;
+                    } else {
+                        infoDiv.style.display = "none";
+                    }
+                }
+            </script>
+
+</body>
+
+</html>

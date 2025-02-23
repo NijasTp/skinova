@@ -1,0 +1,187 @@
+<html>
+<head>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+           .hero {
+  display: flex;
+  justify-content: space-between;
+  background-color: #e6f4f4;
+  align-items: center;
+  padding: 4rem 2rem;
+  width: 100%;
+  margin: 0 auto;
+  min-height: 50vh;
+}
+
+.hero-content {
+  max-width: 500px;
+  margin-left: 40%;
+}
+
+.hero-title {
+  font-size: 2rem;
+  line-height: 1.2;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+
+.hero-description {
+  color: #5d6d7e;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.cta-button {
+  display: inline-block;
+  padding: 0.8rem 2rem;
+  background-color: #1a4741;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.cta-button:hover {
+  background-color: #123530;
+}
+
+.hero-image {
+  width: 300px;
+  position: relative;
+  right: 100px;
+
+}
+@media (max-width: 768px) {
+  .hero {
+      flex-direction: column;
+      text-align: center;
+      padding: 2rem;
+  }
+  .hero-image {
+  width: 300px;
+  position: relative;
+  left: 30px;
+
+}
+
+}
+    </style>
+</head>
+<body class="bg-gray-100">
+    <%- include('../partials/user/header') %> 
+    <main class="hero w-full">
+        <div class="hero-content">
+            <b><h1 class="hero-title">SHOP</h1></b>
+            <p class="hero-description">
+                <a href="/">Home</a> <span> > </span> <a href="/shop">Shop</a>
+            </p>
+        </div>
+        <img src="/img/skinova cover.png" alt="Skinova Cover" class="hero-image">
+    </main>
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <div class="w-1/4 bg-gray-200 p-8">
+            <h2 class="text-xl font-bold mb-8">SETTINGS</h2>
+            <ul>
+                <li class="mb-4"><a href="/orders" class="text-black">Orders</a></li>
+                <li class="mb-4"><a href="/profile" class="text-black font-bold">Personal Info</a></li>
+                <li class="mb-4"><a href="/address" class="text-black">Addresses</a></li>
+                <li class="mb-4"><a href="/wallet" class="text-black">Wallet</a></li>
+            </ul>
+        </div>
+        <!-- Main Content -->
+        <div class="w-3/4 p-8">
+            <h2 class="text-2xl font-bold mb-8">ADD ADDRESS</h2>
+            <form id="addressForm" action="/add-address" method="post">
+                <div class="mb-6">
+                    <label for="name" class="block text-gray-700">Name</label>
+                    <input type="text" id="name" name="name" class="w-full border border-gray-300 p-2 mt-2">
+                    <p id="nameError" class="text-red-500 text-sm hidden">Enter a valid name</p>
+                </div>
+                <div class="mb-6">
+                    <label for="country" class="block text-gray-700">Country</label>
+                    <input type="text" name="country" id="country" class="w-full border border-gray-300 p-2 mt-2">
+                    <p id="countryError" class="text-red-500 text-sm hidden">Enter a valid country</p>
+                </div>
+                <div class="mb-6">
+                    <label for="state" class="block text-gray-700">State</label>
+                    <input type="text" name="state" id="state" class="w-full border border-gray-300 p-2 mt-2">
+                    <p id="stateError" class="text-red-500 text-sm hidden">Enter a valid state</p>
+                </div>
+                <div class="mb-6">
+                    <label for="streetAddress" class="block text-gray-700">Street Address</label>
+                    <input type="text" name="streetAddress" id="streetAddress" class="w-full border border-gray-300 p-2 mt-2">
+                    <p id="streetError" class="text-red-500 text-sm hidden">Enter a valid street address</p>
+                </div>
+                <div class="flex mb-6">
+                    <div class="w-1/2 pr-2">
+                        <label for="city" class="block text-gray-700">Town / City</label>
+                        <input type="text" name="city" id="city" class="w-full border border-gray-300 p-2 mt-2">
+                        <p id="cityError" class="text-red-500 text-sm hidden">Enter a valid city</p>
+                    </div>
+                    <div class="w-1/2 pl-2">
+                        <label for="postcode" class="block text-gray-700">Postcode / ZIP *</label>
+                        <input type="text" name="pincode" id="postcode" class="w-full border border-gray-300 p-2 mt-2">
+                        <p id="pincodeError" class="text-red-500 text-sm hidden">Enter a valid 6-digit pincode</p>
+                    </div>
+                </div>
+                <div class="flex mb-6">
+                    <div class="w-1/2 pr-2">
+                        <label for="phone" class="block text-gray-700">Phone</label>
+                        <input type="text" name="phone" id="phone" class="w-full border border-gray-300 p-2 mt-2">
+                        <p id="phoneError" class="text-red-500 text-sm hidden">Enter a valid 10-digit phone number</p>
+                    </div>
+                    <div class="w-1/2 pl-2">
+                        <label for="alt-phone" class="block text-gray-700">Alternative Phone</label>
+                        <input type="text" name="altPhone" id="altPhone" class="w-full border border-gray-300 p-2 mt-2">
+                        <p id="altPhoneError" class="text-red-500 text-sm hidden">Enter a valid 10-digit alternative phone number</p>
+                    </div>
+                </div>
+                <div class="flex justify-center">
+                    <button type="submit" class="bg-teal-400 text-white py-2 px-6 rounded-full">Add Address</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("addressForm").addEventListener("submit", function(event) {
+            let isValid = true;
+
+            function showError(id, condition) {
+                document.getElementById(id).classList.toggle("hidden", !condition);
+                if (condition) isValid = false;
+            }
+
+            const name = document.getElementById("name").value.trim();
+            showError("nameError", !/^[A-Za-z\s]+$/.test(name));
+
+            const country = document.getElementById("country").value.trim();
+            showError("countryError", !/^[A-Za-z\s]+$/.test(country));
+
+            const state = document.getElementById("state").value.trim();
+            showError("stateError", !/^[A-Za-z\s]+$/.test(state));
+
+            const city = document.getElementById("city").value.trim();
+            showError("cityError", !/^[A-Za-z\s]+$/.test(city));
+
+            const street = document.getElementById("streetAddress").value.trim();
+            showError("streetError", street === "");
+
+            const pincode = document.getElementById("postcode").value.trim();
+            showError("pincodeError", !/^\d{6}$/.test(pincode));
+
+            const phone = document.getElementById("phone").value.trim();
+            showError("phoneError", !/^\d{10}$/.test(phone));
+
+            const altPhone = document.getElementById("altPhone").value.trim();
+            if (altPhone !== "") {
+                showError("altPhoneError", !/^\d{10}$/.test(altPhone));
+            }
+
+            if (!isValid) event.preventDefault();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,399 @@
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Account Page</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
+
+    <style>
+        body {
+            font-family: 'Onest', sans-serif;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 0.875rem;
+        }
+
+        .hero {
+            display: flex;
+            justify-content: space-between;
+            background-color: #e6f4f4;
+            align-items: center;
+            padding: 4rem 2rem;
+            width: 100%;
+            margin: 0 auto;
+            min-height: 50vh;
+        }
+
+        .hero-content {
+            max-width: 500px;
+            margin-left: 40%;
+        }
+
+        .hero-title {
+            font-size: 2rem;
+            line-height: 1.2;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .hero-description {
+            color: #5d6d7e;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 0.8rem 2rem;
+            background-color: #1a4741;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .cta-button:hover {
+            background-color: #123530;
+        }
+
+        .hero-image {
+            width: 300px;
+            position: relative;
+            right: 100px;
+            cursor: pointer;
+            /* Change cursor to pointer */
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                flex-direction: column;
+                text-align: center;
+                padding: 2rem;
+            }
+
+            .hero-image {
+                width: 300px;
+                position: relative;
+                left: 30px;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100">
+    <%- include('../partials/user/header') %>
+        <main class="hero w-full">
+            <div class="hero-content">
+                <b>
+                    <h1 class="hero-title">EDIT PROFILE</h1>
+                </b>
+                <p class="hero-description">
+                    <a href="/">Home</a>
+                    <span>&gt;</span>
+                    <a href="/edit-profile">Edit</a>
+                </p>
+            </div>
+            <img alt="Skinova Cover" class="hero-image" height="300" src="/img/skinova cover.png" width="300" />
+        </main>
+        <div class="flex flex-col lg:flex-row">
+            <div class="w-full lg:w-1/4 bg-gray-200 p-8">
+                <h2 class="text-xl font-bold mb-4">SETTINGS</h2>
+                <ul>
+                    <li class="mb-2"><a class="text-black" href="/orders">Orders</a></li>
+                    <li class="mb-2"><a class="text-black" href="/profile">Personal Info</a></li>
+                    <li class="mb-2"><a class="text-black" href="/address">Addresses</a></li>
+                    <li class="mb-2"><a class="text-black" href="/wallet">Wallet</a></li>
+                </ul>
+            </div>
+            <div class="w-full lg:w-3/4 p-8">
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold mb-4">BASIC INFO</h2>
+                    <form action="/updateprofile" enctype="multipart/form-data" id="updateForm" method="post"
+                        novalidate="">
+                        <div class="mb-4">
+                            <label class="block mb-2">Profile Picture</label>
+                            <input accept="image/*" class="hidden" name="profilePicture" type="file"
+                                id="profilePictureInput" />
+                            <input type="hidden" name="croppedImage" id="croppedImageInput" />
+                            <img id="imagePreview" class="mt-2 cursor-pointer" width="300" alt="Add Image"
+                                src="/<%= user && user.image ? user.image : 'https://cdn.vectorstock.com/i/500p/95/56/user-profile-icon-avatar-or-person-vector-45089556.jpg' %>"
+                                onclick="document.getElementById('profilePictureInput').click();" />
+                        </div>
+
+                        <div id="cropperModal"
+                            class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center">
+                            <div class="bg-white p-4 rounded shadow-lg w-96">
+                                <h2 class="text-lg font-bold mb-4">Crop Your Image</h2>
+                                <div class="w-full h-64">
+                                    <img id="cropperImage" class="max-w-full max-h-64" />
+                                </div>
+                                <div class="flex justify-end mt-4">
+                                    <button id="cancelCrop"
+                                        class="bg-gray-500 text-white px-4 py-2 rounded mr-2">Cancel</button>
+                                    <button id="cropAndUpload" class="bg-blue-500 text-white px-4 py-2 rounded">Crop &
+                                        Use</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block mb-2">First Name</label>
+                                <input class="border border-gray-400 w-full p-2" name="firstName" required=""
+                                    type="text" value="<%= user.firstName %>" />
+                                <p class="error-message" id="firstNameError"></p>
+                            </div>
+                            <div>
+                                <label class="block mb-2">Last Name</label>
+                                <input class="border border-gray-400 w-full p-2" name="lastName" required="" type="text"
+                                    value="<%= user.lastName %>" />
+                                <p class="error-message" id="lastNameError"></p>
+                            </div>
+                            <div>
+                                <label class="block mb-2">Phone</label>
+                                <input class="border border-gray-400 w-full p-2" name="phone" required="" type="text"
+                                    value="<%= user.phone %>" />
+                                <p class="error-message" id="phoneError"></p>
+                            </div>
+                        </div>
+                        <h2 class="text-2xl font-bold mb-4 mt-6">LOGIN DETAILS</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block mb-2">Username</label>
+                                <input class="border border-gray-400 w-full p-2" name="username" required="" type="text"
+                                    value="<%= user.name %>" />
+                                <p class="error-message" id="usernameError"></p>
+                            </div>
+                            <div>
+                                <label class="block mb-2">Change Password?</label>
+                                <a class="bg-teal-200 text-black py-2 px-4 rounded shadow-md hover:bg-teal-300"
+                                    href="/change-password">Click here</a>
+                            </div>
+                        </div>
+                        <div class="mt-8">
+                            <button class="bg-teal-200 text-black py-2 px-4 rounded shadow-md hover:bg-teal-300"
+                                type="submit">Submit</button>
+                        </div>
+                    </form>
+                    <h2 class="text-2xl font-bold mb-4 mt-6">CHANGE EMAIL</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block mb-2">New Email</label>
+                            <input id="newEmail" class="border border-gray-400 w-full p-2" name="newEmail" type="email" required />
+                            <p class="error-message" id="emailError"></p>
+                        </div>
+                        <div>
+                            <label class="block mb-2">Send OTP</label>
+                            <button id="sendOtpBtn" class="bg-teal-200 text-black py-2 px-4 rounded shadow-md hover:bg-teal-300">
+                                Click Here
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- OTP Verification Modal -->
+                    <div id="otpModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center">
+                        <div class="bg-white p-4 rounded shadow-lg w-96">
+                            <h2 class="text-lg font-bold mb-4">Verify OTP</h2>
+                            <input id="otpInput" class="border border-gray-400 w-full p-2 mb-4" type="text" placeholder="Enter OTP" />
+                            <p class="error-message" id="otpError"></p>
+                            <div class="flex justify-end mt-4">
+                                <button id="cancelOtp" class="bg-gray-500 text-white px-4 py-2 rounded mr-2">Cancel</button>
+                                <button id="verifyOtpBtn" class="bg-blue-500 text-white px-4 py-2 rounded">Verify OTP</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Sweet Alert and cropper js-->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
+        <script>
+            function validateForm() {
+                let isValid = true;
+                const firstName = document.querySelector("input[name='firstName']");
+                const lastName = document.querySelector("input[name='lastName']");
+                const phone = document.querySelector("input[name='phone']");
+                const username = document.querySelector("input[name='username']");
+
+                if (!/^[a-zA-Z]+$/.test(firstName.value.trim())) {
+                    document.getElementById("firstNameError").textContent = "First name must contain only letters.";
+                    isValid = false;
+                } else {
+                    document.getElementById("firstNameError").textContent = "";
+                }
+
+                if (!/^[a-zA-Z]+$/.test(lastName.value.trim())) {
+                    document.getElementById("lastNameError").textContent = "Last name must contain only letters.";
+                    isValid = false;
+                } else {
+                    document.getElementById("lastNameError").textContent = "";
+                }
+
+                if (!/^\d{10}$/.test(phone.value.trim())) {
+                    document.getElementById("phoneError").textContent = "Phone number must be exactly 10 digits.";
+                    isValid = false;
+                } else {
+                    document.getElementById("phoneError").textContent = "";
+                }
+
+                if (!/^[a-zA-Z0-9_]{3,15}$/.test(username.value.trim())) {
+                    document.getElementById("usernameError").textContent = "Username must be 3-15 characters long and can only contain letters, numbers, and underscores.";
+                    isValid = false;
+                } else {
+                    document.getElementById("usernameError").textContent = "";
+                }
+
+                return isValid;
+            }
+
+            let cropper;
+            const profilePictureInput = document.getElementById('profilePictureInput');
+            const imagePreview = document.getElementById('imagePreview');
+            const cropperModal = document.getElementById('cropperModal');
+            const cropperImage = document.getElementById('cropperImage');
+            const croppedImageInput = document.getElementById('croppedImageInput');
+            const cropAndUploadButton = document.getElementById('cropAndUpload');
+            const cancelCropButton = document.getElementById('cancelCrop');
+
+            profilePictureInput.addEventListener('change', function (event) {
+                const file = event.target.files[0];
+
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        cropperImage.src = e.target.result; // Set image for cropper
+                        cropperModal.classList.remove('hidden'); // Show modal
+
+                        // Destroy previous cropper instance if exists
+                        if (cropper) {
+                            cropper.destroy();
+                        }
+
+                        // Initialize Cropper.js
+                        cropper = new Cropper(cropperImage, {
+                            aspectRatio: 1,
+                            viewMode: 2,
+                            autoCropArea: 1
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+           
+            cropAndUploadButton.addEventListener('click', function () {
+                if (cropper) {
+                    const canvas = cropper.getCroppedCanvas({
+                        width: 300,
+                        height: 300
+                    });
+
+                  
+                    const croppedImageData = canvas.toDataURL("image/png");
+                    imagePreview.src = croppedImageData;
+                    croppedImageInput.value = croppedImageData; 
+
+                    cropperModal.classList.add('hidden'); 
+                }
+            });
+
+           
+            cancelCropButton.addEventListener('click', function () {
+                cropperModal.classList.add('hidden');
+            });
+
+            
+            document.getElementById("updateForm").addEventListener("submit", async function (event) {
+                event.preventDefault();
+                if (!validateForm()) return;
+
+                const formData = new FormData(this);
+
+                try {
+                    const response = await fetch("/updateprofile", { method: "POST", body: formData });
+                    const result = await response.json();
+
+                    if (result.success) {
+                        Swal.fire({ icon: "success", title: "Success!", text: result.message, timer: 2000, showConfirmButton: false })
+                            .then(() => window.location.reload());
+                    } else {
+                        Swal.fire({ icon: "error", title: "Error!", text: result.message });
+                    }
+                } catch (error) {
+                    Swal.fire({ icon: "error", title: "Error!", text: "Something went wrong. Please try again." });
+                }
+            });
+            document.getElementById("sendOtpBtn").addEventListener("click", async function () {
+        const newEmail = document.getElementById("newEmail").value.trim();
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) {
+            document.getElementById("emailError").textContent = "Enter a valid email address.";
+            return;
+        }
+        document.getElementById("emailError").textContent = "";
+
+        try {
+            const response = await fetch("/generate-email-otp", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: newEmail }),
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                document.getElementById("otpModal").classList.remove("hidden");
+            } else {
+                Swal.fire({ icon: "error", title: "Error!", text: result.message });
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            Swal.fire({ icon: "error", title: "Error!", text: "Something went wrong." });
+        }
+    });
+
+    document.getElementById("verifyOtpBtn").addEventListener("click", async function () {
+        const otp = document.getElementById("otpInput").value.trim();
+        if (!/^\d{6}$/.test(otp)) {
+            document.getElementById("otpError").textContent = "Enter a valid 6-digit OTP.";
+            return;
+        }
+        document.getElementById("otpError").textContent = "";
+
+        try {
+            const response = await fetch("/verify-email-otp", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ otp }),
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                Swal.fire({ icon: "success", title: "Success!", text: "Email updated successfully!", timer: 2000, showConfirmButton: false })
+                    .then(() => window.location.reload());
+            } else {
+                Swal.fire({ icon: "error", title: "Error!", text: result.message });
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            Swal.fire({ icon: "error", title: "Error!", text: "Something went wrong." });
+        }
+    });
+
+    document.getElementById("cancelOtp").addEventListener("click", function () {
+        document.getElementById("otpModal").classList.add("hidden");
+    });
+        </script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,205 @@
+<html>
+<head>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+           .hero {
+  display: flex;
+  justify-content: space-between;
+  background-color: #e6f4f4;
+  align-items: center;
+  padding: 4rem 2rem;
+  width: 100%;
+  margin: 0 auto;
+  min-height: 50vh;
+}
+
+.hero-content {
+  max-width: 500px;
+  margin-left: 40%;
+}
+
+.hero-title {
+  font-size: 2rem;
+  line-height: 1.2;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+
+.hero-description {
+  color: #5d6d7e;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.cta-button {
+  display: inline-block;
+  padding: 0.8rem 2rem;
+  background-color: #1a4741;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.cta-button:hover {
+  background-color: #123530;
+}
+
+.hero-image {
+  width: 300px;
+  position: relative;
+  right: 100px;
+
+}
+@media (max-width: 768px) {
+  .hero {
+      flex-direction: column;
+      text-align: center;
+      padding: 2rem;
+  }
+  .hero-image {
+  width: 300px;
+  position: relative;
+  left: 30px;
+
+}
+
+}
+    </style>
+</head>
+<body class="bg-gray-100">
+    <%- include('../partials/user/header') %> 
+    <main class="hero w-full">
+      <div class="hero-content">
+         <b><h1 class="hero-title">EDIT ADDRESS </h1></b>
+          <p class="hero-description">
+             <a href="/">Home</a> <span> > </span> <a href="/address">Address</a>
+          </p>
+      </div>
+      <img src="/img/skinova cover.png" alt="Skinova Cover" class="hero-image">
+  </main>
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <div class="w-1/4 bg-gray-200 p-8">
+            <h2 class="text-xl font-bold mb-8">SETTINGS</h2>
+            <ul>
+                <li class="mb-4"><a href="#" class="text-black">Orders</a></li>
+                <li class="mb-4"><a href="#" class="text-black font-bold">Personal Info</a></li>
+                <li class="mb-4"><a href="#" class="text-black">Adresses</a></li>
+                <li class="mb-4"><a href="#" class="text-black">Wallet</a></li>
+            </ul>
+        </div>
+    
+        <div class="w-3/4 p-8">
+            <h2 class="text-2xl font-bold mb-8">EDIT ADDRESS</h2>
+            <form action="/editAddress?id=<%= address._id.toLocaleString() %>" method="post" onsubmit="return validateForm()">
+           
+                <div class="mb-6">
+                    <label for="name" class="block text-gray-700">Name</label>
+                    <input type="text" value="<%=address.name%>" id="name" name="name" class="w-full border border-gray-300 p-2 mt-2" required minlength="2">
+                    <p id="nameError" class="text-red-500 text-sm hidden">Name must be at least 2 characters.</p>
+                </div>
+            
+                
+                <div class="mb-6">
+                    <label for="country" class="block text-gray-700">Country</label>
+                    <input type="text" value="<%=address.country%>" name="country" id="country" class="w-full border border-gray-300 p-2 mt-2" required>
+                </div>
+            
+           
+                <div class="mb-6">
+                    <label for="state" class="block text-gray-700">State</label>
+                    <input type="text" value="<%=address.state%>" name="state" id="state" class="w-full border border-gray-300 p-2 mt-2" required>
+                </div>
+            
+                <div class="mb-6">
+                    <label for="streetAddress" class="block text-gray-700">Street Address</label>
+                    <input type="text" value="<%=address.streetAddress%>" name="streetAddress" id="streetAddress" class="w-full border border-gray-300 p-2 mt-2" placeholder="House number and street name" required>
+                </div>
+            
+                
+                <div class="flex mb-6">
+                    <div class="w-1/2 pr-2">
+                        <label for="city" class="block text-gray-700">Town / City</label>
+                        <input type="text" value="<%=address.city%>" name="city" id="city" class="w-full border border-gray-300 p-2 mt-2" required>
+                    </div>
+                    <div class="w-1/2 pl-2">
+                        <label for="postcode" class="block text-gray-700">Postcode / ZIP *</label>
+                        <input type="text" value="<%=address.pincode%>" name="pincode" id="postcode" class="w-full border border-gray-300 p-2 mt-2" required pattern="^\d{5,6}$">
+                        <p id="postcodeError" class="text-red-500 text-sm hidden">Enter a valid 5 or 6 digit postcode.</p>
+                    </div>
+                </div>
+            
+              
+                <div class="flex mb-6">
+                    <div class="w-1/2 pr-2">
+                        <label for="phone" class="block text-gray-700">Phone</label>
+                        <input type="text" value="<%=address.phone%>" name="phone" id="phone" class="w-full border border-gray-300 p-2 mt-2" required pattern="^\d{10}$">
+                        <p id="phoneError" class="text-red-500 text-sm hidden">Enter a valid 10-digit phone number.</p>
+                    </div>
+                    <div class="w-1/2 pl-2">
+                        <label for="alt-phone" class="block text-gray-700">Alternative Phone</label>
+                        <input type="text" value="<%=address.altPhone%>" name="altPhone" id="alt-phone" class="w-full border border-gray-300 p-2 mt-2" pattern="^\d{10}$">
+                        <p id="altPhoneError" class="text-red-500 text-sm hidden">Enter a valid 10-digit phone number.</p>
+                    </div>
+                </div>
+            
+
+                <div class="flex justify-center">
+                    <button type="submit" class="bg-teal-400 text-white py-2 px-6 rounded-full">Save Address</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        function validateForm() {
+            let isValid = true;
+        
+            // Name Validation
+            const name = document.getElementById("name");
+            const nameError = document.getElementById("nameError");
+            if (name.value.trim().length < 2) {
+                nameError.classList.remove("hidden");
+                isValid = false;
+            } else {
+                nameError.classList.add("hidden");
+            }
+        
+            // Postcode Validation
+            const postcode = document.getElementById("postcode");
+            const postcodeError = document.getElementById("postcodeError");
+            const postcodePattern = /^\d{5,6}$/;
+            if (!postcodePattern.test(postcode.value)) {
+                postcodeError.classList.remove("hidden");
+                isValid = false;
+            } else {
+                postcodeError.classList.add("hidden");
+            }
+        
+            // Phone Validation
+            const phone = document.getElementById("phone");
+            const phoneError = document.getElementById("phoneError");
+            const phonePattern = /^\d{10}$/;
+            if (!phonePattern.test(phone.value)) {
+                phoneError.classList.remove("hidden");
+                isValid = false;
+            } else {
+                phoneError.classList.add("hidden");
+            }
+        
+            // Alternative Phone Validation
+            const altPhone = document.getElementById("alt-phone");
+            const altPhoneError = document.getElementById("altPhoneError");
+            if (altPhone.value.trim() !== "" && !phonePattern.test(altPhone.value)) {
+                altPhoneError.classList.remove("hidden");
+                isValid = false;
+            } else {
+                altPhoneError.classList.add("hidden");
+            }
+        
+            return isValid;
+        }
+        </script>
+</body>
+</html>

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        body{
+    font-family: 'Poppins', sans-serif;
+}
+.skinova-logo{
+    position: absolute;
+    width: 150px;
+    left: 4%;
+}
+.login-container {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.login-form-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+.err-msg{
+    color: red;
+    font-size: 0.9rem;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+}
+.login-content {
+    width: 100%;
+    max-width: 400px;
+}
+
+.login-content h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    margin-bottom: 0.5rem;
+    color: #1a1a1a;
+}
+
+
+
+.subtitle {
+    color: #666;
+    margin-bottom: 2rem;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.form-group input {
+    width: 90%;
+    padding: 0.75rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #1a4741;
+    box-shadow: 0 0 0 2px rgba(26, 71, 65, 0.1);
+}
+
+.password-group {
+    position: relative;
+}
+
+.forgot-link {
+    position: absolute;
+    right: 20px;
+    top: -24px;
+    font-size: 0.8rem;
+    color: #64CCC5;
+    text-decoration: none;
+}
+
+.remember-me {
+    margin-bottom: 1.5rem;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.checkbox-container input {
+    width: 16px;
+    height: 16px;
+}
+
+.login-button {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #04364A;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.login-button:hover {
+    background-color: #032633;
+}
+
+.divider {
+    text-align: center;
+    margin: 1.5rem 0;
+    position: relative;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: calc(50% - 1rem);
+    height: 1px;
+    background-color: #e0e0e0;
+}
+
+.divider::before {
+    left: 0;
+}
+
+.divider::after {
+    right: 0;
+}
+
+.divider span {
+    background-color: white;
+    padding: 0 0.5rem;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.google-button {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.google-button:hover {
+    background-color: #f5f5f5;
+}
+
+.google-icon {
+    width: 40px;
+}
+.google-text{
+    color: #1a1a1a;
+    font-size: 0.9rem;
+    font-weight: 600;
+   font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+.signup-prompt {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.signup-link {
+    color: #1a4741;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.signup-link:hover {
+    text-decoration: underline;
+}
+
+.brand-section {
+    background-color: #dbefed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-right: 100px;
+}
+
+.logo-container {
+    max-width: 300px;
+}
+
+.brand-logo {
+    width: 150%;
+}
+.google-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            font-size: 16px;
+            gap: 8px;
+            color: black;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+@media (max-width: 768px) {
+    .login-container {
+        grid-template-columns: 1fr;
+    }
+
+    .forgot-link {
+        right: 40px;
+    }
+    .brand-section {
+        display: none;
+    }
+
+    .login-content {
+        max-width: 100%;
+    }
+}
+    </style>
+</head>
+
+<body>
+
+    <img class="skinova-logo" src="/img/skinova text.png" alt="">
+    <div class="login-container">
+        <div class="login-form-section">
+            <div class="login-content">
+                <h1 class="welcome-text">Welcome back!</h1>
+                <p class="subtitle">Enter your Credentials to access your account</p>
+                <% if(locals.message && message.length > 0){ %>
+                    <div class="err-msg">
+                        <%= message %>
+                    </div>
+                <% } %>
+                  
+                <form action="/login" method="POST" class="login-form">
+                    <div class="form-group">
+                        <label for="email">Email address</label>
+                        <input type="email" id="email" name="email" placeholder="Enter your email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="password-group">
+                            <input type="password" id="password" name="password" placeholder="Enter your password"
+                                required>
+                            <a href="/forgot-password" class="forgot-link">forgot password</a>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="login-button">Login</button>
+
+                    <div class="divider">
+                        <span>or</span>
+                    </div>
+                    <a href="/auth/google" class="google-button">
+                        <svg width="24" height="24" viewBox="0 0 24 24">
+                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                        </svg>
+                        Sign up with Google
+                    </a>
+                    
+                    <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline"
+                        data-text="sign_in_with" data-size="large" data-logo_alignment="left">
+                    </div>
+
+                    <p class="signup-prompt">
+                        Don't have an account?
+                        <a href="/signup" class="signup-link">Sign Up</a>
+                    </p>
+                </form>
+            </div>
+        </div>
+
+        <div class="brand-section">
+            <div class="logo-container">
+                <img src="/img/skinova-full.png" alt="Skinova Logo" class="brand-logo">
+            </div>
+        </div>
+    </div>
+                        <script src="https://accounts.google.com/gsi/client" async defer></script>
+                    <script>
+                        window.onload = function () {
+                            google.accounts.id.initialize({
+                                client_id: '147865379959-95uep5flk15e1f6eputi0lu4p4sjdqts.apps.googleusercontent.com',
+                                callback: handleCredentialResponse
+                            });
+                            google.accounts.id.renderButton(
+                                document.getElementById("g_id_signin"),
+                                { theme: "outline", size: "large" }  // Adjust button style here
+                            );
+                        };
+
+                        function handleCredentialResponse(response) {
+                            const token = response.credential;
+
+                            // Send the token to your backend
+                            fetch('/auth/google', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ credential: token }),
+                            })
+                                .then((res) => {
+                                    if (true) {
+                                        // Redirect to home page
+                                        window.location.href = '/';  // You can also redirect here, if needed
+                                    } else {
+                                        console.error('Google login failed');
+                                    }
+                                })
+                                .catch((error) => {
+                                    console.error('Error during Google login:', error);
+                                });
+                        }
+                    </script>
+</body>
+
+</html>

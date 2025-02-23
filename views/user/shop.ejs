@@ -1,0 +1,359 @@
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Shopping</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet"/>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+        .header {
+            background-image: url('https://placehold.co/1920x300');
+            background-size: cover;
+            background-position: center;
+            height: 300px;
+            position: relative;
+        }
+        .header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 4rem;
+            color: #1a202c;
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .image-container {
+            position: relative;
+            width: 100%;
+            padding-top: 100%; /* 1:1 Aspect Ratio */
+            overflow: hidden;
+            border-radius: 0.5rem;
+        }
+        .image-container img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .hero {
+            display: flex;
+            justify-content: space-between;
+            background-color: #e6f4f4;
+            align-items: center;
+            padding: 4rem 2rem;
+            width: 100%;
+            margin: 0 auto;
+            min-height: 50vh;
+        }
+        .hero-content {
+            max-width: 500px;
+            margin-left: 40%;
+        }
+        .hero-title {
+            font-size: 2rem;
+            line-height: 1.2;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+        .hero-description {
+            color: #5d6d7e;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        .cta-button {
+            display: inline-block;
+            padding: 0.8rem 2rem;
+            background-color: #1a4741;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+        .cta-button:hover {
+            background-color: #123530;
+        }
+        .hero-image {
+            width: 300px;
+            position: relative;
+            right: 100px;
+        }
+        @media (max-width: 768px) {
+            .hero {
+                flex-direction: column;
+                text-align: center;
+                padding: 2rem;
+            }
+            .hero-image {
+                width: 300px;
+                position: relative;
+                left: 30px;
+            }
+        }
+        /* Style for sorting dropdown */
+        .form-control {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ccc;
+            border-radius: 0.375rem;
+            background-color: white;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: #1a4741;
+            box-shadow: 0 0 5px rgba(26, 71, 65, 0.5);
+        }
+        /* Style for Apply button */
+        .btn-primary {
+            background-color: #1a4741;
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 0.375rem;
+            transition: background-color 0.3s ease;
+            font-weight: bold;
+        }
+        .btn-primary:hover {
+            background-color: #123530;
+        }
+        /* Style for Clear All button */
+        .btn-danger {
+            background-color: #d9534f;
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 0.375rem;
+            transition: background-color 0.3s ease;
+            font-weight: bold;
+        }
+        .btn-danger:hover {
+            background-color: #c9302c;
+        }
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .form-inline {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+        .flutter-button {
+    display: inline-block;
+    padding: 12px 24px; /* Adjust padding for button size */
+    background-color: #1a4741; /* Button background color */
+    color: white; /* Text color */
+    text-align: center; /* Center the text */
+    border-radius: 8px; /* Rounded corners */
+    text-decoration: none; /* Remove underline */
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transition */
+    font-weight: bold; /* Bold text */
+}
+
+.flutter-button:hover {
+    background-color: #123530; /* Darker background on hover */
+    transform: translateY(-2px); /* Slight lift effect on hover */
+}
+
+.flutter-button:active {
+    transform: translateY(0); /* Reset lift effect on click */
+}
+    </style>
+</head>
+<body class="bg-gray-100">
+    <%- include('../partials/user/header') %> 
+    <main class="hero w-full">
+        <div class="hero-content">
+            <b><h1 class="hero-title">SHOP</h1></b>
+            <p class="hero-description">
+                <a href="/">Home</a> <span> > </span> <a href="/shop">Shop</a>
+            </p>
+        </div>
+        <img src="/img/skinova cover.png" alt="Skinova Cover" class="hero-image">
+    </main>
+    <div class="container mx-auto px-4 py-8">
+        <div class="flex flex-wrap -mx-4">
+            <div class="w-full md:w-1/4 px-4">
+                <div class="bg-white p-4 rounded-lg shadow-md">
+                    <h2 class="text-xl font-semibold mb-4">CATEGORIES</h2>
+                    <ul class="mb-8">
+                        <% for (let i = 0; i < category.length; i++) { %>
+                            <li class="mb-2">
+                                <a class="text-gray-700" href="/filter?category=<%= category[i]._id %>">
+                                    <%= category[i].name %>
+                                </a>
+                            </li>
+                        <% } %>
+                    </ul>
+                    <h2 class="text-xl font-semibold mb-4">PRICE RANGE</h2>
+                    <div class="mb-4">
+                        <label class="block text-gray-700" for="price-from">Price From:</label>
+                        <input class="w-full p-2 border rounded" id="price-from" type="number" value="1"/>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700" for="price-to">Price To:</label>
+                        <input class="w-full p-2 border rounded" id="price-to" type="number" value="2000"/>
+                    </div>
+                </div>
+            </div>
+            <div class="w-full md:w-3/4 px-4">
+                <div class="flex justify-end mb-4">
+                    <form action="/shop" method="GET" class="form-inline">
+                        <div class="form-group mr-2">
+                            <input type="text" id="advanced-search-glow" name="search" class="form-control" placeholder="Search products...">
+                        </div>
+                        <div class="form-group mr-2">
+                            <select name="sort" class="form-control">
+                                <option value="">Sort by...</option>
+                                <option value="popularity">Popularity</option>
+                                <option value="price_asc">Price: Low to High</option>
+                                <option value="price_desc">Price: High to Low</option>
+                                <option value="rating">Average Ratings</option>
+                                <option value="featured">Featured</option>
+                                <option value="new">New Arrivals</option>
+                                <option value="name_asc">Name: A to Z</option>
+                                <option value="name_desc">Name: Z to A</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Apply</button>
+                        <a href="/shop"><button type="button" class="btn btn-danger">Clear All</button></a>
+                    </form>
+                </div>
+                <div class="flex flex-wrap -mx-4">
+                    <% for (let i = 0; i < products.length; i++) { %>
+                        <div class="w-full md:w-1/3 px-4 mb-8">
+                            <div class="bg-white p-4 rounded-lg shadow-md">
+                                <a href="/productDetails?id=<%= products[i]._id %>">
+                                    <div class="image-container">
+                                        <img alt="<%= products[i].productName %>" src="<%= products[i].productImage[0] %>"/>
+                                    </div>
+                                    <h3 class="text-lg font-semibold mb-2">
+                                        <%= products[i].productName %>
+                                    </h3>
+                                </a>
+                                <p class="text-gray-700 mb-2">₹<%= products[i].salePrice.toLocaleString('en-IN') %></p>
+                                <div class="flex justify-between items-center">
+                                    <a onclick="addToCart('<%= products[i]._id %>')" class="flutter-button">
+                                        Add to Cart
+                                    </a>
+                                    <button class="text-red-500 hover:text-red-600">
+                                        <a onclick="addToWishlist('<%= products[i]._id %>')"><i class="fas fa-heart text-xl"></i></a>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    <% } %>
+                </div>
+                <div class="pagination">
+                    <% if (currentPage > 1) { %>
+                        <a href="/shop?page=<%= currentPage - 1 %>" class="prev-arrow">
+                            <i class="fa fa-long-arrow-left" aria-hidden="true"></i>
+                        </a>
+                    <% } %>
+                    <% if (totalPages > 5 && currentPage > 3) { %>
+                        <a href="/shop?page=1">1</a>
+                        <% if (currentPage > 4) { %>
+                            <a href="#" class="dot-dot">
+                                <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
+                            </a>
+                        <% } %>
+                    <% } %>
+                    <% for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) { %>
+                        <a href="/shop?page=<%= i %>" class="<%= currentPage === i ? 'active' : '' %>"><%= i %></a>
+                    <% } %>
+                    <% if (totalPages > 5 && currentPage < totalPages - 2) { %>
+                        <% if (currentPage < totalPages - 3) { %>
+                            <a href="#" class="dot-dot">
+                                <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
+                            </a>
+                        <% } %>
+                        <a href="/shop?page=<%= totalPages %>"><%= totalPages %></a>
+                    <% } %>
+                    <% if (currentPage < totalPages) { %>
+                        <a href="/shop?page=<%= currentPage + 1 %>" class="next-arrow">
+                            <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+                        </a>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+    <%- include('../partials/user/footer') %>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function addToCart(productId) {
+            fetch(`/addToCart?id=${productId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Added to Cart',
+                            text: data.message,
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.message
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Something went wrong. Please try again.'
+                    });
+                });
+        }
+
+        function addToWishlist(productId) {
+            fetch(`/addToWishlist?id=${productId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Added to Wishlist',
+                            text: data.message,
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Already There!',
+                            text: data.message,
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Something went wrong. Please try again.'
+                    });
+                });
+        }
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
