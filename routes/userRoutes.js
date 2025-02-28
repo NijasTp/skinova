@@ -7,7 +7,8 @@ const productController = require("../controllers/user/productController")
 const wishlistController= require("../controllers/user/wishlistController.js")
 const checkoutController = require("../controllers/user/checkoutController")
 const orderController = require("../controllers/user/orderController")
-
+const paymentController = require ('../controllers/user/paymentController.js')
+const walletController = require('../controllers/user/walletController.js')
 
 const upload = require("../helpers/user-multer");
 const { userAuth } = require('../middlewares/auth');
@@ -71,6 +72,7 @@ router.get('/removeFromWishlist',wishlistController.deleteFromWishlist)
 router.get('/address',userAuth, userController.loadAddress);
 router.get('/add-address',userAuth, userController.loadAddAddress);
 router.post('/add-address',userAuth, userController.postAddAddress);
+router.post('/set-primary-address',userController.setPrimaryAddress)
 router.get("/editAddress",userController.editAddress);
 router.post("/editAddress",userController.postEditAddress)
 router.get("/deleteAddress",userController.deleteAddress)
@@ -80,11 +82,21 @@ router.get("/checkout",userAuth,checkoutController.loadCheckoutPage)
 
 router.post('/place-order',userAuth,checkoutController.placeOrder)
 router.get('/orders',userAuth,checkoutController.getOrders)
-router.get('/order-details',userAuth)
+router.get('/order/:orderId/item/:itemId',orderController.orderDetails)
+router.get("/download-invoice/:orderId", orderController.downloadInvoice);
+
+//Return Order
+router.post('/request-return/:itemId',orderController.requestReturn)
+
+//Payment
+router.post('/create-razorpay-order',paymentController.createRazorpayOrder)
+router.post('/verify-payment',paymentController.verifyPayment)
 
 router.post('/cancel-order/:itemId', orderController.cancelOrder);  
 
-module.exports = router;
+
+//Wallet
+router.get('/wallet',userAuth,walletController.loadWallet)
 
 
 router.get('/logout', userController.logout);

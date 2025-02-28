@@ -42,6 +42,10 @@ const addressSchema = new Schema({
         },
         altPhone: {
             type: String
+        },
+        isPrimary: {
+             type: Boolean,
+              default: false
         }
     }]
 });

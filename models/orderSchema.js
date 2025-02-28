@@ -17,7 +17,7 @@ const orderSchema = new Schema({
     orderedItems: [{
         itemId: {
             type: String,
-            default: () => uuidv4()  // Removed unique: true to prevent schema-level issues
+            default: () => uuidv4()  
         },
         product: {
             type: Schema.Types.ObjectId,
@@ -40,6 +40,17 @@ const orderSchema = new Schema({
         cancellationReason: {  
             type: String, 
             default: null  
+        },
+        returnRequested: {
+            type:Boolean,
+            default:false
+        },
+        returnReason:{
+            type:String,
+            default:''
+        },
+        couponApplied:{
+
         }
     }],
     totalPrice: {
@@ -71,17 +82,21 @@ const orderSchema = new Schema({
         type: Boolean,
         default: false
     },
-    paymentStatus: {  // New field to track payment status
+    paymentStatus: { 
         type: String,
         enum: ['pending', 'paid', 'refunded'],
         default: 'pending'
     },
-    estimatedDelivery: {  // New field to estimate delivery date
+    estimatedDelivery: { 
         type: Date
     },
-    orderCancellationReason: {  // New field for overall order cancellation reason
+    orderCancellationReason: {  
         type: String,
         default: null
+    },
+    paymentMethod:{
+        type:String,
+        enum:['cod','razorpay']
     }
 });
 

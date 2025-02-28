@@ -8,23 +8,36 @@
       --danger-color: #e74c3c;
       --info-color: #3498db;
       --light-gray: #ecf0f1;
-    }
-    .order-table th, .order-table td {
-        vertical-align: middle;
-    }
-    .status-badge {
-        padding: 6px 12px;
-        border-radius: 15px;
-        font-weight: 500;
-    }
-    .order-actions .btn {
-        margin: 0 2px;
-    }
+  }
+  
+  .order-table th, .order-table td {
+      vertical-align: middle;
+  }
+
+  .status-badge {
+      padding: 6px 12px;
+      border-radius: 15px;
+      font-weight: 500;
+  }
+
+  .order-actions .btn {
+      margin: 0 2px;
+  }
+
+  .return-message {
+      font-size: 14px;
+      font-weight: bold;
+      color: #d9534f;
+      margin-top: 5px;
+  }
+
+  .return-actions {
+      margin-top: 10px;
+  }
 </style>
 
 <div class="container-fluid px-4">
     <h1 class="mt-4">Order Management</h1>
-    
 
     <div class="card mb-4">
         <div class="card-header">
@@ -47,52 +60,73 @@
                     </thead>
                     <tbody>
                         <% orders.forEach(order => { %>
-                            <tr>
-                                <td>#<%= order.orderId %></td>
-                                <td><%= new Date(order.createdOn).toLocaleDateString() %></td>
-                                <td><%= order.address.name %></td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <% if (order.orderedItems.length > 0 && order.orderedItems[0].product) { %>
-                                            <img src="/<%= order.orderedItems[0].product.productImage ? order.orderedItems[0].product.productImage[0] : 'default.jpg' %>" 
-                                                 alt="Product" 
-                                                 style="width: 50px; height: 50px; object-fit: cover;"
-                                                 class="me-2">
-                                        <% } else { %>
-                                            <span>No product image</span>
-                                        <% } %>
+                            <% order.orderedItems.forEach(item => { %>
+                                <tr>
+                                    <td>#<%= order.orderId %></td>
+                                    <td><%= new Date(order.createdOn).toLocaleDateString() %></td>
+                                    <td><%= order.userId.name %></td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <% if (item.product) { %>
+                                                <a href="/admin/orders/<%= order._id %>/product/<%= item.product._id %>">
+                                                    <img src="/<%= item.product.productImage ? item.product.productImage[0] : 'default.jpg' %>" 
+                                                         alt="Product" 
+                                                         style="width: 50px; height: 50px; object-fit: cover;"
+                                                         class="me-2">
+                                                </a>
+                                            <% } else { %>
+                                                <span>No product image</span>
+                                            <% } %>
+                                            
+                                            <span><%= item.productName %></span>
+                                        </div>
+                                    </td>
+                                    <td>₹<%= item.price %></td>
+                                    <td>
+                                        <span class="status-badge <%= 
+                                            item.status === 'delivered' ? 'bg-success' :
+                                            item.status === 'cancelled' ? 'bg-danger' :
+                                            item.status === 'shipped' ? 'bg-info' :
+                                            item.status === 'Return Request' ? 'bg-warning' :
+                                            item.status === 'Returned' ? 'bg-secondary' :
+                                            item.status === 'Return offer rejected by admin' ? 'bg-danger' :
+                                            'bg-light'
+                                        %>">
+                                        <%= item.status.toUpperCase() %>
+                                        </span>
+                                    </td>
+                                    <td class="order-actions">
+                                        <a href="/admin/orders/<%= order._id %>/product/<%= item.product._id %>" 
+                                            class="btn btn-primary btn-sm">
+                                            View Details
+                                        </a>                                       
                                         
-                                        <span><%= order.orderedItems[0].productName %></span>
-                                    </div>
-                                </td>
-                                <td>₹<%= order.finalAmount %></td>
-                                <td>
-                                    <span class="status-badge <%= 
-                                        order.orderedItems[0].status === 'delivered' ? 'bg-success' :
-                                        order.orderedItems[0].status === 'cancelled' ? 'bg-danger' :
-                                        order.orderedItems[0].status === 'shipped' ? 'bg-info' :
-                                        'bg-warning'
-                                    %>">
-                                    <%= order.orderedItems[0].status ? order.orderedItems[0].status.toUpperCase() : 'UNKNOWN' %>
-                                    </span>
-                                </td>
-                                <td class="order-actions">
-                                    <a href="/admin/orders/<%= order._id %>" 
-                                       class="btn btn-primary btn-sm">
-                                        View Details
-                                    </a>
-                                    <% if (order.orderedItems[0].status !== 'cancelled' && order.orderedItems[0].status !== 'delivered') { %>
-                                        <button onclick="updateStatus('<%= order._id %>')" 
-                                                class="btn btn-info btn-sm">
-                                            Update Status
-                                        </button>
-                                        <button onclick="cancelOrder('<%= order._id %>')" 
-                                                class="btn btn-danger btn-sm">
-                                            Cancel
-                                        </button>
-                                    <% } %>
-                                </td>
-                            </tr>
+                                       
+                                        
+                                        <% if (item.status !== 'delivered') { %>
+                                            <button onclick="updateStatus('<%= order._id %>', '<%= item.product._id %>')" 
+                                                    class="btn btn-info btn-sm">
+                                                Update Status
+                                            </button>
+                                        <% } %>
+                                        <% if (item.status === 'return request') { %>
+                                            <div class="return-message">🔄 Product return requested</div>
+                                            <div>Reason: <%= item.returnReason %></div>
+                                            <div class="return-actions">
+                                                <button onclick="approveReturn('<%= item._id %>')" 
+                                                        class="btn btn-success btn-sm">
+                                                    Approve
+                                                </button>
+                                                <button onclick="rejectReturn('<%= item._id %>')" 
+                                                        class="btn btn-danger btn-sm">
+                                                    Reject
+                                                </button>
+                                            </div>
+                                        <% } %>
+                                        </tr>
+                                    </td>
+                             
+                            <% }); %>
                         <% }); %>
                     </tbody>
                 </table>
@@ -103,7 +137,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    async function updateStatus(orderId) {
+    async function updateStatus(orderId, productId) {
         const { value: status } = await Swal.fire({
             title: 'Update Order Status',
             input: 'select',
@@ -129,7 +163,7 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ orderId, status }),
+                    body: JSON.stringify({ orderId, productId, status }),
                 });
 
                 const data = await response.json();
@@ -156,38 +190,16 @@
         }
     }
 
-    async function cancelOrder(orderId) {
-    const result = await Swal.fire({
-        title: 'Cancel Order',
-        text: 'Are you sure you want to cancel this order?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Yes, cancel it!'
-    });
-
-    if (result.isConfirmed) {
+    async function approveReturn(itemId) {
         try {
-            const response = await fetch('/admin/orders/cancel', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ orderId }),
-            });
-
-            const text = await response.text(); // Read response as text first
-            console.log("Raw Response:", text);
-
-            const data = JSON.parse(text); // Now parse as JSON
-            console.log("Parsed JSON:", data);
+            const response = await fetch(`/admin/approve-return/${itemId}`, { method: 'POST' });
+            const data = await response.json();
 
             if (data.success) {
                 await Swal.fire({
                     icon: 'success',
-                    title: 'Success',
-                    text: 'Order cancelled successfully',
+                    title: 'Return Approved',
+                    text: 'The return has been successfully approved.',
                     timer: 1500
                 });
                 location.reload();
@@ -199,12 +211,36 @@
             await Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: error.message || 'Failed to cancel order'
+                text: error.message || 'Failed to approve return'
             });
         }
     }
-}
 
+    async function rejectReturn(itemId) {
+        try {
+            const response = await fetch(`/admin/reject-return/${itemId}`, { method: 'POST' });
+            const data = await response.json();
+
+            if (data.success) {
+                await Swal.fire({
+                    icon: 'warning',
+                    title: 'Return Rejected',
+                    text: 'The return request has been rejected.',
+                    timer: 1500
+                });
+                location.reload();
+            } else {
+                throw new Error(data.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            await Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.message || 'Failed to reject return'
+            });
+        }
+    }
 </script>
 
 <%- include('../partials/admin/footer') %>

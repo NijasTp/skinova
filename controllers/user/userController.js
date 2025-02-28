@@ -862,6 +862,7 @@ const addToCart = async (req, res) => {
         }
       };
 
+
       const updateQuantity = async (req, res) => {
         try {
             const userId = req.session.user;
@@ -870,36 +871,52 @@ const addToCart = async (req, res) => {
             const { id, change } = req.query;
             const changeValue = Number(change);
     
-            let cart = await Cart.findOne({ userId });
+            let cart = await Cart.findOne({ userId }).populate("items.productId");
     
             if (!cart) return res.status(404).json({ success: false, message: "Cart not found" });
     
-            const itemIndex = cart.items.findIndex((item) => item.productId.equals(id));
+            const itemIndex = cart.items.findIndex((item) => item.productId._id.equals(id));
     
             if (itemIndex === -1) return res.status(404).json({ success: false, message: "Product not in cart" });
     
-            // Update the quantity
-            cart.items[itemIndex].quantity += changeValue;
+            let item = cart.items[itemIndex];
     
-            if (cart.items[itemIndex].quantity < 1) {
-                // Prevent negative quantity
+            let newQuantity = item.quantity + changeValue;
+    
+            let productStock = item.productId.quantity;
+    
+            if (newQuantity > 5) {
+                return res.json({ success: false, message: "User limit exceeded for this product" });
+            }
+    
+            if (newQuantity > productStock) {
+                return res.json({ success: false, message: `Only ${productStock} items available in stock.` });
+            }
+    
+            if (newQuantity < 1) {
                 return res.json({ success: false, message: "Minimum quantity is 1" });
             }
     
-            // Update total price of the item
-            cart.items[itemIndex].totalPrice = cart.items[itemIndex].quantity * cart.items[itemIndex].price;
+            item.quantity = newQuantity;
+            item.totalPrice = item.quantity * item.productId.salePrice;
     
-            // Recalculate the cart total
             cart.cartTotal = cart.items.reduce((total, item) => total + item.totalPrice, 0);
     
             await cart.save();
     
-            res.json({ success: true, newQuantity: cart.items[itemIndex].quantity });
+            res.json({
+                success: true,
+                newQuantity: item.quantity,
+                salePrice: item.productId.salePrice,
+                cartTotal: cart.cartTotal,
+            });
         } catch (error) {
             console.error("Error updating quantity:", error);
             res.status(500).json({ success: false, message: "Internal Server Error" });
         }
     };
+    
+    
     
     const loadAddress = async (req, res) => {
         try {
@@ -912,7 +929,7 @@ const addToCart = async (req, res) => {
             // Fetch user addresses
             const addresses = await Address.find({ userId });
     
-            res.render("address", { cart, addresses });
+            res.render("address", { cart, addresses,userId });
         } catch (error) {
             console.error("Error loading address:", error);
             res.status(500).send("Internal Server Error");
@@ -934,6 +951,31 @@ const addToCart = async (req, res) => {
     }
  }   
    
+ const setPrimaryAddress = async (req, res) => {
+    try {
+        const { userId, addressId } = req.body;
+
+        // Find user’s address document
+        const addressDoc = await Address.findOne({ userId });
+
+        if (!addressDoc) return res.status(404).json({ message: "Address not found" });
+
+        // Set all addresses to not primary
+        addressDoc.address.forEach(addr => addr.isPrimary = false);
+
+        // Set selected address to primary
+        const selectedAddress = addressDoc.address.find(addr => addr._id.toString() === addressId);
+        if (selectedAddress) selectedAddress.isPrimary = true;
+
+        await addressDoc.save();
+
+        res.json({ success: true, message: "Primary address updated" });
+    } catch (error) {
+        console.error("Error updating primary address:", error);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+};
+
  
  const postAddAddress = async (req, res) => {
     try {
@@ -1134,6 +1176,7 @@ module.exports = {
     loadAddress,
     loadAddAddress,
     postAddAddress,
+    setPrimaryAddress,
     editAddress,
     postEditAddress,
     deleteAddress,

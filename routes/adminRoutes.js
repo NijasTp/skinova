@@ -62,9 +62,12 @@ router.get('/deleteProduct',adminAuth,productController.deleteProduct);
 
 
 router.get('/orders', adminAuth, productController.getOrders);
-router.get('/orders/:id', adminAuth, productController.getOrderDetails);
+router.get('/orders/:orderId/product/:productId', adminAuth, productController.getOrderDetails);
 router.post('/orders/update-status', adminAuth, productController.updateOrderStatus);
 router.post('/orders/cancel', adminAuth,productController.cancelOrder);
 
+
+router.post('/approve-return/:itemId', productController.approveReturn);
+router.post('/reject-return/:itemId', productController.rejectReturn);
 
 module.exports = router;

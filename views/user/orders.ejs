@@ -11,7 +11,7 @@
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
             margin: 0;
-            padding: 20px;
+            padding: 0;
         }
 
         h1 {
@@ -264,44 +264,37 @@
             <img src="/img/skinova cover.png" alt="Skinova Cover" class="hero-image">
         </main>
         <div class="order-container">
-            <% if (orders.length> 0) { %>
-                <% orders.forEach(order=> { %>
+            <% if (orders.length > 0) { %>
+                <% orders.forEach(order => { %>
                     <div class="order">
                         <div class="order-header">
                             Order ID: <%= order.orderId %> | Created On: <%= new Date(order.createdOn).toLocaleDateString() %>
                         </div>
-                    
                         <% order.orderedItems.forEach(item => { %>
-                            <% if (item.product) { %> <!-- Ensure product exists -->
+                            <% if (item.product) { %>
                                 <div class="product">
-                                    <a href="/productDetails?id=<%= item.product._id %>"><img src="<%= item.product.productImage && item.product.productImage.length ? item.product.productImage[0] : '/img/default.jpg' %>" alt="Product Image"></a>
-                                    
-                                    <span class="status <%= item.status ? item.status.toLowerCase() : '' %>">
-                                        <%= item.status || 'Unknown' %>
+                                    <a href="/order/<%= order.orderId %>/item/<%= item.itemId %>">
+                                        <img src="<%= item.product.productImage.length ? item.product.productImage[0] : '/img/default.jpg' %>" alt="Product Image">
+                                    </a>
+                                    <span class="status <%= item.status.toLowerCase() %>">
+                                        <%= item.status %>
                                     </span>
-                    
-                                    <button class="btn btn-primary"
-                                        onclick="showInfo('<%= item.itemId %>', '<%= item.product.productName %>')">Show Info</button>
-                    
+                                    <%=item.product.productName%>
+                                    <a class="cancel-button" onclick="cancelOrder('<%= item.itemId %>')" style = " <%= item.status.toLowerCase() === 'cancelled' ? 'visibility: hidden;' : '' %>">
+                                        Cancel
+                                    </a>
                                     
-                    
-                                    <a class="cancel-button" onclick="cancelOrder('<%= item.itemId %>')">Cancel</a>
-                                </div>
-                            <% } else { %> 
-                                <div class="product">
-                                    <span class="text-danger">Product has been removed from the store.</span>
+                                    <a class="download-button" href="/download-invoice/<%= order.orderId %>" download>
+                                        <i title="download invoice" class="fas fa-download"></i> 
+                                    </a>
                                 </div>
                             <% } %>
-                            
-                            <div class="item-info" id="info-<%= item.itemId %>"></div>
                         <% }); %>
                     </div>
-                    
-                    <% }); %>
-                        <% } else { %>
-                            <p>No orders found.</p>
-                            <% } %>
-
+                <% }); %>
+            <% } else { %>
+                <p>No orders found.</p>
+            <% } %>
         </div>
         <%- include('../partials/user/footer') %>
 

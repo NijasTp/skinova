@@ -101,7 +101,7 @@ const placeOrder = async (req, res) => {
         }
 
         addressId = new mongoose.Types.ObjectId(addressId);
-        console.log("✅ Selected Address ID:", addressId);
+        console.log(" Selected Address ID:", addressId);
 
         // Ensure the address belongs to the current user
         const selectedAddress = await Address.findOne({
@@ -128,7 +128,7 @@ const placeOrder = async (req, res) => {
         // Ensure products exist before processing
         for (let item of cart.items) {
             if (!item.productId) {
-                console.error(`❌ Error: Product not found for item:`, item);
+                console.error(` Error: Product not found for item:`, item);
                 return res.json({ success: false, message: "One or more products in your cart are unavailable." });
             }
 
@@ -150,14 +150,14 @@ const placeOrder = async (req, res) => {
         const totalPrice = orderItems.reduce((sum, item) => sum + item.total, 0);
         const finalAmount = totalPrice;
 
-        // Create and save the order
+        
         const newOrder = new Order({
             userId: userId,
-            address: addressId, // Store only ObjectId
-            orderedItems: orderItems, // Updated items array
+            address: addressId, 
+            orderedItems: orderItems,  
             totalPrice,
             finalAmount,
-            couponApplied: false, // You can modify this later for coupon logic
+            couponApplied: false, 
             createdOn: new Date()
         });
 

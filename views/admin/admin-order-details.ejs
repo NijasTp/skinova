@@ -56,8 +56,7 @@
 <div class="container-fluid px-4">
     <h1 class="mt-4">Order Details</h1>
     <ol class="breadcrumb mb-4">
-        
-        <li class="breadcrumb-item active">Order #<%= order.orderId %></li>
+        <li class="breadcrumb-item active">Order #<%= order._id %></li>
     </ol>
 
     <div class="row">
@@ -65,14 +64,14 @@
             <div class="card mb-4">
                 <div class="card-header">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">Order #<%= order.orderId %></h5>
+                        <h5 class="mb-0">Order #<%= order._id %></h5>
                         <span class="badge bg-<%= 
-                            order.status === 'delivered' ? 'success' :
-                            order.status === 'cancelled' ? 'danger' :
-                            order.status === 'shipped' ? 'info' :
+                            selectedProduct.status === 'delivered' ? 'success' :
+                            selectedProduct.status === 'cancelled' ? 'danger' :
+                            selectedProduct.status === 'shipped' ? 'info' :
                             'warning'
                         %>">
-                            <%= order.orderedItems[0].status ? order.orderedItems[0].status.toUpperCase() : status.toUpperCase() %>
+                            <%= selectedProduct.status.toUpperCase() %>
                         </span>
                     </div>
                 </div>
@@ -83,7 +82,7 @@
                         <% const statuses = ['pending', 'confirmed', 'shipped', 'delivered']; %>
                         <% statuses.forEach(status => { %>
                             <div class="status-point">
-                                <div class="status-dot <%= order.orderedItems[0].status === status || statuses.indexOf(order.orderedItems[0].status) > statuses.indexOf(status) ? 'status-active' : 'status-inactive' %>"></div>
+                                <div class="status-dot <%= selectedProduct.status === status || statuses.indexOf(selectedProduct.status) > statuses.indexOf(status) ? 'status-active' : 'status-inactive' %>"></div>
                                 <small><%= status.toUpperCase() %></small>
                             </div>
                         <% }); %>
@@ -105,182 +104,151 @@
                                 <tr>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <img src="/<%= order.orderedItems[0].product.productImage[0] %>" 
+                                            <img src="/<%= selectedProduct.product.productImage[0] %>" 
                                                  alt="Product"
                                                  style="width: 50px; height: 50px; object-fit: cover;"
                                                  class="me-2">
-                                            <span><%= order.orderedItems[0].product.productName %></span>
+                                            <span><%= selectedProduct.product.productName %></span>
                                         </div>
                                     </td>
-                                    <td>₹<%= order.orderedItems[0].price %></td>
-                                    <td><%= order.orderedItems[0].quantity %></td>
-                                    <td>₹<%= order.finalAmount %></td>
+                                    <td>₹<%= selectedProduct.price %></td>
+                                    <td><%= selectedProduct.quantity %></td>
+                                    <td>₹<%= selectedProduct.price * selectedProduct.quantity %></td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
 
-                    <!-- Order Actions -->
-                    <% if (order.status !== 'cancelled' && order.status !== 'delivered') { %>
+                    <% if (selectedProduct.status !== 'cancelled' && selectedProduct.status !== 'delivered') { %>
                         <div class="mt-4">
-                            <button onclick="updateStatus('<%= order._id %>')" class="btn btn-primary me-2">
+                            <button onclick="updateStatus('<%= order._id %>', '<%= selectedProduct.product._id %>' , '<%= selectedProduct.status %>')" class="btn btn-primary me-2">
                                 Update Status
-                            </button>
-                            <button onclick="cancelOrder('<%= order._id %>')" class="btn btn- danger">
+                            </button>                            
+                            <button onclick="cancelOrder('<%= order._id %>', '<%= selectedProduct.product._id %>')" class="btn btn-danger">
                                 Cancel Order
-                            </button>
+                            </button>                            
                         </div>
                     <% } %>
                 </div>
             </div>
         </div>
 
-        <div class="col-xl-4">
-            <!-- Customer Details -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="mb-0">Customer Information</h5>
-                </div>
-                <div class="card-body">
-                    <div class="customer-details">
-                        <h6>Shipping Address</h6>
-                        <p class="mb-1"><strong><%= order.address.name %></strong></p>
-                        <p class="mb-1"><%= order.address.streetAddress %></p>
-                        <p class="mb-1"><%= order.address.city %>, <%= order.address.state %></p>
-                        <p class="mb-1"><%= order.address.pincode %></p>
-                        <p class="mb-1">Phone: <%= order.address.phone %></p>
-                        <p class="mb-0">Email: <%= order.address.email %></p>
-                    </div>
-
-                    <div class="mt-4">
-                        <h6>Order Summary</h6>
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>Subtotal:</span>
-                            <span>₹<%= order.totalPrice %></span>
-                        </div>
-                        <% if (order.discount > 0) { %>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span>Discount:</span>
-                                <span>-₹<%= order.discount %></span>
-                            </div>
-                        <% } %>
-                        <hr>
-                        <div class="d-flex justify-content-between fw-bold">
-                            <span>Total:</span>
-                            <span>₹<%= order.finalAmount %></span>
-                        </div>
-                    </div>
-
-                    <div class="mt-4">
-                        <h6>Order Information</h6>
-                        <p class="mb-1"><strong>Order Date:</strong> <%= new Date(order.createdOn).toLocaleString() %></p>
-                        <p class="mb-0"><strong>Order Status:</strong> <%= order.orderedItems[0].status.toUpperCase() %></p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    async function updateStatus(orderId) {
-        const { value: status } = await Swal.fire({
-            title: 'Update Order Status',
-            input: 'select',
-            inputOptions: {
-                'pending': 'Pending',
-                'confirmed': 'Confirmed',
-                'shipped': 'Shipped',
-                'delivered': 'Delivered'
-            },
-            inputPlaceholder: 'Select status',
-            showCancelButton: true,
-            inputValidator: (value) => {
-                if (!value) {
-                    return 'You need to select a status!';
-                }
-            }
-        });
-
-        if (status) {
-            try {
-                const response = await fetch('/admin/orders/update-status', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ orderId, status }),
-                });
-
-                const data = await response.json();
-                
-                if (data.success) {
-                    await Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: 'Order status updated successfully',
-                        timer: 1500
-                    });
-                    location.reload();
-                } else {
-                    throw new Error(data.message);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                await Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: error.message || 'Failed to update status'
-                });
-            }
-        }
+    async function updateStatus(orderId , productId , currentStatus) {
+    const statuses = ['pending', 'confirmed', 'shipped', 'delivered'];
+    
+    const currentIndex = statuses.indexOf(currentStatus);
+    
+    const inputOptions = {};
+    for (let i = currentIndex + 1; i < statuses.length; i++) {
+        inputOptions[statuses[i]] = statuses[i].charAt(0).toUpperCase() + statuses[i].slice(1);
     }
 
-    async function cancelOrder(orderId) {
-        const result = await Swal.fire({
-            title: 'Cancel Order',
-            text: 'Are you sure you want to cancel this order?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, cancel it!'
+
+    if (Object.keys(inputOptions).length === 0) {
+        await Swal.fire({
+            icon: 'info',
+            title: 'No Further Updates',
+            text: 'This order is already at the final status.'
         });
+        return;
+    }
 
-        if (result.isConfirmed) {
-            try {
-                const response = await fetch('/admin/orders/cancel', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ orderId }),
-                });
-
-                const data = await response.json();
-                
-                if (data.success) {
-                    await Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: 'Order cancelled successfully',
-                        timer: 1500
-                    });
-                    location.reload();
-                } else {
-                    throw new Error(data.message);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                await Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: error.message || 'Failed to cancel order'
-                });
+    const { value: status } = await Swal.fire({
+        title: 'Update Order Status',
+        input: 'select',
+        inputOptions: inputOptions,
+        inputPlaceholder: 'Select status',
+        showCancelButton: true,
+        inputValidator: (value) => {
+            if (!value) {
+                return 'You need to select a status!';
             }
         }
+    });
+
+    if (status) {
+        try {
+            const response = await fetch('/admin/orders/update-status', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ orderId,productId, status }),
+            });
+
+            const data = await response.json();
+            
+            if (data.success) {
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: 'Order status updated successfully',
+                    timer: 1500
+                });
+                location.reload();
+            } else {
+                throw new Error(data.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            await Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.message || 'Failed to update status'
+            });
+        }
     }
+}
+
+
+    async function cancelOrder(orderId, productId) {
+    const result = await Swal.fire({
+        title: 'Cancel Order',
+        text: 'Are you sure you want to cancel this order?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, cancel it!'
+    });
+
+    if (result.isConfirmed) {
+        try {
+            const response = await fetch('/admin/orders/cancel', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ orderId, productId }),
+            });
+
+            const data = await response.json();
+            
+            if (data.success) {
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: 'Order cancelled successfully',
+                    timer: 1500
+                });
+                location.reload();
+            } else {
+                throw new Error(data.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            await Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.message || 'Failed to cancel order'
+            });
+        }
+    }
+}
+
 </script>
 
 <%- include('../partials/admin/footer') %>

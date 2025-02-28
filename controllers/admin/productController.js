@@ -4,6 +4,7 @@ const sharp = require("sharp")
 const path = require("path")
 const fs = require("fs")
 const Order = require('../../models/orderSchema')
+const Wallet = require('../../models/walletSchema')
 
 const getProductAddPage = async (req, res) => {
   try {
@@ -369,6 +370,10 @@ const getOrders = async (req, res) => {
   try {
       const orders = await Order.find()
           .populate({
+              path: "userId", // Populate user details
+              select: "name phone email", // Select relevant fields
+          })
+          .populate({
               path: "orderedItems.product",
               select: "productName productImage price quantity",
           })
@@ -387,52 +392,70 @@ const getOrders = async (req, res) => {
 
 const getOrderDetails = async (req, res) => {
   try {
-      const orderId = req.params.id;
-      const order = await Order.findById(orderId)
-          .populate({
-              path: "orderedItems.product",
-              select: "productName productImage price quantity",
-          });
+    const { orderId, productId } = req.params;
 
-      if (!order) {
-          return res.status(404).send("Order not found");
-      }
+    const order = await Order.findById(orderId).populate({
+      path: "orderedItems.product",
+      select: "productName productImage price quantity",
+    });
 
-      res.render("admin-order-details", {
-          order,
-          title: "Order Details",
-      });
+    if (!order) {
+      return res.status(404).send("Order not found");
+    }
+
+    // Find the specific product in orderedItems
+    const selectedProduct = order.orderedItems.find(
+      (item) => item.product._id.toString() === productId
+    );
+
+    if (!selectedProduct) {
+      return res.status(404).send("Product not found in this order");
+    }
+
+    res.render("admin-order-details", {
+      order,
+      selectedProduct, // Pass only the selected product for viewing/editing
+      title: "Order Details",
+    });
   } catch (error) {
-      console.error("Error fetching order details:", error);
-      res.status(500).send("Internal Server Error");
+    console.error("Error fetching order details:", error);
+    res.status(500).send("Internal Server Error");
   }
 };
+
 
 const updateOrderStatus = async (req, res) => {
   try {
-      const { orderId, status } = req.body;
-      const order = await Order.findById(orderId);
+    const { orderId, productId, status } = req.body;
+    const order = await Order.findById(orderId);
 
-      if (!order) {
-          return res.status(404).json({ success: false, message: "Order not found" });
-      }
+    if (!order) {
+      return res.status(404).json({ success: false, message: "Order not found" });
+    }
 
-      // Don't allow status change if order is cancelled
-      if (order.status === 'cancelled') {
-          return res.status(400).json({ success: false, message: "Cannot update cancelled order" });
-      }
+    // Find the specific product inside orderedItems
+    const item = order.orderedItems.find(item => item.product.toString() === productId);
 
-      // Update order status
-      order.status = status;
-      order.orderedItems[0].status = status;
+    if (!item) {
+      return res.status(404).json({ success: false, message: "Product not found in this order" });
+    }
 
-      await order.save();
-      res.json({ success: true, message: "Order status updated successfully" });
+    // Prevent update if already cancelled
+    if (item.status === 'cancelled') {
+      return res.status(400).json({ success: false, message: "Cannot update cancelled product" });
+    }
+
+    // Update the status of the correct product
+    item.status = status;
+
+    await order.save();
+    res.json({ success: true, message: "Order status updated successfully" });
   } catch (error) {
-      console.error("Error updating order status:", error);
-      res.status(500).json({ success: false, message: "Internal server error" });
+    console.error("Error updating order status:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
+
 
 const cancelOrder = async (req, res) => {
   try {
@@ -460,6 +483,76 @@ const cancelOrder = async (req, res) => {
   }
 }
 
+const approveReturn = async (req, res) => {
+  try {
+      const { itemId } = req.params;
+      const order = await Order.findOne({ 'orderedItems._id': itemId });
+
+      if (!order) {
+          return res.status(404).json({ success: false, message: 'Order not found' });
+      }
+
+      const item = order.orderedItems.find(i => i._id.toString() === itemId);
+      if (!item) {
+          return res.status(404).json({ success: false, message: 'Item not found' });
+      }
+
+      // Update status to "Returned"
+      item.status = "returned";
+      await order.save();
+
+      // Process refund if paid online
+      if (order.paymentMethod !== "cod") {
+          let wallet = await Wallet.findOne({ userId: order.userId });
+
+          if (!wallet) {
+              wallet = new Wallet({ userId: order.userId, balance: 0, transactions: [] });
+          }
+
+          // Add refunded amount to wallet
+          wallet.balance += item.price;
+          wallet.transactions.push({
+              type: "credit",
+              amount: item.price,
+              description: `Refund for returned item ${item.product.productName}`
+          });
+
+          await wallet.save();
+      }
+
+      return res.json({ success: true, message: 'Return approved successfully' });
+
+  } catch (error) {
+      console.error("Error approving return:", error);
+      res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+const rejectReturn = async (req, res) => {
+  try {
+      const { itemId } = req.params;
+      const order = await Order.findOne({ 'orderedItems._id': itemId });
+
+      if (!order) {
+          return res.status(404).json({ success: false, message: 'Order not found' });
+      }
+
+      const item = order.orderedItems.find(i => i._id.toString() === itemId);
+      if (!item) {
+          return res.status(404).json({ success: false, message: 'Item not found' });
+      }
+
+      // Update status to "Return offer rejected by admin"
+      item.status = "Return offer rejected by admin";
+      await order.save();
+
+      return res.json({ success: true, message: 'Return rejected successfully' });
+
+  } catch (error) {
+      console.error("Error rejecting return:", error);
+      res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
 
 module.exports = {
   getProductAddPage,
@@ -477,8 +570,9 @@ module.exports = {
   getOrders,
   getOrderDetails,
   updateOrderStatus,
-  cancelOrder
+  cancelOrder,
+  approveReturn,
+  rejectReturn
 
 
 }
-
