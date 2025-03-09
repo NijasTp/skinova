@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Coupons</title>
+    <link rel="icon" href="/img/favicon.jpg" type="image/x-icon">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #f4f4f9; }
+        .coupon {
+            background-color: #ffffff;
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease-in-out;
+        }
+        .coupon:hover { transform: scale(1.03); }
+        .used { background-color: #d6d6d6; color: #7a7a7a; }
+        .hero {
+            display: flex;
+            justify-content: space-between;
+            background-color: #e6f4f4;
+            align-items: center;
+            padding: 4rem 2rem;
+            width: 100%;
+            margin: 0 auto;
+            min-height: 50vh;
+        }
+
+        .hero-content {
+            max-width: 500px;
+            margin-left: 40%;
+        }
+
+        .hero-title {
+            font-size: 2rem;
+            line-height: 1.2;
+            color: #2c3e50;
+            margin-top: 70px;
+        }
+
+        .hero-description {
+            color: #5d6d7e;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 0.8rem 2rem;
+            background-color: #1a4741;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .cta-button:hover {
+            background-color: #123530;
+        }
+
+        .hero-image {
+            width: 300px;
+            position: relative;
+            right: 100px;
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                flex-direction: column;
+                text-align: center;
+                padding: 2rem;
+            }
+
+            .hero-content {
+                margin-left: 0;
+            }
+
+            .hero-image {
+                width: 300px;
+                position: relative;
+                left: 0;
+            }
+        }
+
+        .sidebar {
+            background-color: #f8f9fa;
+            border-right: 1px solid #dee2e6;
+            width: 250px; /* Set a fixed width for the sidebar */
+            padding: 1rem; /* Add some padding */
+        }
+
+        .sidebar a {
+            color: #495057;
+            padding: 10px 15px;
+            display: block;
+            transition: background-color 0.3s;
+        }
+
+        .sidebar a:hover {
+            background-color: #e2e6ea;
+        }
+
+        .content {
+            display: flex; /* Use flexbox for layout */
+            padding: 2rem;
+            margin-top: 2rem; /* Add some space below the hero */
+        }
+
+        .coupons-list {
+            flex: 1; /* Allow the coupons list to take the remaining space */
+            padding: 1rem; /* Add some padding */
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column; /* Stack content vertically on smaller screens */
+            }
+
+            .sidebar {
+                width: 100%; /* Full width for smaller screens */
+                border-right: none; /* Remove border on smaller screens */
+                margin-top: 1rem; /* Add some space above the sidebar */
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include('../partials/user/header') %> 
+    <main class="hero w-full">
+        <div class="hero-content">
+            <b>
+                < <h1 class="hero-title">COUPONS</h1>
+            </b>
+            <p class="hero-description">
+                <i>
+                    <a href="/">Home</a>
+                    <span>&gt;</span>
+                    <a href="/coupons">Coupons</a>
+                </i>
+            </p>
+        </div>
+        <img alt="Illustration of a shopping cart with various items" class="hero-image" height="300" src="/img/skinova cover.png" width="300"/>
+    </main>
+    <div class="content">
+        
+            <%- include('../partials/user/sidebar') %>
+        
+        <div class="coupons-list">
+            <% coupons.forEach(coupon => { %>
+                <div class="coupon <%= coupon.isUsed ? 'used' : '' %>">
+                    <h3><%= coupon.name %></h3>
+                    <p><strong>Code:</strong> <%= coupon.code %></p>
+                    <p><strong>Offer Price:</strong> $<%= coupon.offerPrice %></p>
+                    <p><strong>Minimum Price:</strong> $<%= coupon.minimumPrice %></p>
+                    <p><strong>Expires On:</strong> <%= new Date(coupon.expireOn).toLocaleDateString() %></p>
+                    <% if (!coupon.isUsed) { %>
+                        <button class="btn btn-success" onclick="copyCoupon('<%= coupon.code %>')">Copy Code</button>
+                    <% } else { %>
+                        <p class="text-danger">Already Used</p>
+                    <% } %>
+                </div>
+            <% }); %>
+        </div>
+    </div>
+    <%- include('../partials/user/footer') %>
+
+    <script>
+        function copyCoupon(code) {
+            navigator.clipboard.writeText(code).then(() => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Copied!',
+                    text: 'Coupon code copied to clipboard!',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }).catch(err => {
+                console.error("Could not copy text: ", err);
+            });
+        }
+
+        function deleteCoupon(couponId) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'You won\'t be able to revert this!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/delete-coupon/${couponId}`, { method: 'DELETE' })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire(
+                                'Deleted!',
+                                'Your coupon has been deleted.',
+                                'success'
+                            ).then(() => {
+                                location.reload();
+                            });
+                        }
+                    }).catch(error => console.error('Error:', error));
+                }
+            });
+        }
+    </script>
+</body>
+</html>

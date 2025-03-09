@@ -1,0 +1,238 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - Skinova</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #e6f4f4;
+        }
+
+        input,
+        textarea {
+            border: 1px solid #ccc;
+        }
+        .hero {
+            display: flex;
+            justify-content: space-between;
+            background-color: #e6f4f4;
+            align-items: center;
+            padding: 4rem 2rem;
+            width: 100%;
+            margin: 0 auto;
+            min-height: 50vh;
+        }
+
+        .hero-content {
+            max-width: 500px;
+            margin-left: 40%;
+        }
+
+        .hero-title {
+            font-size: 2rem;
+            line-height: 1.2;
+            color: #2c3e50;
+            margin-top: 40px;
+        }
+
+        .hero-description {
+            color: #5d6d7e;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .headerbod {
+            position: fixed; /* Fix the header to the top */
+            top: 0; /* Align to the top */
+            padding: 16px; /* Padding for the header */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional shadow for depth */
+            z-index: 1000; /* Ensure it stays above other content */
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 0.8rem 2rem;
+            background-color: #1a4741;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .cta-button:hover {
+            background-color: #123530;
+        }
+
+        .hero-image {
+            width: 300px;
+            position: relative;
+            right: 100px;
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                flex-direction: column;
+                text-align: center;
+                padding: 2rem;
+            }
+
+            .hero-content {
+                margin-left: 0;
+            }
+
+            .hero-image {
+                width: 300px;
+                position: relative;
+                left: 0;
+            }
+        }
+    </style>
+    <link rel="icon" href="/img/favicon.jpg" type="image/x-icon">
+</head>
+
+<body class="bg-e6f4f4 text-gray-800 font-poppins">
+<%-include ('../partials/user/header')%>
+
+    <main class="pt-24">
+        <div class="hero w-full">
+            <div class="hero-content">
+                <b>
+                    <h1 class="hero-title">Get in Touch with Us</h1>
+                </b>
+                <p class="hero-description">
+                    <i>We'd love to hear from you! Whether you have a question about our products, need assistance, or just want to give feedback, we're here to help.</i>
+                </p>
+            </div>
+            <img alt="Illustration of a shopping cart with various items" class="hero-image" height="300" src="/img/skinova cover.png" width="300"/>
+        </div>
+
+        <section class="contact-form py-20">
+            <div class="container mx-auto px-4">
+                <div class="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-lg">
+                    <h2 class="text-2xl font-bold text-primary-color mb-6">Contact Us</h2>
+                    <form id="contactForm" method="POST" action="https://api.web3forms.com/submit">
+                        <!-- Web3Forms Access Key -->
+                        <input type="hidden" name="access_key" value="3f7f2551-9c08-4c54-a196-d1bc257f9cad">
+                    
+                        <div class="mb-4">
+                            <label for="name" class="block text-gray-700 font-semibold mb-2">Name</label>
+                            <input type="text" id="name" name="name" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-color" required>
+                        </div>
+                    
+                        <div class="mb-4">
+                            <label for="email" class="block text-gray-700 font-semibold mb-2">Email</label>
+                            <input type="email" id="email" name="email" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-color" required>
+                        </div>
+                    
+                        <div class="mb-4">
+                            <label for="subject" class="block text-gray-700 font-semibold mb-2">Subject</label>
+                            <input type="text" id="subject" name="subject" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-color" required>
+                        </div>
+                    
+                        <div class="mb-4">
+                            <label for="message" class="block text-gray-700 font-semibold mb-2">Message</label>
+                            <textarea id="message" name="message" rows="6" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-color" required></textarea>
+                        </div>
+                    
+                        <div class="text-center">
+                            <button type="submit" class="bg-green-500 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-700 transition duration-300">Send Message</button>
+                        </div>
+                    </form>
+                    
+                </div>
+            </div>
+        </section>
+
+        <section class="contact-info py-20 bg-secondary-color">
+            <div class="container mx-auto px-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                    <div class="bg-white p-8 rounded-lg shadow-lg">
+                        <i class="fas fa-phone-alt text-primary-color text-3xl mb-4"></i>
+                        <h3 class="text-xl font-bold text-primary-color mb-2">Call Us</h3>
+                        <p class="text-gray-700">+91 6238606281</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-lg shadow-lg">
+                        <i class="fas fa-envelope text-primary-color text-3xl mb-4"></i>
+                        <h3 class="text-xl font-bold text-primary-color mb-2">Email Us</h3>
+                        <p class="text-gray-700">skinova@gmail.com</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-lg shadow-lg">
+                        <i class="fas fa-map-marker-alt text-primary-color text-3xl mb-4"></i>
+                        <h3 class="text-xl font-bold text-primary-color mb-2">Visit Us</h3>
+                        <p class="text-gray-700">Kinfra, Kakkanchery, Malappuram</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+<%-include('../partials/user/footer')%>
+
+    <script>
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 100) {
+                header.classList.add('bg-white', 'shadow-lg');
+                header.classList.remove('bg-secondary-color');
+            } else {
+                header.classList.add('bg-secondary-color');
+                header.classList.remove('bg-white', 'shadow-lg');
+            }
+        });
+
+        // Mobile menu toggle
+        const hamburger = document.querySelector('.hamburger');
+        const navLinks = document.querySelector('.nav-links');
+
+        hamburger.addEventListener('click', () => {
+            navLinks.classList.toggle('hidden');
+        });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById("contactForm");
+
+        form.addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            const emailInput = document.getElementById("email").value.trim();
+            if (!validateEmail(emailInput)) {
+                alert("Please enter a valid email address.");
+                return;
+            }
+
+            const formData = new FormData(form);
+            
+            try {
+                const response = await fetch(form.action, {
+                    method: "POST",
+                    body: formData
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert("Message sent successfully!");
+                    form.reset();
+                } else {
+                    alert("Error: " + result.message);
+                }
+            } catch (error) {
+                alert("Something went wrong. Please try again later.");
+            }
+        });
+
+        function validateEmail(email) {
+            const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            return emailPattern.test(email);
+        }
+    });
+
+    </script>
+</body>
+
+</html>
+

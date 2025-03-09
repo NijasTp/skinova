@@ -259,7 +259,7 @@ a {
                         <%= data[i].regularPrice %>
                     </td>
                     <td>
-                        <% if(data[i].productOffer) { %>
+                        <% if(data[i].productOffer > 0) { %>
                             <%= data[i].productOffer %>%
                             <button class="btn btn-sm btn-warning" onclick="editOffer('<%= data[i]._id %>', <%= data[i].productOffer %>)">
                                 Edit

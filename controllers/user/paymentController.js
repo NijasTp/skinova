@@ -1,20 +1,20 @@
 const Razorpay = require('razorpay')
 const crypto = require('crypto')
 const mongoose = require('mongoose')
-const Cart= require('../../models/cartSchema')
+const Cart = require('../../models/cartSchema')
 const { v4: uuidv4 } = require('uuid');
 const Order = require('../../models/orderSchema')
 const Product = require('../../models/productSchema')
+const Category = require('../../models/categorySchema')
 
 const razorpay = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
     key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
-const createRazorpayOrder= async (req, res) => {
+const createRazorpayOrder = async (req, res) => {
     try {
-
-        console.log('req body:',req.body)
+        console.log('req body:', req.body);
         const userId = req.session.user;
         if (!userId) {
             return res.status(400).json({ success: false, message: "User session expired. Please log in again." });
@@ -26,16 +26,13 @@ const createRazorpayOrder= async (req, res) => {
             return res.status(400).json({ error: "Invalid address format." });
         }
 
-        // Get user's cart
         const cart = await Cart.findOne({ userId }).populate("items.productId");
         if (!cart || cart.items.length === 0) {
             return res.status(400).json({ success: false, message: "Your cart is empty." });
         }
 
-        // Calculate total price
-        const totalAmount = cart.items.reduce((sum, item) => sum + item.quantity * item.productId.salePrice, 0) * 100; // Convert to paise
+        const totalAmount = ((cart.cartTotal) - (cart.discount || 0)) * 100;
 
-        // Create Razorpay Order
         const options = {
             amount: totalAmount,
             currency: "INR",
@@ -43,7 +40,7 @@ const createRazorpayOrder= async (req, res) => {
         };
 
         const order = await razorpay.orders.create(options);
-        console.log('created order:',order)
+        console.log('created order:', order);
 
         res.json({
             success: true,
@@ -62,16 +59,22 @@ const verifyPayment = async (req, res) => {
     try {
         const { orderId, paymentId, signature, addressId } = req.body;
 
+        if (!orderId || !paymentId || !signature || !addressId) {
+            return res.status(400).json({ success: false, message: "Invalid payment data." });
+        }
+
+        // Generate expected signature
         const generatedSignature = crypto
             .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
             .update(orderId + "|" + paymentId)
             .digest("hex");
 
-        if (generatedSignature !== signature) {
-            return res.status(400).json({ success: false, message: "Invalid payment signature" });
+        const paymentVerified = generatedSignature === signature;
+
+        if (!paymentVerified) {
+            return res.json({ success: false, message: "Payment verification failed. Please try again." });
         }
 
-        // Payment verified, now create the order
         const userId = req.session.user;
         if (!userId) {
             return res.status(400).json({ success: false, message: "User session expired. Please log in again." });
@@ -82,37 +85,46 @@ const verifyPayment = async (req, res) => {
             return res.status(400).json({ success: false, message: "Your cart is empty." });
         }
 
-        const orderItems = cart.items.map(item => ({
-            itemId: uuidv4(),
-            product: item.productId._id,
-            quantity: item.quantity,
-            price: item.productId.salePrice,
-            total: item.quantity * item.productId.salePrice,
-            status: "pending",
-        }));
+        let totalCartPrice = cart.items.reduce((sum, item) => sum + (item.productId.salePrice * item.quantity), 0);
+        let totalCouponDiscount = cart.discount || 0;
 
-        const totalPrice = orderItems.reduce((sum, item) => sum + item.total, 0);
-
-        const newOrder = new Order({
-            userId,
-            address: addressId,
-            orderedItems: orderItems,
-            totalPrice,
-            finalAmount: totalPrice,
-            paymentStatus: "paid",
-            paymentMethod: "razorpay",
-            createdOn: new Date(),
-        });
-
-        await newOrder.save();
-
-        // Reduce stock
         for (let item of cart.items) {
-            await Product.findByIdAndUpdate(item.productId._id, { $inc: { quantity: -item.quantity } });
+            if (!item.productId) return res.json({ success: false, message: "One or more products are unavailable." });
+            if (item.productId.stock < item.quantity) {
+                return res.json({ success: false, message: `${item.productId.productName} is out of stock.` });
+            }
+
+            const finalPrice = item.productId.salePrice;
+            const totalPrice = finalPrice * item.quantity;
+
+            const proportionateCouponDiscount = totalCouponDiscount * (totalPrice / totalCartPrice);
+
+            const category = await Category.findById(item.productId.category);
+            const productOffer = item.productId.productOffer || 0;
+            const categoryOffer = category ? category.categoryOffer || 0 : 0;
+            const bestOffer = Math.max(productOffer, categoryOffer);
+
+            const newOrder = new Order({
+                userId,
+                product: item.productId._id,
+                quantity: item.quantity,
+                price: item.productId.salePrice,
+                finalPrice,
+                totalPrice,
+                discount: bestOffer,
+                couponDiscount: proportionateCouponDiscount,
+                status: "pending",
+                address: addressId,
+                paymentMethod: "razorpay",
+                paymentStatus: "paid",
+                createdOn: new Date(),
+            });
+
+            await newOrder.save();
+            await Product.findByIdAndUpdate(item.productId, { $inc: { quantity: -item.quantity } });
         }
 
-        // Clear cart
-        await Cart.findOneAndDelete({ userId });
+        await Cart.findOneAndUpdate({ userId }, { $unset: { discount: 1, couponCode: 1 }, $set: { items: [], cartTotal: 0, finalTotal: 0 } });
 
         res.json({ success: true, message: "Order placed successfully!" });
     } catch (error) {
@@ -122,7 +134,9 @@ const verifyPayment = async (req, res) => {
 };
 
 
-module.exports={
+
+module.exports = {
+
     createRazorpayOrder,
     verifyPayment
 }

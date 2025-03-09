@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <style>
+        .sidebar {
+            background-color: #f8f9fa;
+            border-right: 1px solid #dee2e6;
+        }
+        .sidebar a {
+            color: #495057;
+            padding: 10px 15px;
+            display: block;
+            transition: background-color 0.3s;
+        }
+        .sidebar a:hover {
+            background-color: #e2e6ea;
+        }
+        .content {
+            padding: 2rem;
+        }
+        .content h2 {
+            color: #1a4741;
+        }
+        .info-box {
+            background-color: #f1f3f5;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .profile-main{
+            position: relative;
+            left: 13%;
+        }
+    </style>
+</head>
+<body>
+     <div class="w-full lg:w-1/4 sidebar p-4">
+            <h2 class="text-xl font-bold mb-4">SETTINGS</h2>
+            <ul>
+                <li class="mb-2"><a href="/orders" class="text-black">Orders</a></li>
+                <li class="mb-2"><a href="/profile" class="text-black">Personal Info</a></li>
+                <li class="mb-2"><a href="/address" class="text-black">Addresses</a></li>
+                <li class="mb-2"><a href="/wallet" class="text-black">Wallet</a></li>
+                <li class="mb-2"><a href="/coupons" class="text-black">Coupons</a></li>
+                <li class="mb-2"><a href="/logout" class="text-black">Logout</a></li>
+
+            </ul>
+        </div>
+       
+</body>
+</html>

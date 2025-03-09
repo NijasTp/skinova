@@ -20,18 +20,16 @@ const blockLoggedInUsers = (req, res, next) => {
 
 const checkBlockedUser = async (req, res, next) => {
     try {
-        // If user is logged in, check if they are blocked
         if (req.session.user) {
             const user = await User.findById(req.session.user);
 
-            // If user is found and is blocked, destroy the session and redirect
+        
             if (user && user.isBlocked) {
                 delete req.session.user;
                 return res.redirect('/login'); 
             }
         }
 
-        // If user is not logged in OR not blocked, proceed normally
         next();
     } catch (error) {
         console.error("Error checking blocked user:", error);
@@ -39,18 +37,7 @@ const checkBlockedUser = async (req, res, next) => {
     }
 };
 
-// const loggedinblock = async (req,res,next) => {
-//     try {
 
-//         if(req.session.user){
-//             res.redirect("/")
-//         }
-//         next()
-        
-//     } catch (error) {
-//         res.redirect("/pageNotFound")
-//     }
-// }
 
 
 module.exports = {

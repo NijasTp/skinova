@@ -50,59 +50,71 @@
             z-index: 100;
         }
         .hero {
-            display: flex;
-            justify-content: space-between;
-            background-color: #e6f4f4;
-            align-items: center;
-            padding: 4rem 2rem;
-            width: 100%;
-            margin: 0 auto;
-            min-height: 50vh;
-        }
-        .hero-content {
-            max-width: 500px;
-            margin-left: 40%;
-        }
-        .hero-title {
-            font-size: 2rem;
-            line-height: 1.2;
-            color: #2c3e50;
-            margin-bottom: 1rem;
-        }
-        .hero-description {
-            color: #5d6d7e;
-            margin-bottom: 2rem;
-            line-height: 1.6;
-        }
-        .cta-button {
-            display: inline-block;
-            padding: 0.8rem 2rem;
-            background-color: #1a4741;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            transition: background-color 0.3s ease;
-        }
-        .cta-button:hover {
-            background-color: #123530;
-        }
-        .hero-image {
-            width: 300px;
-            position: relative;
-            right: 100px;
-        }
-        @media (max-width: 768px) {
-            .hero {
-                flex-direction: column;
-                text-align: center;
-                padding: 2rem;
-            }
-            .hero-image {
-                width: 300px;
-                position: relative;
-                left: 30px;
-            }
-        }
+      display: flex;
+      justify-content: space-between;
+      background-color: #e6f4f4;
+      align-items: center;
+      padding: 4rem 2rem;
+      width: 100%;
+      margin: 0 auto;
+      min-height: 50vh;
+    }
+
+    .hero-content {
+      max-width: 500px;
+      margin-left: 40%;
+    }
+
+    .hero-title {
+      font-size: 2rem;
+      line-height: 1.2;
+      color: #2c3e50;
+      margin-top: 40px;;
+    }
+
+    .hero-description {
+      color: #5d6d7e;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+
+    .cta-button {
+      display: inline-block;
+      padding: 0.8rem 2rem;
+      background-color: #1a4741;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+    }
+
+    .cta-button:hover {
+      background-color: #123530;
+    }
+
+    .hero-image {
+      width: 300px;
+      position: relative;
+      right: 100px;
+    }
+
+    @media (max-width: 768px) {
+      .hero {
+        flex-direction: column;
+        text-align: center;
+        padding: 2rem;
+      }
+
+      .hero-content {
+        margin-left: 0;
+      }
+
+      .hero-image {
+        width: 300px;
+        position: relative;
+        left: 0;
+      }
+    }
     </style>
 </head>
 <body class="bg-white text-gray-800">
@@ -111,13 +123,27 @@
     <%- include('../partials/user/header') %> 
     <main class="hero w-full">
         <div class="hero-content">
-            <b><h1 class="hero-title">PRODUCT</h1></b>
-            <p class="hero-description">
-                <a href="/">Home</a> <span> > </span> <a href="#">Product</a>
-            </p>
+         <b>
+          <h1 class="hero-title">
+            PRODUCT
+          </h1>
+         </b>
+         <p class="hero-description">
+          <i>
+           <a href="/">
+            Home
+           </a>
+           <span>
+            &gt;
+           </span>
+           <a href="#">
+            Product Details
+           </a>
+          </i>
+         </p>
         </div>
-        <img src="/img/skinova cover.png" alt="Skinova Cover" class="hero-image">
-    </main>
+        <img alt="Illustration of a shopping cart with various items" class="hero-image" height="300" src="/img/skinova cover.png" width="300"/>
+       </main>
     <div class="max-w-7xl mx-auto p-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-10 bg-white p-6 shadow-lg rounded-lg">
             <div class="space-y-4 zoom-container">
@@ -140,7 +166,12 @@
                     <span class="bg-red-500 text-white px-2 py-1 text-sm rounded"> <%= product.productOffer %>% Off</span>
                 </div>
                 <p class="mt-4 text-gray-700 leading-relaxed"><%= product.description %></p>
-                
+               <% if (product.quantity < 10) { %>
+                    <p class="mt-4 text-red-500 font-semibold">Only <%= product.quantity %> left in stock</p>
+              <%  } else { %>
+                    <p class="mt-4 text-green-500 font-semibold">In Stock</p>
+              <%  } %>
+            
                 <div class="mt-6 flex items-center space-x-4">
                     <input type="number" id="quantity" value="1" min="1" max="5" class="w-20 px-2 py-2 border rounded text-center">
                     <button onclick="addToCart('<%= product._id %>')" class="bg-teal-500 text-white px-6 py-3 rounded-lg hover:bg-teal-600 transition">Add to Cart</button>
@@ -173,34 +204,44 @@
     }
     
     function addToCart(productId) {
-        const quantity = document.getElementById('quantity').value;
-        fetch(`/addToCart?id=${productId}&quantity=${quantity}`)
-            .then(response => response.json())
-            .then(data => {
+    const quantity = document.getElementById('quantity').value;
+    fetch(`/addToCart?id=${productId}&quantity=${quantity}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
                 Swal.fire({
-                    icon: data.success ? 'success' : 'error',
-                    title: data.success ? 'Added to Cart' : 'Error',
+                    icon: 'success',
+                    title: 'Added to Cart',
                     text: data.message,
                     timer: 2000,
                     showConfirmButton: false
                 });
-            })
-            .catch(error => {
+            } else {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'Something went wrong. Please try again.'
+                    text: data.message
                 });
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Something went wrong. Please try again.'
             });
-    }
+        });
+}
+
 
     function addToWishlist(productId) {
         fetch(`/addToWishlist?id=${productId}`)
             .then(response => response.json())
             .then(data => {
                 Swal.fire({
-                    icon: data.success ? 'success' : 'info',
-                    title: data.success ? 'Added to Wishlist' : 'Already There!',
+                    icon: data.success ? 'success' : 'error',
+                    title: data.success ? 'Added to Wishlist' : 'Error!',
                     text: data.message,
                     timer: 2000,
                     showConfirmButton: false

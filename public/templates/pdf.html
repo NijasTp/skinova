@@ -1,0 +1,51 @@
+<html>
+        <head>
+            <title>Sold Products Report</title>
+            <style>
+                body { font-family: Arial, sans-serif; padding: 20px; }
+                h1 { text-align: center; }
+                table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                th { background-color: #f4f4f4; }
+                .summary { margin-top: 20px; }
+                .summary div { font-size: 18px; margin-bottom: 5px; }
+            </style>
+        </head>
+        <body>
+            <h1>Sold Products Report</h1>
+
+            <div class="summary">
+                <div><strong>Total Orders:</strong> ${totalOrders}</div>
+                <div><strong>Total Sales:</strong> ₹${totalSales.toFixed(2)}</div>
+                <div><strong>Total Discount:</strong> ₹${totalDiscount.toFixed(2)}</div>
+                <div><strong>Total Coupon Discount:</strong> ₹${totalCouponDiscount.toFixed(2)}</div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Final Price</th>
+                        <th>Discount</th>
+                        <th>Coupon Discount</th>
+                        <th>Status</th>
+                        <th>Sold On</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${soldProducts.map(order => `
+                        <tr>
+                            <td>${order._id}</td>
+                            <td>${order.customerName || 'N/A'}</td>
+                            <td>₹${order.finalPrice.toFixed(2)}</td>
+                            <td>${order.discount}%</td>
+                            <td>₹${order.couponDiscount.toFixed(2)}</td>
+                            <td>${order.status}</td>
+                            <td>${new Date(order.deliveredOn).toLocaleDateString()}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        </body>
+        </html>

@@ -2,129 +2,195 @@
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Wallet Page</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet"/>
     <style>
-        body { font-family: 'Roboto', sans-serif; }
-        .card:hover { transform: translateY(-10px);
-             transition: transform 0.3s ease;
-         }
+        body { 
+            font-family: 'Roboto', sans-serif;
+            padding: 0;
+        }
+        .card:hover { 
+            transform: translateY(-10px);
+            transition: transform 0.3s ease;
+        }
+
         .hero {
-            display: flex;
-            justify-content: space-between;
-            background-color: #e6f4f4;
-            align-items: center;
-            padding: 4rem 2rem;
-            width: 100%;
-            margin: 0 auto;
-            min-height: 50vh;
+      display: flex;
+      justify-content: space-between;
+      background-color: #e6f4f4;
+      align-items: center;
+      padding: 4rem 2rem;
+      width: 100%;
+      margin: 0 auto;
+      min-height: 50vh;
+    }
+
+    .hero-content {
+      max-width: 500px;
+      margin-left: 40%;
+    }
+
+    .hero-title {
+      font-size: 2rem;
+      line-height: 1.2;
+      color: #2c3e50;
+      margin-top: 40px;;
+    }
+
+    .hero-description {
+      color: #5d6d7e;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+
+    .cta-button {
+      display: inline-block;
+      padding: 0.8rem 2rem;
+      background-color: #1a4741;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+    }
+
+    .cta-button:hover {
+      background-color: #123530;
+    }
+
+    .hero-image {
+      width: 300px;
+      position: relative;
+      right: 100px;
+    }
+
+    @media (max-width: 768px) {
+      .hero {
+        flex-direction: column;
+        text-align: center;
+        padding: 2rem;
+      }
+
+      .hero-content {
+        margin-left: 0;
+      }
+
+      .hero-image {
+        width: 300px;
+        position: relative;
+        left: 0;
+      }
+    }
+        .sidebar {
+            background-color: #f8f9fa;
+            border-right: 1px solid #dee2e6;
         }
-        .hero-content {
-            max-width: 500px;
-            margin-left: 40%;
+        .sidebar a {
+            color: #495057;
+            padding: 10px 15px;
+            display: block;
+            transition: background-color 0.3s;
         }
-        .hero-title {
-            font-size: 2rem;
-            line-height: 1.2;
-            color: #2c3e50;
+        .sidebar a:hover {
+            background-color: #e2e6ea;
+        }
+        .content {
+            padding: 2rem;
+        }
+        .content h2 {
+            color: #1a4741;
+        }
+        .info-box {
+            background-color: #f1f3f5;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            padding: 1rem;
             margin-bottom: 1rem;
         }
-        .hero-description {
-            color: #5d6d7e;
-            margin-bottom: 2rem;
-            line-height: 1.6;
-        }
-        .cta-button {
-            display: inline-block;
-            padding: 0.8rem 2rem;
-            background-color: #1a4741;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            transition: background-color 0.3s ease;
-        }
-        .cta-button:hover {
-            background-color: #123530;
-        }
-        .hero-image {
-            width: 300px;
+        .profile-main {
             position: relative;
-            right: 100px;
-        }
-        @media (max-width: 768px) {
-            .hero {
-                flex-direction: column;
-                text-align: center;
-                padding: 2rem;
-            }
-            .hero-image {
-                width: 300px;
-                position: relative;
-                left: 30px;
-            }
+            left: 13%;
         }
     </style>
 </head>
 <body class="bg-gray-100">
+    <%-include('../partials/user/header')%>
     <div class="container mx-auto p-4">
-        <%- include('../partials/user/header') %> 
         <main class="hero w-full">
             <div class="hero-content">
-                <b><h1 class="hero-title">WALLET</h1></b>
-                <p class="hero-description">
-                    <i><a href="/">Home</a> <span> > </span> <a href="/wallet">Wallet</a></i>
-                </p>
+             <b>
+              <h1 class="hero-title">
+               WALLET
+              </h1>
+             </b>
+             <p class="hero-description">
+              <i>
+               <a href="/">
+                Home
+               </a>
+               <span>
+                &gt;
+               </span>
+               <a href="/wallet">
+                Wallet
+               </a>
+              </i>
+             </p>
             </div>
-            <img src="/img/skinova cover.png" alt="Skinova Cover" class="hero-image">
-        </main>
-        
-        <section class="my-8">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="card bg-white p-6 rounded-lg shadow-lg">
-                    <div class="flex items-center justify-between">
-                        <h2 class="text-xl font-semibold text-gray-800">Balance</h2>
-                        <i class="fas fa-wallet text-2xl text-gray-600"></i>
-                    </div>
-                    <p class="text-3xl font-bold text-gray-800 mt-4">₹<%= wallet.balance.toFixed(2) %></p>
-                </div>
-                <div class="card bg-white p-6 rounded-lg shadow-lg">
-                    <div class="flex items-center justify-between">
-                        <h2 class="text-xl font-semibold text-gray-800">Total Credit</h2>
-                        <i class="fas fa-arrow-up text-2xl text-green-600"></i>
-                    </div>
-                    <p class="text-3xl font-bold text-gray-800 mt-4">₹<%= totalCredit.toFixed(2) %></p>
-                </div>
-                <div class="card bg-white p-6 rounded-lg shadow-lg">
-                    <div class="flex items-center justify-between">
-                        <h2 class="text-xl font-semibold text-gray-800">Total Debit</h2>
-                        <i class="fas fa-arrow-down text-2xl text-red-600"></i>
-                    </div>
-                    <p class="text-3xl font-bold text-gray-800 mt-4">₹<%= totalDebit.toFixed(2) %></p>
-                </div>
-            </div>
-        </section>
-        
-        <section class="my-8">
-            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Recent Transactions</h2>
-            <div class="bg-white p-6 rounded-lg shadow-lg">
-                <% if (wallet.transactions.length > 0) { %>
-                    <% wallet.transactions.forEach(transaction => { %>
-                        <div class="flex justify-between items-center border-b pb-4 mb-4">
-                            <div>
-                                <p class="text-lg font-semibold text-gray-800"><%= transaction.description %></p>
-                                <p class="text-gray-600"><%= new Date(transaction.date).toLocaleDateString() %></p>
+            <img alt="Illustration of a shopping cart with various items" class="hero-image" height="300" src="/img/skinova cover.png" width="300"/>
+           </main>
+        <div class="flex flex-wrap">
+ <%-include('../partials/user/sidebar')%>
+            <div class="w-full lg:w-3/4 p-4">
+                <section class="my-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="card bg-white p-6 rounded-lg shadow-lg">
+                            <div class="flex items-center justify-between">
+                                <h2 class="text-xl font-semibold text-gray-800">Balance</h2>
+                                <i class="fas fa-wallet text-2xl text-gray-600"></i>
                             </div>
-                            <p class="text-lg font-semibold <%= transaction.type === 'credit' ? 'text-green-600' : 'text-red-600' %>">₹<%= transaction.amount.toFixed(2) %></p>
+                            <p class="text-3xl font-bold text-gray-800 mt-4">₹<%= wallet.balance.toFixed(2) %></p>
                         </div>
-                    <% }) %>
-                <% } else { %>
-                    <p class="text-gray-600">No transactions yet.</p>
-                <% } %>
+                        <div class="card bg-white p-6 rounded-lg shadow-lg">
+                            <div class="flex items-center justify-between">
+                                <h2 class="text-xl font-semibold text-gray-800">Total Credit</h2>
+                                <i class="fas fa-arrow-up text-2xl text-green-600"></i>
+                            </div>
+                            <p class="text-3xl font-bold text-gray-800 mt-4">₹<%= totalCredit.toFixed(2) %></p>
+                        </div>
+                        <div class="card bg-white p-6 rounded-lg shadow-lg">
+                            <div class="flex items-center justify-between">
+                                <h2 class="text-xl font-semibold text-gray-800">Total Debit</h2>
+                                <i class="fas fa-arrow-down text-2xl text-red-600"></i>
+                            </div>
+                            <p class="text-3xl font-bold text-gray-800 mt-4">₹<%= totalDebit.toFixed(2) %></p>
+                        </div>
+                    </ ```html
+                </div>
+                </section>
+                <section class="my-8">
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Recent Transactions</h2>
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <% if (wallet.transactions.length > 0) { %>
+                            <% wallet.transactions.forEach(transaction => { %>
+                                <div class="flex justify-between items-center border-b pb-4 mb-4">
+                                    <div>
+                                        <p class="text-lg font-semibold text-gray-800"><%= transaction.description %></p>
+                                        <p class="text-gray-600"><%= new Date(transaction.date).toLocaleDateString() %></p>
+                                    </div>
+                                    <p class="text-lg font-semibold <%= transaction.type === 'credit' ? 'text-green-600' : 'text-red-600' %>">₹<%= transaction.amount.toFixed(2) %></p>
+                                </div>
+                            <% }) %>
+                        <% } else { %>
+                            <p class="text-gray-600">No transactions yet.</p>
+                        <% } %>
+                    </div>
+                </section>
             </div>
-        </section>
+        </div>
     </div>
+    <%-include('../partials/user/footer')%>
 </body>
 </html>

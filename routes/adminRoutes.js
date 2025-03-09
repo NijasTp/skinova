@@ -7,6 +7,7 @@ const adminController = require('../controllers/admin/adminController');
 const customerController = require('../controllers/admin/customerController');
 const categoryController = require('../controllers/admin/categoryController');
 const productController = require('../controllers/admin/productController');
+const transactionController = require('../controllers/admin/transactionController');
 const { adminAuth } = require('../middlewares/auth');
 const multer = require("multer");
 const upload = multer();
@@ -15,6 +16,7 @@ router.get('/pageerror', adminController.pageError);
 router.get('/login', adminController.loadLogin);
 router.post('/login', adminController.login);
 router.get('/', adminAuth, adminController.loadDashboard);
+router.get('/download-sold-products', adminAuth, adminController.downloadSoldProducts);
 router.get('/logout', adminController.logout);
 
 router.get('/users', adminAuth, customerController.customerInfo);
@@ -62,12 +64,22 @@ router.get('/deleteProduct',adminAuth,productController.deleteProduct);
 
 
 router.get('/orders', adminAuth, productController.getOrders);
-router.get('/orders/:orderId/product/:productId', adminAuth, productController.getOrderDetails);
+router.get('/orders/:orderId', adminAuth, productController.getOrderDetails);
 router.post('/orders/update-status', adminAuth, productController.updateOrderStatus);
 router.post('/orders/cancel', adminAuth,productController.cancelOrder);
+router.post('/orders/approve-return', productController.approveReturn);
+router.post('/orders/reject-return', productController.rejectReturn);
+
+//Coupons
+router.get('/coupon', adminAuth, productController.getCoupons);
+router.get('/add-coupon', adminAuth, productController.getCouponAddPage);
+router.post('/add-coupon', adminAuth, productController.addCoupon);
+
+router.get("/delete-coupon/:id", productController.deleteCoupon);
+
+//Transactions
+router.get('/transactions', adminAuth, transactionController.getTransactions);
 
 
-router.post('/approve-return/:itemId', productController.approveReturn);
-router.post('/reject-return/:itemId', productController.rejectReturn);
 
 module.exports = router;

@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>Skinova Admin</title>
+    <link rel="icon" href="/img/favicon.jpg" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" type="image/x-icon" href="/admin-assets/img/favicon.ico">
     <link href="/admin-assets/css/main.css" rel="stylesheet" type="text/css" />
@@ -11,11 +12,11 @@
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <style>
         :root {
-            --primary-color: #070b2f;
-            --secondary-color: #020733;
-            --accent-color: #050b31;
+            --primary-color: #000000;
+            --secondary-color: #000000;
+            --accent-color: #000000;
             --text-color: #ffffff;
-            --hover-color: #03071b;
+            --hover-color: #000000;
         }
 
         body {
@@ -24,11 +25,11 @@
         }
 
         .navbar {
-            background-color: rgb(9, 9, 46);
+            background-color: rgb(0, 0, 0);
         }
 
         .navbar-aside {
-            background-color: rgb(9, 9, 46);
+            background-color: rgb(0, 0, 0);
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
         }
 
@@ -103,8 +104,9 @@
                     { link: '/admin/addProducts', icon: 'fas fa-plus-square', text: 'Add product' },
                     { link: '/admin/products', icon: 'fas fa-box', text: 'Products' },
                     { link: '/admin/coupon', icon: 'fas fa-ticket-alt', text: 'Coupon' },
-                    { link: '/admin/banner', icon: 'fas fa-image', text: 'Banner' },
-                    { link: '/admin/orders', icon: 'fas fa-shopping-cart', text: 'Orders' }
+                    { link: '/admin/orders', icon: 'fas fa-shopping-cart', text: 'Orders' },
+                    { link: '/admin/transactions ', icon: 'fas fa-credit-card', text: 'Transactions' },
+                    { link: '/admin/logout', icon: 'fas fa-sign-out-alt', text: 'Logout' },
                 ]; %>
                 
                 <% menuItems.forEach(item => { %>
@@ -119,30 +121,4 @@
         </nav>
     </aside>
     <main class="main-wrap">
-        <header class="main-header navbar">
-            <div class="col-search">
-                <!-- Add search functionality if needed -->
-            </div>
-            <div class="col-nav">
-                <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"> 
-                    <i class="fas fa-bars"></i>
-                </button>
-                <ul class="nav">
-                    <li class="dropdown nav-item">
-                        <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownAccount" aria-expanded="false"> 
-                           <h3><b>ADMIN</b></h3>
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownAccount">
-                            <a class="dropdown-item text-secondary" href="/admin/profile">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16">
-                                    <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
-                                  </svg> Profile
-                            </a>
-                            <a class="dropdown-item text-danger" href="/admin/logout">
-                                <i class="fas fa-sign-out-alt"></i> Logout
-                            </a>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-        </header>
+       

@@ -42,59 +42,71 @@
             object-fit: cover;
         }
         .hero {
-            display: flex;
-            justify-content: space-between;
-            background-color: #e6f4f4;
-            align-items: center;
-            padding: 4rem 2rem;
-            width: 100%;
-            margin: 0 auto;
-            min-height: 50vh;
-        }
-        .hero-content {
-            max-width: 500px;
-            margin-left: 40%;
-        }
-        .hero-title {
-            font-size: 2rem;
-            line-height: 1.2;
-            color: #2c3e50;
-            margin-bottom: 1rem;
-        }
-        .hero-description {
-            color: #5d6d7e;
-            margin-bottom: 2rem;
-            line-height: 1.6;
-        }
-        .cta-button {
-            display: inline-block;
-            padding: 0.8rem 2rem;
-            background-color: #1a4741;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            transition: background-color 0.3s ease;
-        }
-        .cta-button:hover {
-            background-color: #123530;
-        }
-        .hero-image {
-            width: 300px;
-            position: relative;
-            right: 100px;
-        }
-        @media (max-width: 768px) {
-            .hero {
-                flex-direction: column;
-                text-align: center;
-                padding: 2rem;
-            }
-            .hero-image {
-                width: 300px;
-                position: relative;
-                left: 30px;
-            }
-        }
+      display: flex;
+      justify-content: space-between;
+      background-color: #e6f4f4;
+      align-items: center;
+      padding: 4rem 2rem;
+      width: 100%;
+      margin: 0 auto;
+      min-height: 50vh;
+    }
+
+    .hero-content {
+      max-width: 500px;
+      margin-left: 40%;
+    }
+
+    .hero-title {
+      font-size: 2rem;
+      line-height: 1.2;
+      color: #2c3e50;
+      margin-top: 70px;;
+    }
+
+    .hero-description {
+      color: #5d6d7e;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+
+    .cta-button {
+      display: inline-block;
+      padding: 0.8rem 2rem;
+      background-color: #1a4741;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+    }
+
+    .cta-button:hover {
+      background-color: #123530;
+    }
+
+    .hero-image {
+      width: 300px;
+      position: relative;
+      right: 100px;
+    }
+
+    @media (max-width: 768px) {
+      .hero {
+        flex-direction: column;
+        text-align: center;
+        padding: 2rem;
+      }
+
+      .hero-content {
+        margin-left: 0;
+      }
+
+      .hero-image {
+        width: 300px;
+        position: relative;
+        left: 0;
+      }
+    }
         /* Style for sorting dropdown */
         .form-control {
             padding: 0.5rem 1rem;
@@ -138,6 +150,8 @@
                 display: flex;
                 flex-direction: column;
                 gap: 0.5rem;
+               /* margin-right: 50px; */
+               margin-top: 20px;
             }
         }
         .flutter-button {
@@ -166,13 +180,27 @@
     <%- include('../partials/user/header') %> 
     <main class="hero w-full">
         <div class="hero-content">
-            <b><h1 class="hero-title">SHOP</h1></b>
-            <p class="hero-description">
-                <a href="/">Home</a> <span> > </span> <a href="/shop">Shop</a>
-            </p>
+         <b>
+          <h1 class="hero-title">
+          SHOP
+          </h1>
+         </b>
+         <p class="hero-description">
+          <i>
+           <a href="/">
+            Home
+           </a>
+           <span>
+            &gt;
+           </span>
+           <a href="/shop">
+            Shop
+           </a>
+          </i>
+         </p>
         </div>
-        <img src="/img/skinova cover.png" alt="Skinova Cover" class="hero-image">
-    </main>
+        <img alt="Illustration of a shopping cart with various items" class="hero-image" height="300" src="/img/skinova cover.png" width="300"/>
+       </main>
     <div class="container mx-auto px-4 py-8">
         <div class="flex flex-wrap -mx-4">
             <div class="w-full md:w-1/4 px-4">
@@ -181,45 +209,49 @@
                     <ul class="mb-8">
                         <% for (let i = 0; i < category.length; i++) { %>
                             <li class="mb-2">
-                                <a class="text-gray-700" href="/filter?category=<%= category[i]._id %>">
+                                <a class="text-gray-700" href="/shop?category=<%= category[i]._id %>&search=<%= search %>&sort=<%= sort %>">
                                     <%= category[i].name %>
                                 </a>
                             </li>
                         <% } %>
-                    </ul>
-                    <h2 class="text-xl font-semibold mb-4">PRICE RANGE</h2>
-                    <div class="mb-4">
-                        <label class="block text-gray-700" for="price-from">Price From:</label>
-                        <input class="w-full p-2 border rounded" id="price-from" type="number" value="1"/>
-                    </div>
-                    <div class="mb-4">
-                        <label class="block text-gray-700" for="price-to">Price To:</label>
-                        <input class="w-full p-2 border rounded" id="price-to" type="number" value="2000"/>
-                    </div>
+                    </ul>                    
+                    
+                    
                 </div>
             </div>
             <div class="w-full md:w-3/4 px-4">
                 <div class="flex justify-end mb-4">
                     <form action="/shop" method="GET" class="form-inline">
-                        <div class="form-group mr-2">
-                            <input type="text" id="advanced-search-glow" name="search" class="form-control" placeholder="Search products...">
-                        </div>
-                        <div class="form-group mr-2">
-                            <select name="sort" class="form-control">
-                                <option value="">Sort by...</option>
-                                <option value="popularity">Popularity</option>
-                                <option value="price_asc">Price: Low to High</option>
-                                <option value="price_desc">Price: High to Low</option>
-                                <option value="rating">Average Ratings</option>
-                                <option value="featured">Featured</option>
-                                <option value="new">New Arrivals</option>
-                                <option value="name_asc">Name: A to Z</option>
-                                <option value="name_desc">Name: Z to A</option>
-                            </select>
-                        </div>
+                        <!-- Search Input -->
+                        <input type="text" name="search" class="form-control" placeholder="Search products..." value="<%= search %>">
+                    
+                        <!-- Category Dropdown -->
+                        <select name="category" class="form-control">
+                            <option value="">All Categories</option>
+                            <% category.forEach(cat => { %>
+                                <option value="<%= cat._id %>" <%= selectedCategory == cat._id ? "selected" : "" %>>
+                                    <%= cat.name %> (<%= cat.productCount %>)
+                                </option>
+                            <% }) %>
+                        </select>
+                    
+                        <!-- Sorting Dropdown -->
+                        <select name="sort" class="form-control">
+                            <option value="">Sort by...</option>
+                            <option value="popularity" <%= sort === "popularity" ? "selected" : "" %>>Popularity</option>
+                            <option value="price_asc" <%= sort === "price_asc" ? "selected" : "" %>>Price: Low to High</option>
+                            <option value="price_desc" <%= sort === "price_desc" ? "selected" : "" %>>Price: High to Low</option>
+                            <option value="rating" <%= sort === "rating" ? "selected" : "" %>>Average Ratings</option>
+                            <option value="featured" <%= sort === "featured" ? "selected" : "" %>>Featured</option>
+                            <option value="new" <%= sort === "new" ? "selected" : "" %>>New Arrivals</option>
+                            <option value="name_asc" <%= sort === "name_asc" ? "selected" : "" %>>Name: A to Z</option>
+                            <option value="name_desc" <%= sort === "name_desc" ? "selected" : "" %>>Name: Z to A</option>
+                        </select>
+                    
                         <button type="submit" class="btn btn-primary">Apply</button>
-                        <a href="/shop"><button type="button" class="btn btn-danger">Clear All</button></a>
+                        <a href="/shop" class="btn btn-danger">Clear All</a>
                     </form>
+                    
                 </div>
                 <div class="flex flex-wrap -mx-4">
                     <% for (let i = 0; i < products.length; i++) { %>
@@ -246,72 +278,83 @@
                         </div>
                     <% } %>
                 </div>
-                <div class="pagination">
-                    <% if (currentPage > 1) { %>
-                        <a href="/shop?page=<%= currentPage - 1 %>" class="prev-arrow">
-                            <i class="fa fa-long-arrow-left" aria-hidden="true"></i>
-                        </a>
-                    <% } %>
-                    <% if (totalPages > 5 && currentPage > 3) { %>
-                        <a href="/shop?page=1">1</a>
-                        <% if (currentPage > 4) { %>
-                            <a href="#" class="dot-dot">
-                                <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
+                <div class="flex justify-center mt-6">
+                    <nav class="flex space-x-2">
+                        <% if (currentPage > 1) { %>
+                            <a href="/shop?page=<%= currentPage - 1 %>&search=<%= search %>&category=<%= selectedCategory %>&sort=<%= sort %>"
+                               class="px-3 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
+                                <i class="fas fa-chevron-left"></i>
                             </a>
                         <% } %>
-                    <% } %>
-                    <% for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) { %>
-                        <a href="/shop?page=<%= i %>" class="<%= currentPage === i ? 'active' : '' %>"><%= i %></a>
-                    <% } %>
-                    <% if (totalPages > 5 && currentPage < totalPages - 2) { %>
-                        <% if (currentPage < totalPages - 3) { %>
-                            <a href="#" class="dot-dot">
-                                <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
+                
+                        <% for (let i = 1; i <= totalPages; i++) { %>
+                            <a href="/shop?page=<%= i %>&search=<%= search %>&category=<%= selectedCategory %>&sort=<%= sort %>"
+                               class="px-4 py-2 rounded-lg <%= currentPage === i ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-300' %> transition">
+                                <%= i %>
                             </a>
                         <% } %>
-                        <a href="/shop?page=<%= totalPages %>"><%= totalPages %></a>
-                    <% } %>
-                    <% if (currentPage < totalPages) { %>
-                        <a href="/shop?page=<%= currentPage + 1 %>" class="next-arrow">
-                            <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
-                        </a>
-                    <% } %>
+                
+                        <% if (currentPage < totalPages) { %>
+                            <a href="/shop?page=<%= currentPage + 1 %>&search=<%= search %>&category=<%= selectedCategory %>&sort=<%= sort %>"
+                               class="px-3 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        <% } %>
+                    </nav>
                 </div>
+                
+                
             </div>
         </div>
     </div>
     <%- include('../partials/user/footer') %>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        function addToCart(productId) {
-            fetch(`/addToCart?id=${productId}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Added to Cart',
-                            text: data.message,
-                            timer: 2000,
-                            showConfirmButton: false
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: data.message
-                        });
-                    }
-                })
-                .catch(error => {
-                    console.error("Error:", error);
+function addToCart(productId, quantity = 1) {
+    fetch(`/addToCart?id=${productId}&quantity=${quantity}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Added to Cart',
+                    text: data.message,
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            } else {
+                if (data.message === "Please log in first.") {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Login Required',
+                        text: 'You must be logged in to add items to your cart.',
+                        showConfirmButton: true,
+                        confirmButtonText: 'Login',
+                        allowOutsideClick: false
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = "/login"; 
+                        }
+                    });
+                } else {
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
-                        text: 'Something went wrong. Please try again.'
+                        text: data.message
                     });
-                });
-        }
+                }
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Something went wrong. Please try again.'
+            });
+        });
+}
+
 
         function addToWishlist(productId) {
             fetch(`/addToWishlist?id=${productId}`)
@@ -327,8 +370,8 @@
                         });
                     } else {
                         Swal.fire({
-                            icon: 'info',
-                            title: 'Already There!',
+                            icon: 'error',
+                            title: 'Error!',
                             text: data.message,
                             timer: 2000,
                             showConfirmButton: false

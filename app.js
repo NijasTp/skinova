@@ -28,19 +28,23 @@ app.use(
       resave: false,
       saveUninitialized: false,
       cookie: { secure: false, httpOnly: true, maxAge: 72 * 60 * 60 * 1000 },
+      store: MongoStore.create({
+        mongoUrl: process.env.MONGODB_URI,
+      }),
     }),
   )
 
+  
+  app.use((req, res, next) => {
+    res.locals.user = req.session.user || null; 
+    next();
+});
   
 app.use(flash());
 
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use((req, res, next) => {
-    res.locals.user = req.user
-    next()
-  })
 
 app.use((req,res,next) => {
     res.set('Cache-Control','no-store')
@@ -54,10 +58,19 @@ app.set('views', [path.join(__dirname, 'views/user'), path.join(__dirname, 'view
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-app.use('/',userRouter);
 
 app.use('/admin', adminRouter);
+app.use('/',userRouter);
 
+
+app.use("/admin", (req, res) => {
+  res.status(404).redirect("/admin/pageerror");
+});
+
+
+app.use((req, res) => {
+  res.status(404).redirect("/pageNotFound");
+});
 
 
 app.listen(3000, () => {

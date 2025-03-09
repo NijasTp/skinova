@@ -13,7 +13,7 @@ const loadWishlist = async (req, res) => {
 
         if (wishlist) {
             
-            const validProducts = wishlist.products.filter(item => item.productId !== null);
+            const validProducts = wishlist.products.filter(item => item.productId !== null && !item.productId.isBlocked);
 
             
             if (validProducts.length !== wishlist.products.length) {
@@ -35,7 +35,7 @@ const addToWishlist = async (req, res) => {
     try {
         const userId = req.session.user;
         if (!userId) {
-            return res.redirect('/login');
+            return res.status(401).json({ success: false, message: "Please log in first" });
         }
 
         const productId = req.query.id;
@@ -44,7 +44,11 @@ const addToWishlist = async (req, res) => {
             return res.status(404).json({ success: false, message: "Product not found" });
         }
 
-        // ✅ CHECK IF ITEM IS IN CART
+        if (product.isBlocked) {
+            return res.status(400).json({ success: false, message: "This product is not available for adding to wishlist" });
+        }
+
+       
         const cart = await Cart.findOne({ userId, "items.productId": productId });
         if (cart) {
             return res.json({ success: false, message: "Item is already in the cart!" });

@@ -24,7 +24,9 @@ const loadWallet = async (req, res) => {
             await wallet.save();
         }
 
-        // Calculate total credit and debit
+        wallet.transactions.sort((a, b) => b.date - a.date);
+
+        
         const totalCredit = wallet.transactions
             .filter(txn => txn.type === 'credit')
             .reduce((sum, txn) => sum + txn.amount, 0);

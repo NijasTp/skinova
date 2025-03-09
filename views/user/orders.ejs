@@ -1,352 +1,182 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Orders</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Orders - Skincare E-commerce</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet"/>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-
-        .order-container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-        }
-
-        .order {
-            border-bottom: 2px solid #ddd;
-            padding: 15px 0;
-        }
-
-        .order-header {
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .product {
+        body { font-family: 'Roboto', sans-serif; }
+        .hero {
             display: flex;
             justify-content: space-between;
+            background-color: #e6f4f4;
             align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid #ddd;
+            padding: 4rem 2rem;
+            width: 100%;
+            margin: 0 auto;
+            min-height: 50vh;
         }
-
-        .product:last-child {
-            border-bottom: none;
+        .hero-content {
+            max-width: 500px;
+            margin-left: 40%;
         }
-
-        .product img {
-            width: 60px;
-            height: 60px;
-            object-fit: cover;
-            border-radius: 5px;
+        .hero-title {
+            font-size: 2rem;
+            line-height: 1.2;
+            color: #2c3e50;
+            margin-top: 70px;
         }
-
-        .status {
-            padding: 5px 10px;
-            border-radius: 5px;
+        .hero-description {
+            color: #5d6d7e;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        .cta-button {
+            display: inline-block;
+            padding: 0.8rem 2rem;
+            background-color: #1a4741;
             color: white;
-            font-weight: bold;
-        }
-
-        .pending {
-            background-color: orange;
-        }
-
-        .confirmed {
-            background-color: blue;
-        }
-
-        .shipped {
-            background-color: teal;
-        }
-
-        .delivered {
-            background-color: green;
-        }
-
-        .cancelled {
-            background-color: red;
-        }
-
-        .return-request {
-            background-color: purple;
-        }
-
-        .returned {
-            background-color: gray;
-        }
-
-        .cancel-button {
-            background-color: red;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .cancel-button:hover {
-            background-color: darkred;
-        }
-
-        .info-button {
-            background-color: blue;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .info-button:hover {
-            background-color: darkblue;
-        }
-
-        .item-info {
-            display: none;
-            margin-top: 10px;
-            padding: 10px;
-            background-color: #e7f3fe;
-            border: 1px solid #b3d7ff;
-            border-radius: 5px;
-        }
-
-        .hero-description a {
             text-decoration: none;
-            color: black;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
         }
-        .hero {
-  display: flex;
-  justify-content: space-between;
-  background-color: #e6f4f4;
-  align-items: center;
-  padding: 4rem 2rem;
-  width: 100%;
-  margin: 0 auto;
-  min-height: 50vh;
-}
-
-.hero-content {
-  max-width: 500px;
-  margin-left: 40%;
-}
-
-.hero-title {
-  font-size: 2rem;
-  line-height: 1.2;
-  color: #2c3e50;
-  margin-bottom: 1rem;
-}
-
-.hero-description {
-  color: #5d6d7e;
-  margin-bottom: 2rem;
-  line-height: 1.6;
-}
-
-.cta-button {
-  display: inline-block;
-  padding: 0.8rem 2rem;
-  background-color: #1a4741;
-  color: white;
-  text-decoration: none;
-  border-radius: 4px;
-  transition: background-color 0.3s ease;
-}
-
-.cta-button:hover {
-  background-color: #123530;
-}
-
-.hero-image {
-  width: 300px;
-  position: relative;
-  right: 100px;
-
-}
-@media (max-width: 768px) {
-  .hero {
-      flex-direction: column;
-      text-align: center;
-      padding: 2rem;
-  }
-  .hero-image {
-  width: 300px;
-  position: relative;
-  left: 30px;
-
-}
-
-}
-/* Style for sorting dropdown */
-.form-control {
-  padding: 0.5rem 1rem;
-  border: 1px solid #ccc;
-  border-radius: 0.375rem;
-  background-color: white;
-  transition: all 0.3s ease;
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: #1a4741;
-  box-shadow: 0 0 5px rgba(26, 71, 65, 0.5);
-}
-
-/* Style for Apply button */
-.btn-primary {
-  background-color: #1a4741;
-  color: white;
-  padding: 0.5rem 1.5rem;
-  border-radius: 0.375rem;
-  transition: background-color 0.3s ease;
-  font-weight: bold;
-}
-
-.btn-primary:hover {
-  background-color: #123530;
-}
-
-/* Style for Clear All button */
-.btn-danger {
-  background-color: #d9534f;
-  color: white;
-  padding: 0.5rem 1.5rem;
-  border-radius: 0.375rem;
-  transition: background-color 0.3s ease;
-  font-weight: bold;
-}
-
-.btn-danger:hover {
-  background-color: #c9302c;
-}
-
-/* Responsive styles */
-@media (max-width: 768px) {
-  .form-inline {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-}
+        .cta-button:hover {
+            background-color: #123530;
+        }
+        .hero-image {
+            width: 300px;
+            position: relative;
+            right: 100px;
+        }
+        .sidebar {
+            background-color: #f8f9fa;
+            border-right: 1px solid #dee2e6;
+            width: 250px; /* Set a fixed width for the sidebar */
+            padding: 1rem; /* Add some padding */
+        }
+        .sidebar a {
+            color: #495057;
+            padding: 10px 15px;
+            display: block;
+            transition: background-color 0.3s;
+        }
+        .sidebar a:hover {
+            background-color: #e2e6ea;
+        }
+        .content {
+            display: flex; /* Use flexbox for layout */
+            margin-top: 2rem; /* Add some space below the hero */
+        }
+        .orders-table {
+            flex: 1; /* Allow the orders table to take the remaining space */
+            padding: 1rem; /* Add some padding */
+        }
+        @media (max-width: 768px) {
+            .hero {
+                flex-direction: column;
+                text-align: center;
+                padding: 2rem;
+            }
+            .hero-content {
+                margin-left: 0;
+            }
+            .hero-image {
+                width: 300px;
+                position: relative;
+                left: 0;
+            }
+            .sidebar {
+                width: 100%; /* Full width for smaller screens */
+                height: auto; /* Auto height */
+                border-right: none; /* Remove border on smaller screens */
+                margin-top: 1rem; /* Add some space above the sidebar */
+            }
+            .content {
+                flex-direction: column; /* Stack content vertically on smaller screens */
+            }
+        }
     </style>
 </head>
+<body class="bg-gray-100">
+    <%- include('../partials/user/header') %> 
 
-<body>
-    <%- include('../partials/user/header') %>
-        <main class="hero w-full">
-            <div class="hero-content">
-                <b>
-                    <h1 class="hero-title">ORDERS</h1>
-                </b>
-                <p class="hero-description">
-                    <i> <a href="/">Home</a> <span> > </span> <a href="/orders">Orders</a></i>
-                </p>
-            </div>
-            <img src="/img/skinova cover.png" alt="Skinova Cover" class="hero-image">
-        </main>
-        <div class="order-container">
-            <% if (orders.length > 0) { %>
-                <% orders.forEach(order => { %>
-                    <div class="order">
-                        <div class="order-header">
-                            Order ID: <%= order.orderId %> | Created On: <%= new Date(order.createdOn).toLocaleDateString() %>
-                        </div>
-                        <% order.orderedItems.forEach(item => { %>
-                            <% if (item.product) { %>
-                                <div class="product">
-                                    <a href="/order/<%= order.orderId %>/item/<%= item.itemId %>">
-                                        <img src="<%= item.product.productImage.length ? item.product.productImage[0] : '/img/default.jpg' %>" alt="Product Image">
-                                    </a>
-                                    <span class="status <%= item.status.toLowerCase() %>">
-                                        <%= item.status %>
-                                    </span>
-                                    <%=item.product.productName%>
-                                    <a class="cancel-button" onclick="cancelOrder('<%= item.itemId %>')" style = " <%= item.status.toLowerCase() === 'cancelled' ? 'visibility: hidden;' : '' %>">
-                                        Cancel
-                                    </a>
-                                    
-                                    <a class="download-button" href="/download-invoice/<%= order.orderId %>" download>
-                                        <i title="download invoice" class="fas fa-download"></i> 
-                                    </a>
-                                </div>
-                            <% } %>
-                        <% }); %>
-                    </div>
-                <% }); %>
+    <main class="hero w-full">
+        <div class="hero-content">
+            <b>
+                <h1 class="hero-title">ORDERS</h1>
+            </b>
+            <p class="hero-description">
+                <i>
+                    <a href="/">Home</a>
+                    <span>&gt;</span>
+                    <a href="/orders">Orders</a>
+                </i>
+            </p>
+        </div>
+        <img alt="Illustration of a shopping cart with various items" class="hero-image" height="300" src="/img/skinova cover.png" width="300"/>
+    </main>
+
+    <div class="content mx-auto px-4 py-8">
+   
+            <%- include('../partials/user/sidebar') %>
+  
+
+        <div class="orders-table">
+            <% if (orders.length === 0) { %>
+                <div class="bg-white shadow rounded-lg p-6 text-center">
+                    <img src="https://www.ipack.com/media/icons/empty-cart-ipack.png" alt="No Orders" class="mx-auto mb-6" width="400" height="300">
+                    <p class="text-gray-600 mb-6">It looks like you haven't placed any orders yet. Start shopping now to find the best skincare products for you!</p>
+                    <a href="/shop" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">Start Shopping</a>
+                </div>
             <% } else { %>
-                <p>No orders found.</p>
+                <div class="bg-white shadow rounded-lg p-6">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white">
+                            <thead>
+                                <tr>
+                                    <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Order ID</th>
+                                    <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Date</th>
+                                    <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Status</th>
+                                    <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Total</th>
+                                    <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Product</th>
+                                    <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% orders.forEach(order => { %>
+                                    <tr>
+                                        <td class="py-2 px-4 border-b"><%= order.orderId %></td>
+                                        <td class="py-2 px-4 border-b"><%= order.createdOn.toLocaleDateString() %></td>
+                                        <td class="py-2 px-4 border-b"><%= order.status %></td>
+                                        <td class="py-2 px-4 border-b">$<%= (order.price * order.quantity - order.couponDiscount).toFixed(2) %></td>
+                                        <td class="py-2 px-4 border-b">
+                                            <img src="<%= order.product.productImage[0] %>" alt="Product Image" class="w-16 h-16 object-cover">
+                                        </td>
+                                        <td class="py-2 px-4 border-b">
+                                            <a href="/order/<%= order._id %>" class="text-blue-500 hover:text-blue-700">View</a>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                        <div class="flex justify-between items-center mt-6">
+                            <% if (currentPage > 1) { %>
+                                <a href="/orders?page=<%= currentPage - 1 %>" class="bg-blue-500 text-white px-4 py-2 rounded">Previous</a>
+                            <% } %>
+                            <span class="text-gray-600">Page <%= currentPage %> of <%= totalPages %></span>
+                            <% if (currentPage < totalPages) { %>
+                                <a href="/orders?page=<%= currentPage + 1 %>" class="bg-blue-500 text-white px-4 py-2 rounded">Next</a>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
             <% } %>
         </div>
-        <%- include('../partials/user/footer') %>
+    </div>
 
-            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-            <script>
-                function cancelOrder(itemId) {
-                    Swal.fire({
-                        title: "Cancel Order",
-                        input: "text",
-                        inputLabel: "Reason for cancellation",
-                        inputPlaceholder: "Enter your reason here...",
-                        showCancelButton: true,
-                        confirmButtonText: "Submit",
-                        cancelButtonText: "Close",
-                        inputValidator: (value) => {
-                            if (!value) {
-                                return "Please enter a reason!";
-                            }
-                        }
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            fetch(`/cancel-order/${itemId}`, {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": "application/json"
-                                },
-                                body: JSON.stringify({ reason: result.value })
-                            }).then(response => {
-                                if (response.ok) {
-                                    Swal.fire("Cancelled!", "Your order has been cancelled.", "success")
-                                        .then(() => window.location.reload());
-                                } else {
-                                    Swal.fire("Error", "Something went wrong!", "error");
-                                }
-                            }).catch(error => {
-                                console.error("Error:", error);
-                                Swal.fire("Error", "Failed to cancel the order.", "error");
-                            });
-                        }
-                    });
-                }
-                function showInfo(itemId, productName) {
-                    const infoDiv = document.getElementById(`info-${itemId}`);
-                    if (infoDiv.style.display === "none" || infoDiv.style.display === "") {
-                        infoDiv.style.display = "block";
-                        infoDiv.innerHTML = `Item ID: ${itemId} <br> Product Name: ${productName}`;
-                    } else {
-                        infoDiv.style.display = "none";
-                    }
-                }
-            </script>
-
+    <%- include('../partials/user/footer') %>
 </body>
-
 </html>

@@ -1,0 +1,206 @@
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>About Us - Skinova</title>
+    <link rel="icon" href="/img/favicon.jpg" type="image/x-icon">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&amp;display=swap" rel="stylesheet"/>
+    <style>
+        body {
+            font-family: 'Onest', sans-serif;
+        }
+        
+        .hero {
+            display: flex;
+            justify-content: space-between;
+            background-color: #e6f4f4;
+            align-items: center;
+            padding: 4rem 2rem;
+            width: 100%;
+            margin: 0 auto;
+            min-height: 50vh;
+        }
+
+        .hero-content {
+            max-width: 500px;
+            margin-left: 40%;
+        }
+
+        .hero-title {
+            font-size: 2rem;
+            line-height: 1.2;
+            color: #2c3e50;
+            margin-top: 40px;
+        }
+
+        .hero-description {
+            color: #5d6d7e;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .headerbod {
+            position: fixed; /* Fix the header to the top */
+            top: 0; /* Align to the top */
+            padding: 16px; /* Padding for the header */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional shadow for depth */
+            z-index: 1000; /* Ensure it stays above other content */
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 0.8rem 2rem;
+            background-color: #1a4741;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .cta-button:hover {
+            background-color: #123530;
+        }
+
+        .hero-image {
+            width: 300px;
+            position: relative;
+            right: 100px;
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                flex-direction: column;
+                text-align: center;
+                padding: 2rem;
+            }
+
+            .hero-content {
+                margin-left: 0;
+            }
+
+            .hero-image {
+                width: 300px;
+                position: relative;
+                left: 0;
+            }
+        }
+    </style>
+</head>
+<%-include('../partials/user/header')%>
+<body class="bg-gray-100">
+<main class="container mx-auto p-4 mt-8">
+    <div class="hero w-full">
+        <div class="hero-content">
+            <b>
+                <h1 class="hero-title">ABOUT SKINOVA</h1>
+            </b>
+            <p class="hero-description">
+                <i>Discover the story behind Skinova, your trusted skincare partner.</i>
+            </p>
+        </div>
+        <img alt="Illustration of a shopping cart with various items" class="hero-image" height="300" src="/img/skinova cover.png" width="300"/>
+    </div>
+    <section class="mb-12">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            <div>
+                <img alt="A collection of Skinova skincare products" class="rounded-lg shadow-lg" src="/img/skinova-new-cover.jpeg"/>
+            </div>
+            <div>
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Our Mission</h2>
+                <p class="text-gray-600 mb-4">
+                    At Skinova, our mission is to provide high-quality, natural skincare products that enhance your beauty and well-being. We believe in the power of nature and science working together to create products that are effective, safe, and luxurious.
+                </p>
+                <p class="text-gray-600">
+                    We are committed to sustainability and ethical practices, ensuring that our products are not only good for your skin but also for the planet. Join us on our journey to healthier, more radiant skin.
+                </p>
+            </div>
+        </div>
+    </section>
+    <section class="mb-12">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            <div class="order-2 md:order-1">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Our Story</h2>
+                <p class="text-gray-600 mb-4">
+                    Skinova was founded with a passion for skincare and a desire to make a difference. Our journey began with a simple idea: to create skincare products that are both effective and gentle on the skin. Over the years, we have grown into a trusted brand, loved by customers around the world.
+                </p>
+                <p class="text-gray-600">
+                    Our team of experts works tirelessly to develop innovative products that meet the highest standards of quality and performance. We are proud of our heritage and excited about the future as we continue to push the boundaries of skincare.
+                </p>
+            </div>
+            <div class="order-1 md:order-2">
+                <img alt="Founders of Skinova working on product development" class="rounded-lg shadow-lg w-full h-auto" src="/img/skinova-new-head.jpeg"/>
+            </div>
+        </div>
+    </section>
+    <section class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-gray-800 mb-4">Meet Our Team</h2>
+        <p class="text-gray-600 mb-8">Our dedicated team of skincare experts, scientists, and beauty enthusiasts.</p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="team-member text-center">
+                <img alt="Portrait of Jane Doe, CEO of Skinova" class="rounded-full mx-auto mb-4 w-32 h-32 object-cover" height="200" src="https://storage.googleapis.com/a1aa/image/UL0l9e_KTEuj-edW_mVbzXDboBrNaCzoG76tHCB83B4.jpg" width="200"/>
+                <h3 class="text-xl font-bold text-gray-800">Jane Doe</h3>
+                <p class="text-gray-600">CEO</p>
+            </div>
+            <div class="team-member text-center">
+                <img alt="Portrait of John Smith, Chief Scientist at Skinova" class="rounded-full mx-auto mb-4 w-32 h-32 object-cover" height="200" src="https://storage.googleapis.com/a1aa/image/P8HIHEtK_jWHfFesm_FZofAZXIJcdcOFS1Hl-s0Un64.jpg" width="200"/>
+                <h3 class="text-xl font-bold text-gray-800">John Smith</h3>
+                <p class="text-gray-600">Chief Scientist</p>
+            </div>
+            <div class="team-member text-center">
+                <img alt="Portrait of Emily Johnson, Marketing Director at Skinova" class="rounded-full mx-auto mb-4 w-32 h-32 object-cover" height="200" src="https://storage.googleapis.com/a1aa/image/ppF20WwhdLwy0kbE3KwURVCh350VWieQ_O_WxQXP9Ws.jpg" width="200"/>
+                <h3 class="text-xl font-bold text-gray-800">Emily Johnson</h3>
+                <p class="text-gray-600">Marketing Director</p>
+            </div>
+        </div>
+    </section>
+    <section class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-gray-800 mb-4">Our Values</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="value-item p-6 bg-white rounded-lg shadow-lg">
+                <i class="fas fa-leaf text-4xl text-green-500 mb-4"></i>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Natural Ingredients</h3>
+                <p class="text-gray-600">
+                    We use only the finest natural ingredients in our products, ensuring they are safe and effective for all skin types.
+                </p>
+            </div>
+            <div class="value-item p-6 bg-white rounded-lg shadow-lg">
+                <i class="fas fa-flask text-4xl text-blue-500 mb-4"></i>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Scientific Innovation</h3>
+                <p class="text-gray-600">
+                    Our products are developed using the latest scientific research and technology to deliver the best results.
+                </p>
+            </div>
+            <div class="value-item p-6 bg-white rounded-lg shadow-lg">
+                <i class="fas fa-globe text-4xl text-yellow-500 mb-4"></i>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Sustainability</h3>
+                <p class="text-gray-600">
+                    We are committed to sustainable practices, from sourcing ingredients to packaging and shipping.
+                </p>
+            </div>
+        </div>
+    </section>
+    <section class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-gray-800 mb-4">Join Our Community</h2>
+        <p class="text-gray-600 mb-8">Follow us on social media and be part of the Skinova family.</p>
+        <div class="flex justify-center space-x-4">
+            <a class="text-gray-700 hover:text-gray-900" href="#">
+                <i class="fab fa-facebook-f text-2xl"></i>
+            </a>
+            <a class="text-gray-700 hover:text-gray-900" href="#">
+                <i class="fab fa-instagram text-2xl"></i>
+            </a>
+            <a class="text-gray-700 hover:text-gray-900" href="#">
+                <i class="fab fa-twitter text-2xl"></i>
+            </a>
+            <a class="text-gray-700 hover:text-gray-900" href="#">
+                <i class="fab fa-pinterest text-2xl"></i>
+            </a>
+        </div>
+    </section>
+</main>
+<%-include('../partials/user/footer')%>
+</body>
+</html>

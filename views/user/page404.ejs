@@ -1,69 +1,270 @@
-<!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>404 - Page Not Found</title>
-<style>
-    body {
-    margin: 0;
-    padding: 0;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background-color: #e6f4f4;
-}
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>
+   404 - Page Not Found
+  </title>
+  <script src="https://cdn.tailwindcss.com">
+  </script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <style>
+   body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #e6f4f4;
+        }
 
-.container {
-    text-align: center;
-}
+        .container {
+            text-align: center;
+        }
 
-.error-image {
-    width: 200px;
-    height: 200px;
-    background-image: url('/images/skinova cover.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    margin-bottom: 20px;
-    margin-left: 30px;
-}
+        .error-image {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 20px;
+            cursor: pointer;
+        }
 
-.error-code {
-    font-size: 72px;
-    font-weight: bold;
-    margin: 20px 0;
-    color: #333;
-}
+        .error-code {
+            font-size: 72px;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #333;
+        }
 
-.error-message {
-    font-size: 16px;
-    color: #666;
-    margin-bottom: 20px;
-}
+        .error-message {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 20px;
+        }
 
-.back-link {
-    color: #2b7bb9;
-    text-decoration: none;
-}
+        .back-link {
+            color: #2b7bb9;
+            text-decoration: none;
+        }
 
-.back-link:hover {
-    text-decoration: underline;
-}
-</style>
-</head>
-<body>
-    <div class="container">
-        <div class="error-image">
-            <img class="error-image" src="/img/skinova cover.png" alt="skinova cover">  
-        </div>
-        <div class="error-code">404</div>
-        <div class="error-message">
-            Page not found. Check the address or <a href="/" class="back-link">go back</a>
-        </div>
-    </div>
-</body>
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .game-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            background-color: #e6f4f4;
+            overflow: hidden;
+        }
+
+        .head {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 130px;
+            height: 130px;
+        }
+
+        .coin {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(360deg); }
+        }
+
+        .game-over-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 24px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .game-over-message span:first-child {
+            font-size: 28px;
+        }
+
+        .game-over-message a {
+            color: #2b7bb9;
+            text-decoration: none;
+        }
+
+        .game-over-message p {
+            font-size: 15px;
+            position: relative;
+            top: -10px;
+        }
+
+        .game-over-message a:hover {
+            text-decoration: underline;
+        }
+
+        #game-over-score {
+            font-size: normal;
+        }
+
+        .game-over {
+            font-size: 30px !important;
+            position: relative;
+            top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .head {
+                bottom: 50px;
+                width: 70px;
+                height: 70px;
+            }
+
+            .coin {
+                width: 20px;
+                height: 20px;
+            }
+
+            .game-over-message {
+                font-size: 18px;
+            }
+        }
+  </style>
+ </head>
+ <body>
+  <div class="container">
+   <div class="error-image">
+    <img alt="Illustration of an open head" class="error-image" height="200" src="/img/skinova cover.png" width="200"/>
+   </div>
+   <div class="error-code">
+    404
+   </div>
+   <div class="error-message">
+    Page not found. Check the address or
+    <a class="back-link" href="/">
+     go back
+    </a>
+   </div>
+  </div>
+  <div class="game-container hidden">
+   <img alt="Illustration of an open head" class="head" height="100" src="/img/skinova cover.png" width="100"/>
+   <div class="score text-2xl font-bold absolute top-4 left-4">
+    Score:
+    <span id="score">
+     0
+    </span>
+   </div>
+   <div class="game-over-message hidden">
+    <span class="game-over">
+     Game over.
+    </span>
+    <span>
+     Your score is
+     <span id="game-over-score">
+      0
+     </span>
+    </span>
+    <p>
+     <a href="/">
+      Go back to home?
+     </a>
+    </p>
+   </div>
+  </div>
+  <script>
+   const errorImage = document.querySelector('.error-image img');
+        const gameContainer = document.querySelector('.game-container');
+        const head = document.querySelector('.head');
+        const scoreDisplay = document.querySelector('.score');
+        const gameOverMessage = document.querySelector('.game-over-message');
+        let score = 0;
+        let gameInterval;
+        let coinSpeed = 2000;
+
+        errorImage.addEventListener('click', startGame);
+
+        function startGame() {
+            document.querySelector('.container').classList.add('hidden');
+            gameContainer.classList.remove('hidden');
+            score = 0;
+            coinSpeed = 2000;
+            scoreDisplay.querySelector('#score').textContent = score;
+            gameOverMessage.classList.add('hidden');
+            gameInterval = setInterval(dropCoin, coinSpeed);
+        }
+
+        function dropCoin() {
+            const coin = document.createElement('div');
+            coin.classList.add('coin');
+            coin.style.backgroundImage = 'url("https://upload.wikimedia.org/wikipedia/commons/e/e6/Coin_video_game.png")';
+            coin.style.backgroundSize = 'cover';
+            coin.style.left = `${Math.random() * (window.innerWidth - 40)}px`;
+            coin.style.top = '0px';
+            gameContainer.appendChild(coin);
+
+            let coinFall = setInterval(() => {
+                const coinRect = coin.getBoundingClientRect();
+                const headRect = head.getBoundingClientRect();
+
+                if (coinRect.top + coinRect.height >= headRect.top &&
+                    coinRect.left + coinRect.width >= headRect.left &&
+                    coinRect.left <= headRect.left + headRect.width) {
+                    score++;
+                    scoreDisplay.querySelector('#score').textContent = score;
+                    coin.remove();
+                    clearInterval(coinFall);
+                } else if (coinRect.top + coinRect.height >= window.innerHeight) {
+                    gameOver();
+                    clearInterval(coinFall);
+                } else if (coinRect.left < 0 || coinRect.left + coinRect.width > window.innerWidth) {
+                    coin.remove();
+                    clearInterval(coinFall);
+                } else {
+                    coin.style.top = `${coinRect.top + 5}px`;
+                }
+            }, 20);
+
+            if (score % 5 === 0 && coinSpeed > 500) {
+                clearInterval(gameInterval);
+                coinSpeed -= 200;
+                gameInterval = setInterval(dropCoin, coinSpeed);
+            }
+        }
+
+        function gameOver() {
+            clearInterval(gameInterval);
+            gameOverMessage.classList.remove('hidden');
+            gameOverMessage.querySelector('#game-over-score').textContent = score;
+            document.querySelectorAll('.coin').forEach(coin => coin.remove());
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            head.style.left = `${e.clientX - head.offsetWidth / 2}px`;
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            head.style.left = `${e.touches[0].clientX - head.offsetWidth / 2}px`;
+        });
+
+        document.addEventListener('click', () => {
+            if (!gameOverMessage.classList.contains('hidden')) {
+                location.href = '/pageNotFound';
+            }
+        });
+  </script>
+ </body>
 </html>

@@ -1,211 +1,94 @@
-<!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stylish Header</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>
+   Skinova
+  </title>
+  <script src="https://cdn.tailwindcss.com">
+  </script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
 
-        body {
-            background-color: #f4f4f4;
-        }
-
-        .navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 2rem;
-            background-color: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            z-index: 10;
-        }
-
-        .hero-logo {
-            width: 150px;
-        }
-
-        .logo {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #2c3e50;
-            text-decoration: none;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            align-items: center;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            color: #2c3e50;
-            font-size: 1rem;
-            text-transform: uppercase;
-            font-weight: bold;
-            position: relative;
-        }
-
-        .nav-links a::after {
-            content: '';
-            display: block;
-            width: 0;
-            height: 2px;
-            background: #2c3e50;
-            transition: width 0.3s;
-        }
-
-        .nav-links a:hover::after {
-            width: 100%;
-        }
-
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            cursor: pointer;
-            gap: 5px;
-        }
-
-        .hamburger div {
-            width: 25px;
-            height: 3px;
-            background-color: #2c3e50;
-            transition: all 0.3s;
-        }
-
-        .dropdown {
-            position: relative;
-            display: inline-block;
-        }
-
-        .dropdown-menu {
-            display: none;
-            position: absolute;
-            right: 0;
-            background-color: white;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            z-index: 1;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
-
-        .dropdown-menu a {
-            color: #2c3e50;
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-            transition: background 0.3s;
-        }
-
-        .dropdown-menu a:hover {
-            background-color: #f1f1f1;
-        }
-
-        .dropdown.active .dropdown-menu {
-            display: block;
-        }
-        
-
-        @media (max-width: 900px) {
-            .nav-links {
-                display: none;
-            }
-
-            .hamburger {
-                display: flex;
-            }
-        }
-
-        @media (min-width: 900px) {
-            .nav-links {
-                display: flex !important;
-            }
-        }
-    </style>
-</head>
-<body>
-    <nav class="navbar">
-        <a href="/" class="logo"><img class="hero-logo" src="/img/skinova text.png" alt="Skinova Logo"></a>
-        <div class="hamburger" onclick="toggleMenu()">
-            <div></div>
-            <div></div>
-            <div></div>
+ </head>
+ <body class=" bg-gray-100">
+    <nav class="bg-white p-4 shadow-md fixed w-full z-50">
+        <div class="container mx-auto flex justify-between items-center">
+           <a href="/" class="flex items-center">
+              <img src="/img/skinova text.png" alt="Skinova Logo" class="h-10 w-auto">
+           </a>
+     
+           <!-- Mobile Menu Button -->
+           <button class="md:hidden text-gray-800 focus:outline-none" onclick="toggleMenu()">
+              <i class="fas fa-bars text-2xl"></i>
+           </button>
+     
+           <!-- Desktop Menu -->
+           <div class="hidden md:flex space-x-4 items-center">
+              <a href="/" class="text-gray-600 hover:text-gray-800">Home</a>
+              <a href="/shop" class="text-gray-600 hover:text-gray-800">Shop</a>
+              <a href="/about" class="text-gray-600 hover:text-gray-800">About</a>
+              <a href="/contact" class="text-gray-600 hover:text-gray-800">Contact</a>
+              <a href="/profile" class="text-gray-600 hover:text-gray-800">Settings</a>
+              <a href="/cart" class="text-gray-600 hover:text-gray-800"><i class="fas fa-shopping-cart"></i></a>
+              <a href="/wishlist" class="text-gray-600 hover:text-gray-800"><i class="fas fa-heart"></i></a>
+     
+              <!-- User Dropdown -->
+              <div class="relative">
+                 <% if (user) { %>
+                 <button onclick="toggleDropdown(event)" class="flex items-center text-gray-600 hover:text-gray-800">
+                    <span class="mr-2"><b><%= user.name %></b></span>
+                    <i class="fas fa-caret-down"></i>
+                 </button>
+                 <div id="user-menu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                    <a href="/profile" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Profile</a>
+                    <a href="/logout" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Logout</a>
+                 </div>
+                 <% } else { %>
+                 <a href="/login" class="text-gray-600 hover:text-gray-800">Login</a>
+                 <% } %>
+              </div>
+           </div>
         </div>
-        <div class="nav-links">
-            <a href="/">Home</a>
-            <a href="/shop">Shop</a>
-            <a href="/about">About</a>
-            <a href="/contact">Contact</a>
-            <a href="/cart">Cart</a>
-            <a href="/wishlist">Wishlist</a>
-            <a href="/profile">Settings</a>
-            <% if (user) { %>
-                <div class="dropdown">
-                    <a class="dropdown-toggle" onclick="toggleDropdown(event)"><b><%= user.name %></b> <i class="fas fa-caret-down"></i></a>
-                    <div class="dropdown-menu">
-                        <a href="/profile">Profile</a>
-                        <a href="/logout">Logout</a>
-                    </div>
-                </div>
-            <% } else { %>
-                <a href="/login">Login</a>  
-            <% } %>
+     
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden absolute top-16 left-0 w-full bg-white shadow-lg z-50">
+           <a href="/" class="block text-gray-600 py-2 px-4 border-b hover:bg-gray-100">Home</a>
+           <a href="/shop" class="block text-gray-600 py-2 px-4 border-b hover:bg-gray-100">Shop</a>
+           <a href="/about" class="block text-gray-600 py-2 px-4 border-b hover:bg-gray-100">About</a>
+           <a href="/contact" class="block text-gray-600 py-2 px-4 border-b hover:bg-gray-100">Contact</a>
+           <a href="/profile" class="block text-gray-600 py-2 px-4 border-b hover:bg-gray-100">Settings</a>
+           <a href="/cart" class="block text-gray-600 py-2 px-4 border-b hover:bg-gray-100">Cart</a>
+           <a href="/wishlist" class="block text-gray-600 py-2 px-4 border-b hover:bg-gray-100">Wishlist</a>
+           <% if (user) { %>
+           <a href="/profile" class="block text-gray-600 py-2 px-4 border-b hover:bg-gray-100">
+              <%= user.name %> <i class="fa-solid fa-user"></i>
+           </a>
+           <a href="/logout" class="block text-gray-600 py-2 px-4 hover:bg-gray-100">Logout</a>
+           <% } else { %>
+           <a href="/login" class="block text-gray-600 py-2 px-4 hover:bg-gray-100">Login</a>
+           <% } %>
         </div>
-    </nav>
-    <script>
-        function toggleMenu() {
-            const navLinks = document.querySelector('.nav-links');
-            navLinks.classList.toggle('active');
+     </nav>
+     
+  <script>
+   function toggleMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
         }
 
         function toggleDropdown(event) {
-            event.stopPropagation(); // Prevent the click event from bubbling up
-            const dropdown = event.currentTarget.parentElement;
-            dropdown.classList.toggle('active');
+            event.stopPropagation();
+            const menu = document.getElementById('user-menu');
+            menu.classList.toggle('hidden');
         }
 
-        // Close dropdown if clicked outside
         document.addEventListener('click', function() {
-            const dropdowns = document.querySelectorAll('.dropdown');
-            dropdowns.forEach(dropdown => {
-                dropdown.classList.remove('active');
-            });
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const logoutButton = document.getElementById('logoutButton');
-            const logoutForm = document.getElementById('logoutForm');
-
-            if (logoutButton && logoutForm) {
-                logoutButton.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    Swal.fire({
-                        title: 'Are you sure?',
-                        text: "You will be logged out!",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#003545',
-                        cancelButtonColor: '#000000',
-                        confirmButtonText: 'Yes'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            logoutForm.submit();
-                        }
-                    });
-                });
+            const menu = document.getElementById('user-menu');
+            if (!menu.classList.contains('hidden')) {
+                menu.classList.add('hidden');
             }
         });
-    </script>
-</body>
+  </script>
+ </body>
 </html>

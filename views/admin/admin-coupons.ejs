@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coupons - Admin Panel</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            table-layout: fixed;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            word-wrap: break-word;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+            min-width: 120px;
+        }
+
+        td {
+            background-color: #fff;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+            transition: 0.3s;
+        }
+
+        td:last-child {
+            text-align: center;
+            min-width: 150px;
+        }
+
+        a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            margin: 20px 0;
+            transition: background 0.3s ease;
+        }
+
+        .button:hover {
+            background-color: #218838;
+        }
+
+        .no-coupons {
+            text-align: center;
+            color: #777;
+            font-style: italic;
+        }
+
+        .delete-btn {
+            color: #dc3545;
+            cursor: pointer;
+            font-size: 16px;
+            transition: color 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            color: #b52a37;
+        }
+    </style>
+</head>
+
+<body>
+    <%- include("../../views/partials/admin/header") %>
+        <div class="container">
+            <h1>Available Coupons</h1>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 25%;">Coupon Code</th>
+                        <th style="width: 20%;">Discount</th>
+                        <th style="width: 20%;">Min Price</th>
+                        <th style="width: 20%;">Expiry Date</th>
+                        <th style="width: 15%;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (coupons.length> 0) { %>
+                        <% coupons.forEach(coupon=> { %>
+                            <tr>
+                                <td><%= coupon.code %></td>
+                                <td>₹<%= coupon.offerPrice %></td>
+                                <td>₹<%= coupon.minimumPrice %></td>
+                                <td><%= new Date(coupon.expireOn).toLocaleDateString() %></td>
+                                <td>
+                                    <i class="fas fa-trash-alt delete-btn" onclick="confirmDelete('<%= coupon._id %>')"></i>
+                                </td>
+                             
+                            </tr>
+                
+                           
+                        <% }) %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="6" class="no-coupons">No coupons available.</td>
+                        </tr>
+                    <% } %>
+                </tbody>
+               
+            </table>
+
+            <a href="/admin/add-coupon" class="button">Add Coupon</a>
+        </div>
+        <%- include("../../views/partials/admin/footer") %>
+
+    <script>
+        function confirmDelete(couponId) {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Yes, delete it!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = `/admin/delete-coupon/${couponId}`;
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

@@ -29,14 +29,22 @@ router.post('/resend-otp', userController.resendOtp);
 router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 router.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/signup' }), (req, res) => {
+    req.session.user = req.user;
     res.redirect('/');
 });
+
 
 router.get('/login', userController.loadLoginPage);
 
 router.post('/login', userController.login);
 
 router.get('/',checkBlockedUser, userController.loadHomePage);
+
+router.get('/home',(req,res) => res.redirect('/'))
+
+router.get('/about',userController.loadAboutPage);
+
+router.get('/contact',userController.loadContactPage);
 
 router.get("/shop",userController.loadShoppingPage);
 router.get('/filter', userController.filterProduct);
@@ -57,7 +65,7 @@ router.post("/verify-email-otp", userController.verifyEmailOTP);
 
 
 
-router.get('/addToCart',userAuth, userController.addToCart)
+router.get('/addToCart', userController.addToCart)
 router.get('/cart',userAuth, userController.loadCartPage)
 router.get('/deleteFromCart',userController.deleteFromCart)
 router.post('/update-quantity',userController.updateQuantity)
@@ -77,16 +85,21 @@ router.get("/editAddress",userController.editAddress);
 router.post("/editAddress",userController.postEditAddress)
 router.get("/deleteAddress",userController.deleteAddress)
 
+router.get("/coupons", userController.loadCoupons);
 
 router.get("/checkout",userAuth,checkoutController.loadCheckoutPage)
 
 router.post('/place-order',userAuth,checkoutController.placeOrder)
 router.get('/orders',userAuth,checkoutController.getOrders)
-router.get('/order/:orderId/item/:itemId',orderController.orderDetails)
+router.get('/order/:orderId', userAuth, orderController.orderDetails);
 router.get("/download-invoice/:orderId", orderController.downloadInvoice);
 
+//Coupons
+router.post('/apply-coupon', orderController.applyCoupon)
+router.get('/clear-coupons', orderController.clearCoupons)
+
 //Return Order
-router.post('/request-return/:itemId',orderController.requestReturn)
+router.post('/request-return',orderController.requestReturn)
 
 //Payment
 router.post('/create-razorpay-order',paymentController.createRazorpayOrder)
@@ -108,7 +121,6 @@ router.post("/verify-passForgot-otp",profileController.verifyForgotPassOtp)
 router.get("/reset-password",resetPasswordMiddleware,profileController.getResetPassPage)
 router.post("/resend-forgot-otp",blockLoggedInUsers,profileController.resendOtp);
 router.post("/reset-password",resetPasswordMiddleware,profileController.postNewPassword);
-
 
 
 

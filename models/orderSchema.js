@@ -8,52 +8,21 @@ const orderSchema = new Schema({
         default: () => uuidv4(),
         unique: true
     },
-    
     userId: {  
         type: Schema.Types.ObjectId,
         ref: 'User', 
         required: true
     },
-    orderedItems: [{
-        itemId: {
-            type: String,
-            default: () => uuidv4()  
-        },
-        product: {
-            type: Schema.Types.ObjectId,
-            ref: 'Product',
-            required: true
-        },
-        quantity: {
-            type: Number,
-            required: true
-        },
-        price: {
-            type: Number,
-            default: 0
-        },
-        status: {
-            type: String,
-            required: true,
-            enum: ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled', 'return request', 'returned']
-        },
-        cancellationReason: {  
-            type: String, 
-            default: null  
-        },
-        returnRequested: {
-            type:Boolean,
-            default:false
-        },
-        returnReason:{
-            type:String,
-            default:''
-        },
-        couponApplied:{
-
-        }
-    }],
-    totalPrice: {
+    product: {
+        type: Schema.Types.ObjectId,
+        ref: 'Product',
+        required: true
+    },
+    quantity: {
+        type: Number,
+        required: true
+    },
+    price: {
         type: Number,
         required: true
     },
@@ -61,9 +30,37 @@ const orderSchema = new Schema({
         type: Number,
         default: 0
     },
-    finalAmount: {
+    finalPrice: {
         type: Number,
         required: true
+    },
+    couponDiscount: {
+        type: Number,
+        default: 0
+    },
+    shippingCharge: {
+        type: Number,
+        default: 0
+    },
+    status: {
+        type: String,
+        required: true,
+        enum: ['pending','payment pending', 'confirmed', 'shipped', 'delivered', 'cancelled', 'return request', 'returned','return rejected']
+    },
+    deliveredOn:{
+        type: Date,
+    },
+    cancellationReason: {  
+        type: String, 
+        default: null  
+    },
+    returnRequested: {
+        type: Boolean,
+        default: false
+    },
+    returnReason: {
+        type: String,
+        default: ''
     },
     address: {
         type: Schema.Types.ObjectId,
@@ -78,10 +75,6 @@ const orderSchema = new Schema({
         default: Date.now,
         required: true
     },
-    couponApplied: {
-        type: Boolean,
-        default: false
-    },
     paymentStatus: { 
         type: String,
         enum: ['pending', 'paid', 'refunded'],
@@ -90,13 +83,10 @@ const orderSchema = new Schema({
     estimatedDelivery: { 
         type: Date
     },
-    orderCancellationReason: {  
+    paymentMethod: {
         type: String,
-        default: null
-    },
-    paymentMethod:{
-        type:String,
-        enum:['cod','razorpay']
+        enum: ['cod', 'razorpay'],
+        required: true
     }
 });
 

@@ -1,12 +1,12 @@
 const User = require("../../models/userSchema");
 const Product = require("../../models/productSchema");
 const Category = require("../../models/categorySchema");
-const Address = require("../../models/addressSchema"); // Assuming you have an Address model
+const Coupon = require("../../models/couponSchema");
+const Address = require("../../models/addressSchema");
 const Cart = require("../../models/cartSchema");
-const Order = require("../../models/orderSchema");  
+const Order = require("../../models/orderSchema");
 const mongoose = require("mongoose");
 const { v4: uuidv4 } = require('uuid');
-
 
 const loadCheckoutPage = async (req, res) => {
     try {
@@ -25,154 +25,159 @@ const loadCheckoutPage = async (req, res) => {
             },
         });
 
-        // ✅ Fetch all addresses instead of just one
-        const addresses = await Address.find({ userId });
+
+        const addresses = await Address.findOne({ userId });
+
+        const userAddresses = addresses ? addresses.address : [];
+
+        const coupons = await Coupon.find({ isActive: true });
+
+        let totalDiscount = cart.discount;
+        let subtotal = 0;
+
+        // Find coupons used by the user
+        const usedCoupons = coupons
+            .filter(coupon => coupon.usedBy.some(entry => entry.userId.toString() === userId.toString() && entry.timesUsed > 0))
+            .map(coupon => coupon.code); // Extract used coupon codes
+
 
         if (!cart || cart.items.length === 0) {
             return res.render("checkout", {
                 user,
+                cart: { cartTotal: 0, finalTotal: 0, discount: 0 },
                 cartItems: [],
                 subtotal: 0,
-                totalDiscount: 0,
+                totalDiscount,
                 shippingCharge: 0,
                 grandTotal: 0,
-                addresses, // Pass all addresses
+                addresses: userAddresses,
+                coupons, 
+                usedCoupons
             });
         }
-
-    
 
         const cartItems = cart.items.filter(item =>
             item.productId &&
             !item.productId.isBlocked &&
-            item.productId.category && 
+            item.productId.category &&
             item.productId.category.isListed !== false
         );
 
 
-        let totalDiscount = 0;
-        let subtotal = 0;
 
         cartItems.forEach(item => {
-            const offerPercentage = item.productId.productOffer || 0;
-            const discountAmount = (item.productId.salePrice * offerPercentage) / 100;
-            totalDiscount += discountAmount * item.quantity;
-
-            item.discountedPrice = item.productId.salePrice - discountAmount;
-            item.totalPrice = item.discountedPrice * item.quantity;
-
+            const offerPercentage = item.productOffer || 0;  
+            const discountAmount = item.discountedPrice ? (item.productId.salePrice - item.discountedPrice) : 0;
+            const couponDiscount = item.couponDiscount || 0;
+        
+            totalDiscount += (discountAmount + couponDiscount) * item.quantity;
+        
+            item.totalPrice = (item.discountedPrice || item.productId.salePrice) * item.quantity;
+        
             subtotal += item.totalPrice;
         });
+        
 
-        const shippingCharge = 0; // Free shipping
+        const shippingCharge = 0;
         const grandTotal = subtotal + shippingCharge;
+
+        cart.finalTotal = grandTotal;
+        await cart.save();
 
         res.render("checkout", {
             user,
+            cart,
             cartItems,
             subtotal,
             totalDiscount,
             shippingCharge,
             grandTotal,
-            addresses, 
+            addresses: userAddresses,
+            coupons, 
+            usedCoupons
         });
+
     } catch (error) {
         console.error("Error in loadCheckoutPage:", error);
         res.redirect("/pageNotFound");
     }
 };
 
-  
-
 const placeOrder = async (req, res) => {
     try {
         const userId = req.session.user;
+        if (!userId) return res.status(401).json({ success: false, message: "User session expired. Please log in again." });
 
-        if (!userId) {
-        
-            return res.status(400).json({ success: false, message: "User session expired. Please log in again." });
+        let { addressId, paymentMethod } = req.body;
+        if (!mongoose.Types.ObjectId.isValid(addressId)) {
+            return res.status(400).json({ success: false, message: "Invalid address format." });
         }
 
-        let addressId = req.body.addressId;
        
 
-        if (!mongoose.Types.ObjectId.isValid(addressId)) {
-            return res.status(400).json({ error: "Invalid address format." });
-        }
-
         addressId = new mongoose.Types.ObjectId(addressId);
-        console.log(" Selected Address ID:", addressId);
 
-        // Ensure the address belongs to the current user
-        const selectedAddress = await Address.findOne({
-            userId: userId,
-            address: { $elemMatch: { _id: addressId } }
-        });
+        // Fetch the selected address
+        const selectedAddress = await Address.findOne({ userId, "address._id": addressId });
+        if (!selectedAddress) return res.status(404).json({ success: false, message: "Address not found." });
 
-        if (!selectedAddress) {
-          
-            return res.status(400).json({ error: "Address not found in user records." });
-        }
-        
-        // Extract the specific address from the array
         const addressDetails = selectedAddress.address.find(addr => addr._id.equals(addressId));
 
-
-        // Fetch user's cart and populate products
+        // Fetch the user's cart
         const cart = await Cart.findOne({ userId }).populate("items.productId");
+        if (!cart || cart.items.length === 0) return res.json({ success: false, message: "Your cart is empty." });
 
-        if (!cart || cart.items.length === 0) {
-            return res.json({ success: false, message: "Your cart is empty." });
+        let totalCartPrice = cart.items.reduce((sum, item) => sum + (item.productId.salePrice * item.quantity), 0);
+        let totalCouponDiscount = cart.discount || 0; // Total coupon discount applied
+
+        if (paymentMethod === "cod" && (totalCartPrice - totalCouponDiscount) > 1500) {
+            return res.json({ success: false, message: "Cash on Delivery is only for orders less than ₹1500." });
         }
 
-        // Ensure products exist before processing
         for (let item of cart.items) {
-            if (!item.productId) {
-                console.error(` Error: Product not found for item:`, item);
-                return res.json({ success: false, message: "One or more products in your cart are unavailable." });
-            }
-
+            if (!item.productId) return res.json({ success: false, message: "One or more products are unavailable." });
             if (item.productId.stock < item.quantity) {
                 return res.json({ success: false, message: `${item.productId.productName} is out of stock.` });
             }
-        }
 
-        // Prepare order items with unique `itemId`
-        const orderItems = cart.items.map(item => ({
-            itemId: uuidv4(), // Generate unique item ID
-            product: item.productId._id,
-            quantity: item.quantity,
-            price: item.productId.salePrice,
-            total: item.quantity * item.productId.salePrice,
-            status: "pending" // Each item has its own status
-        }));
+            const finalPrice = item.productId.salePrice; 
+            const totalPrice = finalPrice * item.quantity;
 
-        const totalPrice = orderItems.reduce((sum, item) => sum + item.total, 0);
-        const finalAmount = totalPrice;
+         
+            const proportionateCouponDiscount = totalCouponDiscount * (totalPrice / totalCartPrice);
 
-        
-        const newOrder = new Order({
-            userId: userId,
-            address: addressId, 
-            orderedItems: orderItems,  
-            totalPrice,
-            finalAmount,
-            couponApplied: false, 
-            createdOn: new Date()
-        });
+            const category = await Category.findById(item.productId.category);
+            const productOffer = item.productId.productOffer || 0;
+            const categoryOffer = category ? category.categoryOffer || 0 : 0;
+            const bestOffer = Math.max(productOffer, categoryOffer);
 
-        await newOrder.save();
-      
+         
+            const newOrder = new Order({
+                userId,
+                product: item.productId._id,
+                quantity: item.quantity,
+                price: item.productId.salePrice,
+                finalPrice,
+                totalPrice,
+                discount: bestOffer,
+                couponDiscount: proportionateCouponDiscount,
+                status: "pending",
+                address: addressDetails._id,
+                paymentMethod,
+                paymentStatus: paymentMethod === "razorpay" ? "paid" : "pending",
+                createdOn: new Date(),
+            });
 
-        // Reduce stock quantity
-        for (let item of cart.items) {
-            await Product.findByIdAndUpdate(item.productId._id, {
+            await newOrder.save();
+
+   
+            await Product.findByIdAndUpdate(item.productId, {
                 $inc: { quantity: -item.quantity }
             });
         }
 
-        // Clear user cart
-        await Cart.findOneAndDelete({ userId });
+        
+        await Cart.findOneAndUpdate({ userId }, { $unset: { discount: 1, couponCode: 1 }, $set: { items: [], cartTotal: 0, finalTotal: 0 } });
 
         return res.json({ success: true, message: "Order placed successfully!" });
 
@@ -184,33 +189,38 @@ const placeOrder = async (req, res) => {
 
 
 
+
 const getOrders = async (req, res) => {
     try {
         let userId = req.session.user;
 
-      
-    
-
         if (!mongoose.Types.ObjectId.isValid(userId)) {
-           
-            return res.render("orders", { orders: [] });
+            return res.render("orders", { orders: [], currentPage: 1, totalPages: 1 });
         }
 
         userId = new mongoose.Types.ObjectId(userId);
 
+
+        const page = parseInt(req.query.page) || 1;  
+        const limit = 5;  
+        const skip = (page - 1) * limit;
+
+        const totalOrders = await Order.countDocuments({ userId }); 
+        const totalPages = Math.ceil(totalOrders / limit); 
+
         const orders = await Order.find({ userId })
-            .populate("orderedItems.product")
-            .sort({ createdOn: -1 });
+            .populate("product")
+            .sort({ createdOn: -1 })
+            .skip(skip)
+            .limit(limit);
 
-      
-      
-
-        res.render("orders", { orders });
+        res.render("orders", { orders, currentPage: page, totalPages });
     } catch (error) {
-        console.error(" Error fetching orders:", error);
+        console.error("Error fetching orders:", error);
         res.status(500).send("Something went wrong.");
     }
 };
+
 
 
 module.exports = {

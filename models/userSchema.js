@@ -12,7 +12,8 @@ const userSchema = new Schema({
     },
     name:{
         type: String,
-        required: false
+        required: false,
+        
     },
     email:{
         type: String,
@@ -33,6 +34,10 @@ const userSchema = new Schema({
     password:{
         type: String,
         required: false,
+    },
+    refreralCode: {
+        type: String,
+        default: null
     },
     isBlocked:{
         type: Boolean,
@@ -96,7 +101,8 @@ const userSchema = new Schema({
         searchOn:{
             type: Date,
             default: Date.now
-        }
+        },
+
     }]
 
 })

@@ -12,6 +12,7 @@ const path=require('path');
 const sharp = require('sharp');
 const { addCategory } = require('../admin/categoryController');
 const Address = require('../../models/addressSchema');
+const Coupon = require('../../models/couponSchema')
 
 
 const pageNotFound = async (req, res) => {
@@ -27,6 +28,8 @@ const pageNotFound = async (req, res) => {
 const loadHomePage = async (req, res) => {
     try {
         const user = req.session.user;
+
+
         const categories = await Category.find({isListed:true})
         let productData = await Product.find({
             isBlocked:false,
@@ -64,7 +67,23 @@ const loadSignUpPage = async (req, res) => {
 }
 
 
+const loadAboutPage = async (req, res) => {
+    try {
+        res.render('about')
+    } catch (error) {
+        console.log('About Page Not Found')
+        res.status(500).send('Server Error')
+    }
+}
 
+const loadContactPage = async (req, res) => {
+    try {
+        res.render('contact')
+    } catch (error) {
+        console.log('Contact Page Not Found')
+        res.redirect('/pageNotfound')
+    }
+}
 
 
 
@@ -111,13 +130,14 @@ const signUp = async (req, res) => {
         const { name, email, phone, password, cPassword } = req.body
         
     
-
-        const findUser = await User.findOne({email:email})
-
-        if(findUser){
-            return res.render('signup',{message:'User already exists'})
+        const findEmail = await User.findOne({email:email});
+        if(findEmail){
+            return res.render("signup",{message:"Email Already Exists"})
         }
-
+        const findPhone = await User.findOne({phone:phone});        
+        if(findPhone){
+            return res.render("signup",{message:"Phone Number Already Exists"})
+        }
         const otp = generateOTP()
 
         const emailSent = await sendVerificationEmail(email,otp);
@@ -268,168 +288,108 @@ const logout = async (req, res) => {
 };
 
 
-// const loadShoppingPage = async (req,res) => {
-//     try {
-
-//         const user = req.session.user;
-//         const userData = await User.findOne({_id:user});
-//         const categories = await Category.find({isListed:true});
-
-//         const categoriesWithCounts = await Promise.all(categories.map(async (category) => {
-//             const count = await Product.countDocuments({ 
-//                 category: category._id, 
-//                 isBlocked: false, 
-//                 quantity: { $gt: 0 } 
-//             });
-//             return { _id: category._id, name: category.name, productCount: count };
-//         }));
-    
-
-//         const categoryIds = categories.map((category) => category._id.toString());
-//         const page = parseInt(req.query.page) || 1;
-//         const limit = 9;
-//         const skip = (page-1)*limit;
-//         const products = await Product.find({
-//             isBlocked:false,
-//             category:{$in:categoryIds},
-//             quantity:{$gt:0},
-
-//         }).sort({createdOn:-1}).skip(skip).limit(limit)
-
-//         const totalProducts = await Product.countDocuments({
-//             isBlocked:false,
-//             category:{$in:categoryIds},
-//             quantity:{$gt:0},
-
-//         })
-
-//         const totalPages = Math.ceil(totalProducts/limit);
-
-//         // const brands = await Brand.find({isBlocked:false});
-
-//         const categoriesWithIds = categories.map(category => ({_id:category._id,name:category.name}));
-
-        
-//         res.render("shop",{
-//             user:userData,
-//             products:products,
-//             category:categoriesWithIds,
-//             // brand:brands,
-//             totalProducts:totalProducts,
-//             currentPage:page,
-//             totalPages:totalPages
-//         })
-
-//     } catch (error) {
-
-//         res.redirect("/pageNotFound")
-        
-//     }
-// }
-
 const loadShoppingPage = async (req, res) => {
     try {
-        // Get user data if authenticated
         const user = req.session.user;
         const userData = user ? await User.findOne({ _id: user }) : null;
 
         // Pagination setup
         const page = parseInt(req.query.page) || 1;
-        const limit = 9;
+        const limit = 6;
         const skip = (page - 1) * limit;
 
-        // Build query object
+        // Build query object for filtering products
         let query = {
             isBlocked: false,
             quantity: { $gt: 0 }
         };
 
-        // Add search functionality
+        // Add search functionality (case insensitive)
         if (req.query.search) {
-            query.productName = { $regex: req.query.search, $options: 'i' };
+            query.productName = { $regex: req.query.search, $options: "i" };
         }
 
-        // Get categories and ensure they're listed
-        const categories = await Category.find({ isListed: true });
-        const categoryIds = categories.map(category => category._id);
-        query.category = { $in: categoryIds };
-
-        // Determine sort order
-        let sort = {};
-        switch (req.query.sort) {
-            case 'popularity':
-                sort = { popularity: -1 };
-                break;
-            case 'price_asc':
-                sort = { salePrice: 1 };
-                break;
-            case 'price_desc':
-                sort = { salePrice: -1 };
-                break;
-            case 'rating':
-                sort = { averageRating: -1 };
-                break;
-            case 'featured':
-                sort = { featured: -1 };
-                break;
-            case 'new':
-                sort = { createdAt: -1 };
-                break;
-            case 'name_asc':
-                sort = { productName: 1 };
-                break;
-            case 'name_desc':
-                sort = { productName: -1 };
-                break;
-            default:
-                sort = { createdAt: -1 }; 
+        // Add category filter (if a category is selected)
+        if (req.query.category) {
+            query.category = req.query.category;
         }
 
-
+        // Fetch categories with product counts
         const categoriesWithCounts = await Category.aggregate([
             {
                 $match: { isListed: true }
             },
             {
                 $lookup: {
-                    from: 'products',
-                    let: { categoryId: '$_id' },
+                    from: "products",
+                    let: { categoryId: "$_id" },
                     pipeline: [
                         {
                             $match: {
                                 $expr: {
                                     $and: [
-                                        { $eq: ['$category', '$$categoryId'] },
-                                        { $eq: ['$isBlocked', false] },
-                                        { $gt: ['$quantity', 0] }
+                                        { $eq: ["$category", "$$categoryId"] },
+                                        { $eq: ["$isBlocked", false] },
+                                        { $gt: ["$quantity", 0] }
                                     ]
                                 }
                             }
                         }
                     ],
-                    as: 'products'
+                    as: "products"
                 }
             },
             {
                 $project: {
                     _id: 1,
                     name: 1,
-                    productCount: { $size: '$products' }
+                    productCount: { $size: "$products" }
                 }
             }
         ]);
 
+        // Sorting logic
+        let sort = {};
+        switch (req.query.sort) {
+            case "popularity":
+                sort = { popularity: -1 };
+                break;
+            case "price_asc":
+                sort = { salePrice: 1 };
+                break;
+            case "price_desc":
+                sort = { salePrice: -1 };
+                break;
+            case "rating":
+                sort = { averageRating: -1 };
+                break;
+            case "featured":
+                sort = { featured: -1 };
+                break;
+            case "new":
+                sort = { createdAt: -1 };
+                break;
+            case "name_asc":
+                sort = { productName: 1 };
+                break;
+            case "name_desc":
+                sort = { productName: -1 };
+                break;
+            default:
+                sort = { createdAt: -1 };
+        }
 
+        // Fetch products based on query
         const products = await Product.find(query)
             .sort(sort)
             .skip(skip)
             .limit(limit);
 
-
+        // Get total product count for pagination
         const totalProducts = await Product.countDocuments(query);
         const totalPages = Math.ceil(totalProducts / limit);
 
-     
+        // Render shop page with updated data
         res.render("shop", {
             user: userData,
             products: products,
@@ -437,8 +397,9 @@ const loadShoppingPage = async (req, res) => {
             totalProducts: totalProducts,
             currentPage: page,
             totalPages: totalPages,
-            search: req.query.search,
-            sort: req.query.sort,
+            search: req.query.search || "",
+            selectedCategory: req.query.category || "",
+            sort: req.query.sort || "",
             req: req
         });
 
@@ -758,12 +719,22 @@ const verifyEmailOTP = async (req, res) => {
 const addToCart = async (req, res) => {
     try {
         const userId = req.session.user;
-        if (!userId) return res.status(401).json({ success: false, message: "Please log in to add items to the cart" });
+
+        if (!userId) {
+            return res.status(401).json({ success: false, message: "Please log in first" });
+        }
 
         const productId = req.query.id;
-        const quantity = parseInt(req.query.quantity) || 1;
-        const product = await Product.findById(productId);
-        if (!product) return res.status(404).json({ success: false, message: "Product not found" });
+        let quantity = parseInt(req.query.quantity) || 1;
+        const product = await Product.findById(productId).populate('category'); 
+
+        if (!product) {
+            return res.status(404).json({ success: false, message: "Product not found" });
+        }
+
+        if (product.quantity === 0 || product.isBlocked) {
+            return res.status(400).json({ success: false, message: "This product is out of stock or blocked" });
+        }
 
         let cart = await Cart.findOne({ userId });
 
@@ -775,12 +746,28 @@ const addToCart = async (req, res) => {
         const productPrice = Number(product.salePrice) || 0;
 
         if (itemIndex > -1) {
+            if (cart.items[itemIndex].quantity + quantity > product.quantity) {
+                return res.status(400).json({ success: false, message: "Only " + product.quantity + " left in stock!" });
+            }
+
+            if (cart.items[itemIndex].quantity + quantity > 5) {
+                return res.status(400).json({ success: false, message: "User limit exceeded for this product (Max: 5)" });
+            }
+
             cart.items[itemIndex].quantity += quantity;
-            cart.items[itemIndex].totalPrice = cart.items[itemIndex].quantity * cart.items[itemIndex].price;
+            cart.items[itemIndex].totalPrice = cart.items[itemIndex].quantity * productPrice;
         } else {
+            if (quantity > product.quantity) {
+                return res.status(400).json({ success: false, message: "Only " + product.quantity + " left in stock!" });
+            }
+
+            if (quantity > 5) {
+                return res.status(400).json({ success: false, message: "User limit exceeded for this product (Max: 5)" });
+            }
+
             cart.items.push({
                 productId,
-                quantity: quantity,
+                quantity,
                 price: productPrice,
                 totalPrice: quantity * productPrice,
                 status: "placed",
@@ -791,13 +778,10 @@ const addToCart = async (req, res) => {
         cart.cartTotal = cart.items.reduce((total, item) => total + item.totalPrice, 0);
         await cart.save();
 
-        
-        await Wishlist.updateOne(
-            { userId },
-            { $pull: { products: { productId } } }
-        );
+        await Wishlist.updateOne({ userId }, { $pull: { products: { productId } } });
 
         res.json({ success: true, message: "Product added to cart successfully!" });
+
     } catch (error) {
         console.error("Error adding to cart:", error);
         res.status(500).json({ success: false, message: "Internal Server Error" });
@@ -806,24 +790,28 @@ const addToCart = async (req, res) => {
 
 
 
-  const loadCartPage = async (req, res) => {
+
+const loadCartPage = async (req, res) => {
     try {
         const userId = req.session.user;
         if (!userId) return res.redirect("/login");
 
-        const cart = await Cart.findOne({ userId }).populate("items.productId");
+        let cart = await Cart.findOne({ userId }).populate("items.productId");
 
-       
         if (!cart) {
             return res.render("cart", { cart: null, cartTotal: 0 });
         }
 
-     
-        if (cart.items.length === 0) {
-            return res.render("cart", { cart, cartTotal: 0 }); 
-        }
+        cart.items = cart.items.filter(item => !item.productId.isBlocked);
 
-    
+        cart.items.forEach(item => {
+            const productPrice = item.productId.salePrice || 0;
+            const categoryOffer = item.productId.category?.categoryOffer || 0;
+            const productOffer = item.productId.productOffer || 0;
+            const bestOffer = Math.max(productOffer, categoryOffer);
+            item.discount = (bestOffer / 100) * productPrice; // Calculate discount amount
+        });
+
         res.render("cart", { cart, cartTotal: cart.cartTotal });
     } catch (error) {
         console.error("Error loading cart:", error);
@@ -831,31 +819,32 @@ const addToCart = async (req, res) => {
     }
 };
 
+
       const deleteFromCart = async (req, res) => {
         try {
           const userId = req.session.user;
           if (!userId) return res.redirect("/login");
       
-          const productId = req.query.id; 
+          const productId = req.query.id;
           if (!productId) return res.status('/pageNotFound').json({ message: "Product ID not provided" });
       
           const cart = await Cart.findOne({ userId });
           if (!cart) return res.status(404).json({ message: "Cart not found" });
       
-          
           const itemIndex = cart.items.findIndex((item) => item.productId.equals(productId));
           if (itemIndex === -1) return res.status(404).json({ message: "Product not found in cart" });
       
-          
           const deletedItem = cart.items.splice(itemIndex, 1)[0];
       
-          
           cart.cartTotal = cart.items.reduce((total, item) => total + item.totalPrice, 0);
       
-          
+          if (cart.discount > 0) {
+            cart.finalTotal = Math.max(cart.finalTotal - deletedItem.totalPrice, 0);
+          }
+      
           await cart.save();
       
-          res.redirect("/cart"); 
+          res.redirect("/cart");
         } catch (error) {
           console.error("Error deleting item from cart:", error);
           res.status(500).send("Internal Server Error");
@@ -882,7 +871,6 @@ const addToCart = async (req, res) => {
             let item = cart.items[itemIndex];
     
             let newQuantity = item.quantity + changeValue;
-    
             let productStock = item.productId.quantity;
     
             if (newQuantity > 5) {
@@ -902,6 +890,13 @@ const addToCart = async (req, res) => {
     
             cart.cartTotal = cart.items.reduce((total, item) => total + item.totalPrice, 0);
     
+            if (cart.discount > 0) {
+                cart.finalTotal += changeValue * item.productId.salePrice;
+                cart.finalTotal = Math.max(cart.finalTotal, 0);
+            } else {
+                cart.finalTotal = cart.cartTotal;
+            }
+    
             await cart.save();
     
             res.json({
@@ -909,12 +904,15 @@ const addToCart = async (req, res) => {
                 newQuantity: item.quantity,
                 salePrice: item.productId.salePrice,
                 cartTotal: cart.cartTotal,
+                discount: cart.discount,
+                finalTotal: cart.finalTotal,
             });
         } catch (error) {
             console.error("Error updating quantity:", error);
             res.status(500).json({ success: false, message: "Internal Server Error" });
         }
     };
+    
     
     
     
@@ -1146,7 +1144,27 @@ const deleteAddress = async (req, res) => {
 };
 
 
-
+const loadCoupons = async (req, res) => {
+    const userId = req.session.user;
+  
+    try {
+      const coupons = await Coupon.find({ isActive: true });
+      const userCoupons = await Coupon.find({
+        "usedBy.userId": userId,
+      });
+  
+      const usedCouponCodes = userCoupons.map(coupon => coupon.code);
+  
+      const availableCoupons = coupons.map(coupon => ({
+        ...coupon.toObject(),
+        isUsed: usedCouponCodes.includes(coupon.code),
+      }));
+  
+      res.render("coupons", { coupons: availableCoupons });
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching coupons", error });
+    }
+  }
 
 
 module.exports = {
@@ -1181,7 +1199,10 @@ module.exports = {
     postEditAddress,
     deleteAddress,
     generateEmailOTP,
-    verifyEmailOTP
+    verifyEmailOTP,
+    loadCoupons,
+    loadAboutPage,
+    loadContactPage
 
 
 

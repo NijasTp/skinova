@@ -13,6 +13,8 @@ passport.use(new GoogleStrategy({
 async (accessToken, refreshToken, profile, done) => {
     try {
 
+        console.log("🔍 Google Profile:", profile);
+
         let user = await User.findOne({ googleId: profile.id });
         if(user){
             return done(null, user);
@@ -28,7 +30,7 @@ async (accessToken, refreshToken, profile, done) => {
         
     } catch (error) {
 
-        return done(err,null)
+        return done(error,null)
         
     }
 }
@@ -36,18 +38,28 @@ async (accessToken, refreshToken, profile, done) => {
 ));
 
 passport.serializeUser((user, done) => {
-    done(null, user.id);
+    done(null, user.id);  
 });
+
+
 
 passport.deserializeUser((id, done) => {
     User.findById(id)
-    .then(user => {
-        done(null, user);
-    })
-    .catch(err => {
-        done(err,null)
-    })
+        .then(user => {
+            if (user) {
+                done(null, user);
+            } else {
+                console.log("❌ User Not Found");
+                done(null, false);
+            }
+        })
+        .catch(err => {
+            console.error("❌ Deserialize Error:", err);
+            done(err, null);
+        });
 });
+
+
 
 
 module.exports = passport;

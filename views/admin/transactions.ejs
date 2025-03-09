@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Transactions</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+
+<body class="bg-gray-100 text-gray-800">
+    <%- include('../partials/admin/header') %>
+
+        <div class="container mx-auto p-6">
+            <h1 class="text-3xl font-bold text-center mb-6">Transaction History</h1>
+
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-2">Total Credit</h3>
+                    <p class="text-2xl font-bold text-green-600">₹<%= totalCredit.toLocaleString('en-IN') %>
+                    </p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-2">Total Debit</h3>
+                    <p class="text-2xl font-bold text-red-600">₹<%= totalDebit.toLocaleString('en-IN') %>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <form action="/admin/transactions" method="GET"
+                class="flex flex-wrap gap-4 items-center bg-white p-4 rounded-lg shadow-md mb-6">
+                <div>
+                    <label class="block text-gray-700">Start Date:</label>
+                    <input type="date" name="startDate" value="<%= startDate || '' %>" class="border p-2 rounded">
+                </div>
+                <div>
+                    <label class="block text-gray-700">End Date:</label>
+                    <input type="date" name="endDate" value="<%= endDate || '' %>" class="border p-2 rounded">
+                </div>
+                <div>
+                    <label class="block text-gray-700">Transaction Type:</label>
+                    <select name="type" class="border p-2 rounded">
+                        <option value="">All</option>
+                        <option value="credit" <%=type==='credit' ? 'selected' : '' %>>Wallet Credit</option>
+                        <option value="debit" <%=type==='debit' ? 'selected' : '' %>>Wallet Debit</option>
+                        <option value="Razorpay" <%=type==='Razorpay Payment' ? 'selected' : '' %>>Razorpay Payment
+                        </option>
+                    </select>
+                </div>
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Apply
+                    Filter</button>
+            </form>
+
+            <!-- Transactions Table -->
+            <div class="bg-white p-4 rounded-lg shadow-md overflow-x-auto">
+                <table class="min-w-full bg-white border border-gray-200">
+                    <thead>
+                        <tr class="bg-gray-200">
+                            <th class="py-2 px-4 border-b text-left">Transaction ID</th>
+                            <th class="py-2 px-4 border-b text-left">Date</th>
+                            <th class="py-2 px-4 border-b text-left">User</th>
+                            <th class="py-2 px-4 border-b text-left">Type</th>
+                            <th class="py-2 px-4 border-b text-left">Amount</th>
+                            <th class="py-2 px-4 border-b text-left">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (transactions.length===0) { %>
+                            <tr>
+                                <td colspan="6" class="text-center py-4 text-gray-500">No transactions found.</td>
+                            </tr>
+                            <% } else { %>
+                                <% transactions.forEach(transaction=> { %>
+                                    <tr class="hover:bg-gray-100">
+                                        <td class="py-2 px-4 border-b">
+                                            <%= transaction.transactionId %>
+                                        </td>
+                                        <td class="py-2 px-4 border-b">
+                                            <%= new Date(transaction.date).toISOString().split('T')[0] %>
+                                        </td>
+                                        <td class="py-2 px-4 border-b">
+                                            <%= transaction.user %>
+                                        </td>
+                                        <td
+                                            class="py-2 px-4 border-b font-bold <%= transaction.type.includes('credit') ? 'text-green-600' : 'text-red-600' %>">
+                                            <%= transaction.type %>
+                                        </td>
+                                        <td class="py-2 px-4 border-b">₹<%= transaction.amount.toLocaleString('en-IN')
+                                                %>
+                                        </td>
+                                        <td class="py-2 px-4 border-b">
+                                            <button onclick="showTransactionDetails(
+                                                '<%= transaction.transactionId %>', 
+                                                '<%= transaction.user %>', 
+                                                '<%= transaction.date %>', 
+                                                '<%= transaction.type %>', 
+                                                '<%= transaction.amount %>', 
+                                                '<%= transaction.source %>', 
+                                                '<%= transaction.orderId ? transaction.orderId.toString() : '' %>')" class="text-blue-500 hover:underline">
+                                                View Details
+                                            </button>
+
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- MODAL -->
+            <div id="transactionModal"
+                class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex items-center justify-center">
+                <div class="bg-white rounded-lg p-6 shadow-lg w-96">
+                    <h2 class="text-xl font-bold mb-4">Transaction Details</h2>
+                    <p><strong>User:</strong> <span id="modalUser"></span></p>
+                    <p><strong>Transaction ID:</strong> <span id="modalTransactionId"></span></p>
+                    <p><strong>Date:</strong> <span id="modalDate"></span></p>
+                    <p><strong>Type:</strong> <span id="modalType"></span></p>
+                    <p><strong>Amount:</strong> ₹<span id="modalAmount"></span></p>
+                    <p><strong>Source:</strong>
+                        <span id="modalSource"></span>
+                        <span id="modalOrderLink"></span>
+                    </p>
+                    <button onclick="closeModal()" class="bg-red-500 text-white px-4 py-2 mt-4 rounded">Close</button>
+                </div>
+            </div>
+
+            <script>
+               function showTransactionDetails(id, user, date, type, amount, source, orderId) {
+    document.getElementById("modalUser").innerText = user;
+    document.getElementById("modalTransactionId").innerText = id;
+    document.getElementById("modalDate").innerText = new Date(date).toISOString().split('T')[0];
+    document.getElementById("modalType").innerText = type;
+    document.getElementById("modalAmount").innerText = amount;
+    document.getElementById("modalSource").innerText = source;
+
+
+        if ((type.toLowerCase() === "credit" || type.toLowerCase() === "wallet credit") && orderId) {
+
+        document.getElementById("modalOrderLink").innerHTML = `
+            <a href="/admin/orders/${orderId}" class="text-blue-500 hover:underline">
+                View Order Details
+            </a>`;
+    } else {
+        document.getElementById("modalOrderLink").innerHTML = "";
+    }
+
+    document.getElementById("transactionModal").classList.remove("hidden");
+}
+
+
+
+                function closeModal() {
+                    document.getElementById("transactionModal").classList.add("hidden");
+                }
+            </script>
+
+</body>
+
+</html>

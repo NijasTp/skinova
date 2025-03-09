@@ -56,7 +56,7 @@
 <div class="container-fluid px-4">
     <h1 class="mt-4">Order Details</h1>
     <ol class="breadcrumb mb-4">
-        <li class="breadcrumb-item active">Order #<%= order._id %></li>
+        <li class="breadcrumb-item active">Order #<%= orders.orderId %></li>
     </ol>
 
     <div class="row">
@@ -64,14 +64,14 @@
             <div class="card mb-4">
                 <div class="card-header">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">Order #<%= order._id %></h5>
+                        <h5 class="mb-0">Order #<%= orders.orderId %></h5>
                         <span class="badge bg-<%= 
-                            selectedProduct.status === 'delivered' ? 'success' :
-                            selectedProduct.status === 'cancelled' ? 'danger' :
-                            selectedProduct.status === 'shipped' ? 'info' :
+                            orders.status === 'delivered' ? 'success' :
+                            orders.status === 'cancelled' ? 'danger' :
+                            orders.status === 'shipped' ? 'info' :
                             'warning'
                         %>">
-                            <%= selectedProduct.status.toUpperCase() %>
+                            <%= orders.status.toUpperCase() %>
                         </span>
                     </div>
                 </div>
@@ -82,7 +82,7 @@
                         <% const statuses = ['pending', 'confirmed', 'shipped', 'delivered']; %>
                         <% statuses.forEach(status => { %>
                             <div class="status-point">
-                                <div class="status-dot <%= selectedProduct.status === status || statuses.indexOf(selectedProduct.status) > statuses.indexOf(status) ? 'status-active' : 'status-inactive' %>"></div>
+                                <div class="status-dot <%= orders.status === status || statuses.indexOf(orders.status) > statuses.indexOf(status) ? 'status-active' : 'status-inactive' %>"></div>
                                 <small><%= status.toUpperCase() %></small>
                             </div>
                         <% }); %>
@@ -104,27 +104,27 @@
                                 <tr>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <img src="/<%= selectedProduct.product.productImage[0] %>" 
+                                            <img src="/<%= orders.product.productImage[0] %>" 
                                                  alt="Product"
                                                  style="width: 50px; height: 50px; object-fit: cover;"
                                                  class="me-2">
-                                            <span><%= selectedProduct.product.productName %></span>
+                                            <span><%= orders.product.productName %></span>
                                         </div>
                                     </td>
-                                    <td>₹<%= selectedProduct.price %></td>
-                                    <td><%= selectedProduct.quantity %></td>
-                                    <td>₹<%= selectedProduct.price * selectedProduct.quantity %></td>
+                                    <td>₹<%= orders.price %></td>
+                                    <td><%= orders.quantity %></td>
+                                    <td>₹<%= orders.price * orders.quantity %></td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
 
-                    <% if (selectedProduct.status !== 'cancelled' && selectedProduct.status !== 'delivered') { %>
+                    <% if (orders.status !== 'cancelled' && orders.status !== 'delivered' && orders.status !== 'return request' && orders.status !== 'returned') { %>
                         <div class="mt-4">
-                            <button onclick="updateStatus('<%= order._id %>', '<%= selectedProduct.product._id %>' , '<%= selectedProduct.status %>')" class="btn btn-primary me-2">
+                            <button onclick="updateStatus('<%= orders._id %>', '<%= orders.status %>')" class="btn btn-primary me-2">
                                 Update Status
                             </button>                            
-                            <button onclick="cancelOrder('<%= order._id %>', '<%= selectedProduct.product._id %>')" class="btn btn-danger">
+                            <button onclick="cancelOrder('<%= orders._id %>', '<%= orders.product._id %>')" class="btn btn-danger">
                                 Cancel Order
                             </button>                            
                         </div>
@@ -136,7 +136,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    async function updateStatus(orderId , productId , currentStatus) {
+    async function updateStatus(orderId , currentStatus) {
     const statuses = ['pending', 'confirmed', 'shipped', 'delivered'];
     
     const currentIndex = statuses.indexOf(currentStatus);
@@ -176,7 +176,7 @@
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ orderId,productId, status }),
+                body: JSON.stringify({ orderId, status }),
             });
 
             const data = await response.json();

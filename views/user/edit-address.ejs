@@ -1,84 +1,104 @@
 <html>
 <head>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="/img/favicon.jpg" type="image/x-icon">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
-           .hero {
-  display: flex;
-  justify-content: space-between;
-  background-color: #e6f4f4;
-  align-items: center;
-  padding: 4rem 2rem;
-  width: 100%;
-  margin: 0 auto;
-  min-height: 50vh;
-}
 
-.hero-content {
-  max-width: 500px;
-  margin-left: 40%;
-}
+.hero {
+      display: flex;
+      justify-content: space-between;
+      background-color: #e6f4f4;
+      align-items: center;
+      padding: 4rem 2rem;
+      width: 100%;
+      margin: 0 auto;
+      min-height: 50vh;
+    }
 
-.hero-title {
-  font-size: 2rem;
-  line-height: 1.2;
-  color: #2c3e50;
-  margin-bottom: 1rem;
-}
+    .hero-content {
+      max-width: 500px;
+      margin-left: 40%;
+    }
 
-.hero-description {
-  color: #5d6d7e;
-  margin-bottom: 2rem;
-  line-height: 1.6;
-}
+    .hero-title {
+      font-size: 2rem;
+      line-height: 1.2;
+      color: #2c3e50;
+      margin-top: 40px;;
+    }
 
-.cta-button {
-  display: inline-block;
-  padding: 0.8rem 2rem;
-  background-color: #1a4741;
-  color: white;
-  text-decoration: none;
-  border-radius: 4px;
-  transition: background-color 0.3s ease;
-}
+    .hero-description {
+      color: #5d6d7e;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
 
-.cta-button:hover {
-  background-color: #123530;
-}
+    .cta-button {
+      display: inline-block;
+      padding: 0.8rem 2rem;
+      background-color: #1a4741;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+    }
 
-.hero-image {
-  width: 300px;
-  position: relative;
-  right: 100px;
+    .cta-button:hover {
+      background-color: #123530;
+    }
 
-}
-@media (max-width: 768px) {
-  .hero {
-      flex-direction: column;
-      text-align: center;
-      padding: 2rem;
-  }
-  .hero-image {
-  width: 300px;
-  position: relative;
-  left: 30px;
+    .hero-image {
+      width: 300px;
+      position: relative;
+      right: 100px;
+    }
 
-}
+    @media (max-width: 768px) {
+      .hero {
+        flex-direction: column;
+        text-align: center;
+        padding: 2rem;
+      }
 
-}
+      .hero-content {
+        margin-left: 0;
+      }
+
+      .hero-image {
+        width: 300px;
+        position: relative;
+        left: 0;
+      }
+    }
     </style>
 </head>
 <body class="bg-gray-100">
     <%- include('../partials/user/header') %> 
     <main class="hero w-full">
-      <div class="hero-content">
-         <b><h1 class="hero-title">EDIT ADDRESS </h1></b>
-          <p class="hero-description">
-             <a href="/">Home</a> <span> > </span> <a href="/address">Address</a>
-          </p>
-      </div>
-      <img src="/img/skinova cover.png" alt="Skinova Cover" class="hero-image">
-  </main>
+        <div class="hero-content">
+         <b>
+          <h1 class="hero-title">
+           MY CART
+          </h1>
+         </b>
+         <p class="hero-description">
+          <i>
+           <a href="/">
+            Home
+           </a>
+           <span>
+            &gt;
+           </span>
+           <a href="/cart">
+            Cart
+           </a>
+          </i>
+         </p>
+        </div>
+        <img alt="Illustration of a shopping cart with various items" class="hero-image" height="300" src="/img/skinova cover.png" width="300"/>
+       </main>
     <div class="flex min-h-screen">
         <!-- Sidebar -->
         <div class="w-1/4 bg-gray-200 p-8">

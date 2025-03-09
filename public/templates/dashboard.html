@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-6">
+        <h1 class="text-3xl font-bold mb-6">Admin Dashboard</h1>
+        
+        <!-- Filter Options -->
+        <div class="mb-6">
+            <label for="filter" class="font-semibold">Filter Sales:</label>
+            <select id="filter" class="p-2 border rounded">
+                <option value="yearly">Yearly</option>
+                <option value="monthly">Monthly</option>
+                <option value="weekly">Weekly</option>
+            </select>
+        </div>
+        
+        <!-- Overview Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+            <% const stats = [
+                { title: "Total Revenue", value: totalRevenue, icon: "fa-dollar-sign", bg: "bg-blue-500" },
+                { title: "Number of Orders", value: totalOrders, icon: "fa-shopping-cart", bg: "bg-green-500" },
+                { title: "Total Products Sold", value: totalProductsSold, icon: "fa-box", bg: "bg-yellow-500" },
+                { title: "Total Users", value: totalUsers, icon: "fa-users", bg: "bg-red-500" }
+            ]; %>
+            
+            <% stats.forEach(stat => { %>
+                <div class="bg-white p-6 rounded-lg shadow-lg flex items-center">
+                    <div class="p-3 <%= stat.bg %> rounded-full text-white">
+                        <i class="fas <%= stat.icon %>"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h4 class="text-2xl font-semibold"><%= stat.title %></h4>
+                        <p class="text-gray-600">₹<%= stat.value.toLocaleString() %></p>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+
+        <!-- Sales Chart -->
+        <div class="bg-white p-6 rounded-lg shadow-lg mb-6">
+            <canvas id="salesChart"></canvas>
+        </div>
+
+        <!-- Best-Selling Lists -->
+        <% const bestSellingLists = [
+            { title: "Best-Selling Products", data: bestSellingProducts },
+            { title: "Best-Selling Categories", data: bestSellingCategories },
+            { title: "Best-Selling Brands", data: bestSellingBrands }
+        ]; %>
+        
+        <% bestSellingLists.forEach(list => { %>
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-6">
+                <h2 class="text-2xl font-semibold mb-4"><%= list.title %></h2>
+                <ul>
+                    <% list.data.forEach((item, index) => { %>
+                        <li class="py-2 border-b"><%= index + 1 %>. <%= item.name %> - <%= item.sales %> sales</li>
+                    <% }) %>
+                </ul>
+            </div>
+        <% }) %>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        const salesChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: <%= JSON.stringify(chartLabels) %>,
+                datasets: [{
+                    label: 'Sales',
+                    data: <%= JSON.stringify(chartData) %>,
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderWidth: 2
+                }]
+            },
+            options: { responsive: true }
+        });
+    </script>
+</body>
+</html>
