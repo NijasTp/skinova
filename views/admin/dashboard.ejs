@@ -10,6 +10,64 @@
         body {
             font-family: 'Roboto', sans-serif;
         }
+        .pagination {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.page-link {
+    display: inline-block;
+    padding: 8px 12px;
+    margin: 0 5px;
+    color: #007bff;
+    text-decoration: none;
+    border: 1px solid #007bff;
+    border-radius: 5px;
+}
+
+.page-link:hover {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.page-link.active {
+    background-color: #007bff;
+    color: white;
+    pointer-events: none;
+}
+
+.filter-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .filter-label {
+            font-weight: bold;
+        }
+
+        .filter-dropdown {
+            padding: 8px 12px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+            background: white;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .filter-section {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .filter-dropdown {
+                width: 100%;
+                margin-top: 10px;
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -24,7 +82,7 @@
                     </div>
                     <div>
                         <div class="font-bold">Total Revenue</div>
-                        <div class="text-2xl">$<%= totalRevenue %></div>
+                        <div class="text-2xl">₹<%= totalRevenue %></div>
                     </div>
                 </div>
             </div>
@@ -141,6 +199,16 @@
         <a href="/admin/download-sold-products" class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 mt-4 rounded">
             <i class="fas fa-download "> Download Sales Report </i>
         </a>
+
+        <div class="filter-section">
+            <label class="filter-label" for="dashboard-filter">Filter By:</label>
+            <select id="dashboard-filter" class="filter-dropdown">
+             
+                <option value="weekly" <%= selectedFilter === 'weekly' ? 'selected' : '' %>>Weekly</option>
+                <option value="monthly" <%= selectedFilter === 'monthly' ? 'selected' : '' %>>Monthly</option>
+                <option value="yearly" <%= selectedFilter === 'yearly' ? 'selected' : '' %>>Yearly</option>
+            </select>
+        </div>
         
         <div class="overflow-x-auto">
             <table class="min-w-full bg-white rounded shadow">
@@ -161,12 +229,26 @@
                             <td class="py-2 px-4 border-b"><%= order.userId.name %></td>
                             <td class="py-2 px-4 border-b"><%= order.product ? order.product.productName || order.product.name || 'N/A' : 'N/A' %></td>                            
                             <td class="py-2 px-4 border-b"><%= order.quantity %></td>
-                            <td class="py-2 px-4 border-b">$<%= order.finalPrice %></td>
+                            <td class="py-2 px-4 border-b">₹<%= order.finalPrice %></td>
                             <td class="py-2 px-4 border-b"><%= order.deliveredOn ? order.deliveredOn.toDateString() : 'N/A' %></td>
                         </tr>
                     <% }) %>
                 </tbody>
             </table>
+            <div class="pagination">
+                <% if (currentPage > 1) { %>
+                    <a href="?page=<%= currentPage - 1 %>" class="page-link">« Previous</a>
+                <% } %>
+            
+                <% for (let i = 1; i <= totalPages; i++) { %>
+                    <a href="?page=<%= i %>" class="page-link <%= currentPage === i ? 'active' : '' %>"><%= i %></a>
+                <% } %>
+            
+                <% if (currentPage < totalPages) { %>
+                    <a href="?page=<%= currentPage + 1 %>" class="page-link">Next »</a>
+                <% } %>
+            </div>
+            
         </div>
 
 
@@ -226,6 +308,11 @@
                 const filter = document.getElementById('filter').value;
                 window.location.href = `/admin/?filter=${filter}`;
             });
+        });
+
+        document.getElementById('dashboard-filter').addEventListener('change', function () {
+            const selectedFilter = this.value;
+            window.location.href = `/admin/?filter=${selectedFilter}`;
         });
     </script>
 </body>

@@ -29,33 +29,41 @@
                 </div>
             </div>
 
-            <!-- Filters -->
-            <form action="/admin/transactions" method="GET"
-                class="flex flex-wrap gap-4 items-center bg-white p-4 rounded-lg shadow-md mb-6">
-                <div>
-                    <label class="block text-gray-700">Start Date:</label>
-                    <input type="date" name="startDate" value="<%= startDate || '' %>" class="border p-2 rounded">
-                </div>
-                <div>
-                    <label class="block text-gray-700">End Date:</label>
-                    <input type="date" name="endDate" value="<%= endDate || '' %>" class="border p-2 rounded">
-                </div>
-                <div>
-                    <label class="block text-gray-700">Transaction Type:</label>
-                    <select name="type" class="border p-2 rounded">
-                        <option value="">All</option>
-                        <option value="credit" <%=type==='credit' ? 'selected' : '' %>>Wallet Credit</option>
-                        <option value="debit" <%=type==='debit' ? 'selected' : '' %>>Wallet Debit</option>
-                        <option value="Razorpay" <%=type==='Razorpay Payment' ? 'selected' : '' %>>Razorpay Payment
-                        </option>
-                    </select>
-                </div>
-                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Apply
-                    Filter</button>
-            </form>
+<!-- Filters & Search Form (Merged) -->
+<form action="/admin/transactions" method="GET" class="flex flex-wrap gap-4 items-center bg-white p-4 rounded-lg shadow-md mb-6">
+    <!-- Start Date -->
+    <div>
+        <label class="block text-gray-700">Start Date:</label>
+        <input type="date" name="startDate" value="<%= startDate || '' %>" class="border p-2 rounded">
+    </div>
+    <!-- End Date -->
+    <div>
+        <label class="block text-gray-700">End Date:</label>
+        <input type="date" name="endDate" value="<%= endDate || '' %>" class="border p-2 rounded">
+    </div>
+    <!-- Transaction Type -->
+    <div>
+        <label class="block text-gray-700">Transaction Type:</label>
+        <select name="type" class="border p-2 rounded">
+            <option value="">All</option>
+            <option value="credit" <%= type === 'credit' ? 'selected' : '' %>>Wallet Credit</option>
+            <option value="debit" <%= type === 'debit' ? 'selected' : '' %>>Wallet Debit</option>
+            <option value="Razorpay" <%= type === 'Razorpay' ? 'selected' : '' %>>Razorpay Payment</option>
+        </select>
+    </div>
+    <!-- Search by User Name -->
+    <div>
+        <label class="block text-gray-700">Search by User:</label>
+        <input type="text" name="search" value="<%= search || '' %>" placeholder="Enter user name..." class="border p-2 rounded">
+    </div>
+    <!-- Submit Button -->
+    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Apply Filters</button>
+    <a href="/admin/transactions" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Clear Filters</a>
+</form>
 
             <!-- Transactions Table -->
             <div class="bg-white p-4 rounded-lg shadow-md overflow-x-auto">
+
                 <table class="min-w-full bg-white border border-gray-200">
                     <thead>
                         <tr class="bg-gray-200">
@@ -99,7 +107,8 @@
                                                 '<%= transaction.type %>', 
                                                 '<%= transaction.amount %>', 
                                                 '<%= transaction.source %>', 
-                                                '<%= transaction.orderId ? transaction.orderId.toString() : '' %>')" class="text-blue-500 hover:underline">
+                                                '<%= transaction.orderId ? transaction.orderId.toString() : '' %>')"
+                                                class="text-blue-500 hover:underline">
                                                 View Details
                                             </button>
 
@@ -109,6 +118,28 @@
                                         <% } %>
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="flex justify-center mt-6">
+                <% if (totalPages> 1) { %>
+                    <% if (page> 1) { %>
+                        <a href="?page=<%= page - 1 %>&search=<%= search %>&startDate=<%= startDate %>&endDate=<%= endDate %>&type=<%= type %>"
+                            class="px-4 py-2 bg-gray-300 rounded mx-1">Previous</a>
+                        <% } %>
+
+                            <% for (let i=1; i <=totalPages; i++) { %>
+                                <a href="?page=<%= i %>&search=<%= search %>&startDate=<%= startDate %>&endDate=<%= endDate %>&type=<%= type %>"
+                                    class="px-4 py-2 mx-1 <%= page === i ? 'bg-blue-500 text-white' : 'bg-gray-300' %> rounded">
+                                    <%= i %>
+                                </a>
+                                <% } %>
+
+                                    <% if (page < totalPages) { %>
+                                        <a href="?page=<%= page + 1 %>&search=<%= search %>&startDate=<%= startDate %>&endDate=<%= endDate %>&type=<%= type %>"
+                                            class="px-4 py-2 bg-gray-300 rounded mx-1">Next</a>
+                                        <% } %>
+                                            <% } %>
             </div>
 
             <!-- MODAL -->
@@ -130,7 +161,7 @@
             </div>
 
             <script>
-               function showTransactionDetails(id, user, date, type, amount, source, orderId) {
+function showTransactionDetails(id, user, date, type, amount, source, orderId) {
     document.getElementById("modalUser").innerText = user;
     document.getElementById("modalTransactionId").innerText = id;
     document.getElementById("modalDate").innerText = new Date(date).toISOString().split('T')[0];
@@ -138,19 +169,19 @@
     document.getElementById("modalAmount").innerText = amount;
     document.getElementById("modalSource").innerText = source;
 
-
-        if ((type.toLowerCase() === "credit" || type.toLowerCase() === "wallet credit") && orderId) {
-
-        document.getElementById("modalOrderLink").innerHTML = `
-            <a href="/admin/orders/${orderId}" class="text-blue-500 hover:underline">
-                View Order Details
-            </a>`;
-    } else {
-        document.getElementById("modalOrderLink").innerHTML = "";
+      if (orderId){
+    document.getElementById("modalOrderLink").innerHTML = `
+        <a href="/admin/orders/${orderId || ''}" class="text-blue-500 hover:underline">
+            View Order Details
+        </a>`;
+    }else{
+        document.getElementById("modalOrderLink").innerHTML = ""; 
     }
-
+    
     document.getElementById("transactionModal").classList.remove("hidden");
 }
+
+
 
 
 

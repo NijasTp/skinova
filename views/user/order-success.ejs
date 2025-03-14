@@ -1,0 +1,83 @@
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>
+   Order Successful
+  </title>
+  <script src="https://cdn.tailwindcss.com">
+  </script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <style>
+   body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #e6f4f4;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        .success-image {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 20px;
+        }
+
+        .success-code {
+            font-size: 36px;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #333;
+        }
+
+        .success-message {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .order-link {
+            color: #2b7bb9;
+            text-decoration: none;
+        }
+
+        .order-link:hover {
+            text-decoration: underline;
+        }
+  </style>
+ </head>
+ <body>
+  <div class="container">
+   <div class="success-image">
+    <img alt="Illustration of a checkmark indicating success" class="success-image" height="200" src="/img/skinova cover.png" width="200"/>
+   </div>
+   <div class="success-code">
+    Thank you for your purchase!
+   </div>
+   
+   <div class="success-message">
+    Your order ID 
+    <span class="font-bold text-gray-800">
+     <%= orderId %>
+    </span>
+   </div>
+   <div>
+    <a class="order-link" href="/orders">
+     View Orders
+    </a>
+   </div>
+   <div class="mt-8">
+    <a href="/shop" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">Continue Shopping</a>
+   </div>
+  </div>
+ </body>
+</html>
+

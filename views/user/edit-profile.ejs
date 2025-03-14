@@ -23,212 +23,221 @@
 
 
         .hero {
-      display: flex;
-      justify-content: space-between;
-      background-color: #e6f4f4;
-      align-items: center;
-      padding: 4rem 2rem;
-      width: 100%;
-      margin: 0 auto;
-      min-height: 50vh;
-    }
+            display: flex;
+            justify-content: space-between;
+            background-color: #e6f4f4;
+            align-items: center;
+            padding: 4rem 2rem;
+            width: 100%;
+            margin: 0 auto;
+            min-height: 50vh;
+        }
 
-    .hero-content {
-      max-width: 500px;
-      margin-left: 40%;
-    }
+        .hero-content {
+            max-width: 500px;
+            margin-left: 40%;
+        }
 
-    .hero-title {
-      font-size: 2rem;
-      line-height: 1.2;
-      color: #2c3e50;
-      margin-top: 40px;;
-    }
+        .hero-title {
+            font-size: 2rem;
+            line-height: 1.2;
+            color: #2c3e50;
+            margin-top: 70px;
+            ;
+        }
 
-    .hero-description {
-      color: #5d6d7e;
-      margin-bottom: 2rem;
-      line-height: 1.6;
-    }
+        .hero-description {
+            color: #5d6d7e;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
 
-    .cta-button {
-      display: inline-block;
-      padding: 0.8rem 2rem;
-      background-color: #1a4741;
-      color: white;
-      text-decoration: none;
-      border-radius: 4px;
-      transition: background-color 0.3s ease;
-    }
+        .cta-button {
+            display: inline-block;
+            padding: 0.8rem 2rem;
+            background-color: #1a4741;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
 
-    .cta-button:hover {
-      background-color: #123530;
-    }
+        .cta-button:hover {
+            background-color: #123530;
+        }
 
-    .hero-image {
-      width: 300px;
-      position: relative;
-      right: 100px;
-    }
+        .hero-image {
+            width: 300px;
+            position: relative;
+            right: 100px;
+        }
 
-    @media (max-width: 768px) {
-      .hero {
-        flex-direction: column;
-        text-align: center;
-        padding: 2rem;
-      }
+        @media (max-width: 768px) {
+            .hero {
+                flex-direction: column;
+                text-align: center;
+                padding: 2rem;
+            }
 
-      .hero-content {
-        margin-left: 0;
-      }
+            .hero-content {
+                margin-left: 0;
+            }
 
-      .hero-image {
-        width: 300px;
-        position: relative;
-        left: 0;
-      }
-    }
+            .hero-image {
+                width: 300px;
+                position: relative;
+                left: 0;
+            }
+        }
     </style>
 </head>
 
 <body class="bg-gray-100">
     <%- include('../partials/user/header') %>
-    <main class="hero w-full">
-        <div class="hero-content">
-         <b>
-          <h1 class="hero-title">
-           EDIT PROFILE
-          </h1>
-         </b>
-         <p class="hero-description">
-          <i>
-           <a href="/">
-            Home
-           </a>
-           <span>
-            &gt;
-           </span>
-           <a href="/profile">
-            Profile
-           </a>
-           <span>
-            &gt;
-           </span>
-           <a href="/edit-profile">
-            Edit Profile
-           </a>
-          </i>
-         </p>
-        </div>
-        <img alt="Illustration of a shopping cart with various items" class="hero-image" height="300" src="/img/skinova cover.png" width="300"/>
-       </main>
+        <main class="hero w-full">
+            <div class="hero-content">
+                <b>
+                    <h1 class="hero-title">
+                        EDIT PROFILE
+                    </h1>
+                </b>
+                <p class="hero-description">
+                    <i>
+                        <a href="/">
+                            Home
+                        </a>
+                        <span>
+                            &gt;
+                        </span>
+                        <a href="/profile">
+                            Profile
+                        </a>
+                        <span>
+                            &gt;
+                        </span>
+                        <a href="/edit-profile">
+                            Edit Profile
+                        </a>
+                    </i>
+                </p>
+            </div>
+            <img alt="Illustration of a shopping cart with various items" class="hero-image" height="300"
+                src="/img/skinova cover.png" width="300" />
+        </main>
         <div class="flex flex-col lg:flex-row">
             <%-include('../partials/user/sidebar')%>
-            <div class="w-full lg:w-3/4 p-8">
-                <div class="mb-8">
-                    <h2 class="text-2xl font-bold mb-4">BASIC INFO</h2>
-                    <form action="/updateprofile" enctype="multipart/form-data" id="updateForm" method="post"
-                        novalidate="">
-                        <div class="mb-4">
-                            <label class="block mb-2">Profile Picture</label>
-                            <input accept="image/*" class="hidden" name="profilePicture" type="file"
-                                id="profilePictureInput" />
-                            <input type="hidden" name="croppedImage" id="croppedImageInput" />
-                           <% if (user.image) { %>
-                            <img id="imagePreview" class="mt-2 cursor-pointer" width="300" alt="Add Image"
-                                src="/<%= user.image %>"
-                                onclick="document.getElementById('profilePictureInput').click();" />
-                            <% } else { %>
-                                <img id="imagePreview" class="mt-2 cursor-pointer" width="300" alt="Add Image"
-                                src="https://static.vecteezy.com/system/resources/thumbnails/004/511/281/small_2x/default-avatar-photo-placeholder-profile-picture-vector.jpg"
-                                onclick="document.getElementById('profilePictureInput').click();" />
-                            <% } %>
+                <div class="w-full lg:w-3/4 p-8">
+                    <div class="mb-8">
+                        <h2 class="text-2xl font-bold mb-4">BASIC INFO</h2>
+                        <form action="/updateprofile" enctype="multipart/form-data" id="updateForm" method="post"
+                            novalidate="">
+                            <div class="mb-4">
+                                <label class="block mb-2">Profile Picture</label>
+                                <input accept="image/*" class="hidden" name="profilePicture" type="file"
+                                    id="profilePictureInput" />
+                                <input type="hidden" name="croppedImage" id="croppedImageInput" />
+                                <% if (user.image) { %>
+                                    <img id="imagePreview" class="mt-2 cursor-pointer" width="300" alt="Add Image"
+                                        src="/<%= user.image %>"
+                                        onclick="document.getElementById('profilePictureInput').click();" />
+                                    <% } else { %>
+                                        <img id="imagePreview" class="mt-2 cursor-pointer" width="300" alt="Add Image"
+                                            src="https://static.vecteezy.com/system/resources/thumbnails/004/511/281/small_2x/default-avatar-photo-placeholder-profile-picture-vector.jpg"
+                                            onclick="document.getElementById('profilePictureInput').click();" />
+                                        <% } %>
+                            </div>
+
+                            <div id="cropperModal"
+                                class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center">
+                                <div class="bg-white p-4 rounded shadow-lg w-96">
+                                    <h2 class="text-lg font-bold mb-4">Crop Your Image</h2>
+                                    <div class="w-full h-64">
+                                        <img id="cropperImage" class="max-w-full max-h-64" />
+                                    </div>
+                                    <div class="flex justify-end mt-4">
+                                        <button id="cancelCrop"
+                                            class="bg-gray-500 text-white px-4 py-2 rounded mr-2">Cancel</button>
+                                        <button id="cropAndUpload" class="bg-blue-500 text-white px-4 py-2 rounded">Crop
+                                            &
+                                            Use</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block mb-2">First Name</label>
+                                    <input class="border border-gray-400 w-full p-2" name="firstName" required=""
+                                        type="text" value="<%= user.firstName %>" />
+                                    <p class="error-message" id="firstNameError"></p>
+                                </div>
+                                <div>
+                                    <label class="block mb-2">Last Name</label>
+                                    <input class="border border-gray-400 w-full p-2" name="lastName" required=""
+                                        type="text" value="<%= user.lastName %>" />
+                                    <p class="error-message" id="lastNameError"></p>
+                                </div>
+                                <div>
+                                    <label class="block mb-2">Phone</label>
+                                    <input class="border border-gray-400 w-full p-2" name="phone" required=""
+                                        type="text" value="<%= user.phone %>" />
+                                    <p class="error-message" id="phoneError"></p>
+                                </div>
+                            </div>
+                            <h2 class="text-2xl font-bold mb-4 mt-6">LOGIN DETAILS</h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block mb-2">Username</label>
+                                    <input class="border border-gray-400 w-full p-2" name="username" required=""
+                                        type="text" value="<%= user.name %>" />
+                                    <p class="error-message" id="usernameError"></p>
+                                </div>
+                                <div>
+                                    <label class="block mb-2">Change Password?</label>
+                                    <a class="bg-teal-200 text-black py-2 px-4 rounded shadow-md hover:bg-teal-300"
+                                        href="/change-password">Click here</a>
+                                </div>
+                            </div>
+                            <div class="mt-8">
+                                <button class="bg-teal-200 text-black py-2 px-4 rounded shadow-md hover:bg-teal-300"
+                                    type="submit">Submit</button>
+                            </div>
+                        </form>
+                        <h2 class="text-2xl font-bold mb-4 mt-6">CHANGE EMAIL</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block mb-2">New Email</label>
+                                <input id="newEmail" class="border border-gray-400 w-full p-2" name="newEmail"
+                                    type="email" required />
+                                <p class="error-message" id="emailError"></p>
+                            </div>
+                            <div>
+                                <label class="block mb-2">Send OTP</label>
+                                <button id="sendOtpBtn"
+                                    class="bg-teal-200 text-black py-2 px-4 rounded shadow-md hover:bg-teal-300">
+                                    Click Here
+                                </button>
+                            </div>
                         </div>
 
-                        <div id="cropperModal"
+                        <!-- OTP Verification Modal -->
+                        <div id="otpModal"
                             class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center">
                             <div class="bg-white p-4 rounded shadow-lg w-96">
-                                <h2 class="text-lg font-bold mb-4">Crop Your Image</h2>
-                                <div class="w-full h-64">
-                                    <img id="cropperImage" class="max-w-full max-h-64" />
-                                </div>
+                                <h2 class="text-lg font-bold mb-4">Verify OTP</h2>
+                                <input id="otpInput" class="border border-gray-400 w-full p-2 mb-4" type="text"
+                                    placeholder="Enter OTP" />
+                                <p class="error-message" id="otpError"></p>
                                 <div class="flex justify-end mt-4">
-                                    <button id="cancelCrop"
+                                    <button id="cancelOtp"
                                         class="bg-gray-500 text-white px-4 py-2 rounded mr-2">Cancel</button>
-                                    <button id="cropAndUpload" class="bg-blue-500 text-white px-4 py-2 rounded">Crop &
-                                        Use</button>
+                                    <button id="verifyOtpBtn" class="bg-blue-500 text-white px-4 py-2 rounded">Verify
+                                        OTP</button>
                                 </div>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block mb-2">First Name</label>
-                                <input class="border border-gray-400 w-full p-2" name="firstName" required=""
-                                    type="text" value="<%= user.firstName %>" />
-                                <p class="error-message" id="firstNameError"></p>
-                            </div>
-                            <div>
-                                <label class="block mb-2">Last Name</label>
-                                <input class="border border-gray-400 w-full p-2" name="lastName" required="" type="text"
-                                    value="<%= user.lastName %>" />
-                                <p class="error-message" id="lastNameError"></p>
-                            </div>
-                            <div>
-                                <label class="block mb-2">Phone</label>
-                                <input class="border border-gray-400 w-full p-2" name="phone" required="" type="text"
-                                    value="<%= user.phone %>" />
-                                <p class="error-message" id="phoneError"></p>
-                            </div>
-                        </div>
-                        <h2 class="text-2xl font-bold mb-4 mt-6">LOGIN DETAILS</h2>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block mb-2">Username</label>
-                                <input class="border border-gray-400 w-full p-2" name="username" required="" type="text"
-                                    value="<%= user.name %>" />
-                                <p class="error-message" id="usernameError"></p>
-                            </div>
-                            <div>
-                                <label class="block mb-2">Change Password?</label>
-                                <a class="bg-teal-200 text-black py-2 px-4 rounded shadow-md hover:bg-teal-300"
-                                    href="/change-password">Click here</a>
-                            </div>
-                        </div>
-                        <div class="mt-8">
-                            <button class="bg-teal-200 text-black py-2 px-4 rounded shadow-md hover:bg-teal-300"
-                                type="submit">Submit</button>
-                        </div>
-                    </form>
-                    <h2 class="text-2xl font-bold mb-4 mt-6">CHANGE EMAIL</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block mb-2">New Email</label>
-                            <input id="newEmail" class="border border-gray-400 w-full p-2" name="newEmail" type="email" required />
-                            <p class="error-message" id="emailError"></p>
-                        </div>
-                        <div>
-                            <label class="block mb-2">Send OTP</label>
-                            <button id="sendOtpBtn" class="bg-teal-200 text-black py-2 px-4 rounded shadow-md hover:bg-teal-300">
-                                Click Here
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- OTP Verification Modal -->
-                    <div id="otpModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center">
-                        <div class="bg-white p-4 rounded shadow-lg w-96">
-                            <h2 class="text-lg font-bold mb-4">Verify OTP</h2>
-                            <input id="otpInput" class="border border-gray-400 w-full p-2 mb-4" type="text" placeholder="Enter OTP" />
-                            <p class="error-message" id="otpError"></p>
-                            <div class="flex justify-end mt-4">
-                                <button id="cancelOtp" class="bg-gray-500 text-white px-4 py-2 rounded mr-2">Cancel</button>
-                                <button id="verifyOtpBtn" class="bg-blue-500 text-white px-4 py-2 rounded">Verify OTP</button>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
         </div>
 
 
@@ -309,7 +318,7 @@
                 }
             });
 
-           
+
             cropAndUploadButton.addEventListener('click', function () {
                 if (cropper) {
                     const canvas = cropper.getCroppedCanvas({
@@ -317,32 +326,38 @@
                         height: 300
                     });
 
-                  
-                    const croppedImageData = canvas.toDataURL("image/png");
+                    const croppedImageData = canvas.toDataURL("image/png"); // Convert to Base64
                     imagePreview.src = croppedImageData;
-                    croppedImageInput.value = croppedImageData; 
+                    croppedImageInput.value = croppedImageData; // Store Base64 in hidden input
 
-                    cropperModal.classList.add('hidden'); 
+                    cropperModal.classList.add('hidden');
                 }
             });
 
-           
+
+
             cancelCropButton.addEventListener('click', function () {
                 cropperModal.classList.add('hidden');
             });
 
-            
+
             document.getElementById("updateForm").addEventListener("submit", async function (event) {
                 event.preventDefault();
                 if (!validateForm()) return;
 
                 const formData = new FormData(this);
 
+                if (croppedImageInput.value) {
+                    formData.delete("profilePicture");
+                    formData.append("croppedImage", croppedImageInput.value);
+                }
+
                 try {
                     const response = await fetch("/updateprofile", { method: "POST", body: formData });
                     const result = await response.json();
 
                     if (result.success) {
+                        imagePreview.src = `/${result.image}`; // Update image preview dynamically
                         Swal.fire({ icon: "success", title: "Success!", text: result.message, timer: 2000, showConfirmButton: false })
                             .then(() => window.location.reload());
                     } else {
@@ -352,64 +367,67 @@
                     Swal.fire({ icon: "error", title: "Error!", text: "Something went wrong. Please try again." });
                 }
             });
+
+
+
             document.getElementById("sendOtpBtn").addEventListener("click", async function () {
-        const newEmail = document.getElementById("newEmail").value.trim();
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) {
-            document.getElementById("emailError").textContent = "Enter a valid email address.";
-            return;
-        }
-        document.getElementById("emailError").textContent = "";
+                const newEmail = document.getElementById("newEmail").value.trim();
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) {
+                    document.getElementById("emailError").textContent = "Enter a valid email address.";
+                    return;
+                }
+                document.getElementById("emailError").textContent = "";
 
-        try {
-            const response = await fetch("/generate-email-otp", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email: newEmail }),
+                try {
+                    const response = await fetch("/generate-email-otp", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ email: newEmail }),
+                    });
+
+                    const result = await response.json();
+                    if (result.success) {
+                        document.getElementById("otpModal").classList.remove("hidden");
+                    } else {
+                        Swal.fire({ icon: "error", title: "Error!", text: result.message });
+                    }
+                } catch (error) {
+                    console.error("Error:", error);
+                    Swal.fire({ icon: "error", title: "Error!", text: "Something went wrong." });
+                }
             });
 
-            const result = await response.json();
-            if (result.success) {
-                document.getElementById("otpModal").classList.remove("hidden");
-            } else {
-                Swal.fire({ icon: "error", title: "Error!", text: result.message });
-            }
-        } catch (error) {
-            console.error("Error:", error);
-            Swal.fire({ icon: "error", title: "Error!", text: "Something went wrong." });
-        }
-    });
+            document.getElementById("verifyOtpBtn").addEventListener("click", async function () {
+                const otp = document.getElementById("otpInput").value.trim();
+                if (!/^\d{6}$/.test(otp)) {
+                    document.getElementById("otpError").textContent = "Enter a valid 6-digit OTP.";
+                    return;
+                }
+                document.getElementById("otpError").textContent = "";
 
-    document.getElementById("verifyOtpBtn").addEventListener("click", async function () {
-        const otp = document.getElementById("otpInput").value.trim();
-        if (!/^\d{6}$/.test(otp)) {
-            document.getElementById("otpError").textContent = "Enter a valid 6-digit OTP.";
-            return;
-        }
-        document.getElementById("otpError").textContent = "";
+                try {
+                    const response = await fetch("/verify-email-otp", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ otp }),
+                    });
 
-        try {
-            const response = await fetch("/verify-email-otp", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ otp }),
+                    const result = await response.json();
+                    if (result.success) {
+                        Swal.fire({ icon: "success", title: "Success!", text: "Email updated successfully!", timer: 2000, showConfirmButton: false })
+                            .then(() => window.location.reload());
+                    } else {
+                        Swal.fire({ icon: "error", title: "Error!", text: result.message });
+                    }
+                } catch (error) {
+                    console.error("Error:", error);
+                    Swal.fire({ icon: "error", title: "Error!", text: "Something went wrong." });
+                }
             });
 
-            const result = await response.json();
-            if (result.success) {
-                Swal.fire({ icon: "success", title: "Success!", text: "Email updated successfully!", timer: 2000, showConfirmButton: false })
-                    .then(() => window.location.reload());
-            } else {
-                Swal.fire({ icon: "error", title: "Error!", text: result.message });
-            }
-        } catch (error) {
-            console.error("Error:", error);
-            Swal.fire({ icon: "error", title: "Error!", text: "Something went wrong." });
-        }
-    });
-
-    document.getElementById("cancelOtp").addEventListener("click", function () {
-        document.getElementById("otpModal").classList.add("hidden");
-    });
+            document.getElementById("cancelOtp").addEventListener("click", function () {
+                document.getElementById("otpModal").classList.add("hidden");
+            });
         </script>
 
 

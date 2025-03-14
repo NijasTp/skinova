@@ -18,6 +18,14 @@ const orderSchema = new Schema({
         ref: 'Product',
         required: true
     },
+    productName: {
+        type: String,
+        required: true
+    },
+    productImage: [{
+        type: String,
+        required: true
+    }],
     quantity: {
         type: Number,
         required: true
@@ -63,9 +71,12 @@ const orderSchema = new Schema({
         default: ''
     },
     address: {
-        type: Schema.Types.ObjectId,
-        ref: 'Address', 
-        required: true
+        fullName: { type: String, required: true },
+        mobile: { type: String, required: true },
+        street: { type: String, required: true },
+        city: { type: String, required: true },
+        state: { type: String, required: true },
+        pincode: { type: String, required: true },
     },
     invoiceDate: {
         type: Date
@@ -85,7 +96,7 @@ const orderSchema = new Schema({
     },
     paymentMethod: {
         type: String,
-        enum: ['cod', 'razorpay'],
+        enum: ['cod', 'razorpay','wallet'],
         required: true
     }
 });

@@ -1,0 +1,85 @@
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>
+   Order Failed
+  </title>
+  <script src="https://cdn.tailwindcss.com">
+  </script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&amp;display=swap" rel="stylesheet"/>
+  <style>
+   body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Roboto', sans-serif;
+            background-color: #ffe6e6;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        .failure-image {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 20px;
+        }
+
+        .failure-code {
+            font-size: 36px;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #b30000;
+        }
+
+        .failure-message {
+            font-size: 16px;
+            color: #800000;
+            margin-bottom: 20px;
+        }
+
+        .order-link {
+            color: #b30000;
+            text-decoration: none;
+        }
+
+        .order-link:hover {
+            text-decoration: underline;
+        }
+  </style>
+ </head>
+ <body>
+
+  <div class="container">
+   <div class="failure-image">
+    <img alt="Illustration of a cross mark indicating failure" class="failure-image" height="200" src="/img/skinova cover.png" width="200"/>
+   </div>
+   <div class="failure-code">
+    Order Failed!
+   </div>
+   <div class="failure-message">
+    Unfortunately, your order could not be processed at this time. Please try again later or contact support for assistance.
+   </div>
+   <div>
+    <a href="/checkout" class="bg-red-600 text-white px-4 py-2.5 mr-2 rounded-lg hover:bg-red-700 transition duration-300">
+        <i class="fas fa-redo-alt mr-2"></i>
+        Try Again
+    </a>
+    <a href="/orders" class="bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 transition duration-300">
+        <i class="fas fa-list mr-2"></i>
+        View Orders
+    </a>
+
+   </div>
+  </div>
+
+  
+ </body>
+</html>

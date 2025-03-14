@@ -1,5 +1,6 @@
 const Product = require("../../models/productSchema")
 const Category = require("../../models/categorySchema")
+const Cart = require("../../models/cartSchema")
 const sharp = require("sharp")
 const path = require("path")
 const fs = require("fs")
@@ -46,51 +47,72 @@ const saveImage = async (req, res) => {
 const addProducts = async (req, res) => {
   try {
     const { productName, description, category, regularPrice, salePrice, quantity } = req.body;
-    const files = req.files;
-
-    if (!files || Object.keys(files).length < 4) {
-      return res.status(400).json({ success: false, message: "Please upload at least 4 images" });
-    }
-
-    // Run product & category lookup in parallel
-    const [productExists, foundCategory] = await Promise.all([
-      Product.findOne({ productName }).lean(),
-      Category.findOne({ name: category }).lean()
-    ]);
-
+    
+  
+    const productExists = await Product.findOne({ productName });
     if (productExists) {
       return res.status(400).json({ success: false, message: "Product already exists, try another name" });
     }
-    if (!foundCategory) {
-      return res.status(400).json({ success: false, message: "Category not found" });
-    }
 
-    // Ensure upload directory exists
+   
     const uploadDir = path.join(__dirname, "../../public/uploads/product-images");
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
     }
 
-    // Optimize image processing (run in parallel)
-    const imageProcessingPromises = Object.values(files).flat().map(async (file) => {
-      const filename = Date.now() + '-' + file.originalname.replace(/\s/g, "");
-      const filePath = path.join(uploadDir, filename);
+   
+    const imageFilenames = [];
 
-      await sharp(file.buffer)
-        .resize(800, 1700, { fit: "inside", withoutEnlargement: true })
-        .webp({ quality: 80 })
-        .toFile(filePath);
+    
+    for (let i = 1; i <= 4; i++) {
+      const croppedImageData = req.body[`croppedImage${i}`];
+      
+      if (croppedImageData && croppedImageData.startsWith('data:image')) {
+        
+        const base64Data = croppedImageData.replace(/^data:image\/\w+;base64,/, '');
+        const imageBuffer = Buffer.from(base64Data, 'base64');
+        
+      
+        const filename = Date.now() + "-" + `cropped-image-${i}` + ".webp";
+        const filepath = path.join(uploadDir, filename);
 
-      return `uploads/product-images/${filename}`;
-    });
+        
+        await sharp(imageBuffer)
+          .webp({ quality: 80 })
+          .toFile(filepath);
 
-    const imageFilenames = await Promise.all(imageProcessingPromises);
+        imageFilenames.push(`uploads/product-images/${filename}`);
+      } else if (req.files && req.files[`image${i}`]) {
+       
+        const file = req.files[`image${i}`][0];
+        const filename = Date.now() + "-" + file.originalname.replace(/\s/g, "") + ".webp";
+        const filepath = path.join(uploadDir, filename);
 
-    // Create and save new product
+        await sharp(file.buffer)
+          .resize(800, 800, { fit: "inside", withoutEnlargement: true })
+          .webp({ quality: 80 })
+          .toFile(filepath);
+
+        imageFilenames.push(`uploads/product-images/${filename}`);
+      }
+    }
+
+   
+    if (imageFilenames.length < 4) {
+      return res.status(400).json({ success: false, message: "Please upload all 4 product images" });
+    }
+
+    
+    const foundCategory = await Category.findOne({ name: category });
+    if (!foundCategory) {
+      return res.status(400).json({ success: false, message: "Category not found" });
+    }
+
+    
     const newProduct = new Product({
       productName,
       description,
-      category: foundCategory._id,
+      category: foundCategory._id, 
       regularPrice,
       salePrice,
       quantity,
@@ -100,13 +122,11 @@ const addProducts = async (req, res) => {
 
     await newProduct.save();
     return res.status(200).json({ success: true, message: "Product added successfully" });
-
   } catch (error) {
     console.error("Error saving product:", error);
     return res.status(500).json({ success: false, message: "Error saving product" });
   }
 };
-
 
 const getAllProducts = async (req, res) => {
   try {
@@ -122,8 +142,9 @@ const getAllProducts = async (req, res) => {
       .sort({ createdAt: -1 }) 
       .limit(limit * 1)
       .skip((page - 1) * limit)
-      .populate("category")  // Ensure population of category
+      .populate("category") 
       .exec();
+
 
     const count = await Product.find({
       $or: [
@@ -135,7 +156,7 @@ const getAllProducts = async (req, res) => {
 
     if (category) {
       res.render("products", {
-        data: productData,
+        data: productData.reverse(),
         currentPage: page,
         totalPages: Math.ceil(count / limit),
         cat: category,
@@ -250,9 +271,13 @@ const getEditProduct = async (req, res) => {
 const editProduct = async (req, res) => {
   try {
     const id = req.params.id;
-    const { 
-      productName, description, regularPrice, salePrice, 
-      quantity, category 
+    const {
+      productName,
+      description,
+      regularPrice,
+      salePrice,
+      quantity,
+      category,
     } = req.body;
 
     const existingProduct = await Product.findOne({
@@ -261,7 +286,9 @@ const editProduct = async (req, res) => {
     });
 
     if (existingProduct) {
-      return res.status(400).json({ success: false, message: "Product with this name already exists. Please try another name." });
+      return res
+        .status(400)
+        .json({ success: false, message: "Product with this name already exists. Please try another name." });
     }
 
     const updateFields = {
@@ -278,34 +305,80 @@ const editProduct = async (req, res) => {
       return res.status(404).json({ success: false, message: "Product not found" });
     }
 
-    // Handle image updates
     for (let i = 1; i <= 4; i++) {
-      if (req.files[`image${i}`]) {
-        const file = req.files[`image${i}`][0];
-        const filename = Date.now() + '-' + file.originalname.replace(/\s/g, "");
+      const croppedImageData = req.body[`croppedImage${i}`];
+
+      if (croppedImageData && croppedImageData.startsWith('data:image')) {
+        const base64Data = croppedImageData.replace(/^data:image\/\w+;base64,/, '');
+        const imageBuffer = Buffer.from(base64Data, 'base64');
+
+        const filename = Date.now() + "-" + `cropped-image-${i}` + ".webp";
         const filepath = path.join(__dirname, "../../public/uploads/product-images", filename);
 
-        await sharp(file.buffer)
-          .resize(800, 1700, { fit: "inside", withoutEnlargement: true })
+        await sharp(imageBuffer)
           .webp({ quality: 80 })
           .toFile(filepath);
 
         const imagePath = `uploads/product-images/${filename}`;
-        
-        if (product.productImage[i-1]) {
-          product.productImage[i-1] = imagePath;
+
+        if (product.productImage[i - 1]) {
+          product.productImage[i - 1] = imagePath;
+        } else {
+          product.productImage.push(imagePath);
+        }
+      } else if (req.files && req.files[`image${i}`]) {
+        const file = req.files[`image${i}`][0];
+        const filename = Date.now() + "-" + file.originalname.replace(/\s/g, "") + ".webp";
+        const filepath = path.join(__dirname, "../../public/uploads/product-images", filename);
+
+        await sharp(file.buffer)
+          .resize(800, 800, { fit: "inside", withoutEnlargement: true })
+          .webp({ quality: 80 })
+          .toFile(filepath);
+
+        const imagePath = `uploads/product-images/${filename}`;
+
+        if (product.productImage[i - 1]) {
+          product.productImage[i - 1] = imagePath;
         } else {
           product.productImage.push(imagePath);
         }
       }
     }
 
+    const carts = await Cart.find({ "items.productId": id });
+
+    for (let cart of carts) {
+      let cartUpdated = false;
+
+      cart.items.forEach(item => {
+        if (item.productId.toString() === id) {
+          if (quantity < item.quantity) {
+            const diff = item.quantity - quantity;
+            item.quantity = quantity;
+            item.totalPrice = item.quantity * item.price;
+            cart.cartTotal -= diff * item.price;
+
+            if (cart.discount) {
+             
+              const discountPerUnit = cart.discount / cart.cartTotal;
+              cart.discount -= diff * discountPerUnit;
+            }
+
+            cartUpdated = true;
+          }
+        }
+      });
+
+      if (cartUpdated) {
+        await cart.save();
+      }
+    }
+
     Object.assign(product, updateFields);
     await product.save();
 
-    // res.json({ success: true, message: "Product updated successfully" });
-    res.redirect("/admin/products")
-
+    res.json({ success: true, message: "Product updated successfully" });
   } catch (error) {
     console.error("Error in editProduct:", error);
     res.status(500).json({ success: false, message: "An error occurred while updating the product" });
@@ -359,12 +432,21 @@ const deleteProduct = async (req, res) => {
           return res.status(404).json({ status: false, message: 'Product not found' });
       }
 
-      res.redirect('/admin/products'); // Redirect to the products management page or wherever you want
+      await Cart.updateMany(
+          { "items.productId": productId },
+          { 
+              $pull: { items: { productId: productId } },
+              $inc: { cartTotal: -product.salePrice, finalTotal: -product.salePrice } 
+          }
+      );
+
+      res.redirect('/admin/products'); 
   } catch (err) {
       console.error(err);
       res.status(500).json({ status: false, message: 'Server Error' });
   }
-}
+};
+
 
 const getOrders = async (req, res) => {
   try {
@@ -408,7 +490,7 @@ const getOrderDetails = async (req, res) => {
 
     const orders = await Order.findById(orderId)
       .populate("product", "productName productImage price")
-      .populate("userId", "name email")
+      .populate("userId", "name phone email")
       .populate("address");
 
     if (!orders) {
@@ -485,15 +567,16 @@ const cancelOrder = async (req, res) => {
         wallet = new Wallet({ userId: order.userId, balance: 0, transactions: [] });
       }
 
-      wallet.balance += order.finalPrice;
+      wallet.balance += order.finalPrice * order.quantity;
 
       const productName = order.product ? order.product.productName : "Unknown Product";
 
       wallet.transactions.push({
         type: "credit",
-        amount: order.finalPrice,
+        amount: order.finalPrice * order.quantity,
         date: new Date(),
-        description: `Refund for cancelling ${productName}`
+        description: `Refund for cancelling ${productName}`,
+        orderId: orderId
       });
 
       await wallet.save();
@@ -534,7 +617,7 @@ const approveReturn = async (req, res) => {
         wallet = new Wallet({ userId: order.userId, balance: 0, transactions: [] });
       }
 
-      const refundAmount = order.finalPrice;
+      const refundAmount = order.finalPrice * order.quantity;
 
       wallet.balance += refundAmount;
       wallet.transactions.push({
@@ -542,6 +625,7 @@ const approveReturn = async (req, res) => {
         amount: refundAmount,
         description: `Refund for Returning ${order.product.productName}`,
         timestamp: new Date(),
+        orderId:orderId
       });
 
       await wallet.save();
@@ -574,16 +658,34 @@ const rejectReturn = async (req, res) => {
   }
 };
 
-
 const getCoupons = async (req, res) => {
   try {
-      const coupons = await Coupon.find();
-      res.render('admin-coupons', { coupons });
+      const today = new Date();
+      const expiredCoupons = await Coupon.find({ expireOn: { $lt: today } });
+      await Coupon.deleteMany({ _id: { $in: expiredCoupons.map(c => c._id) } });
+
+      const perPage = 5; 
+      const page = parseInt(req.query.page) || 1; 
+
+      const totalCoupons = await Coupon.countDocuments();
+      const totalPages = Math.ceil(totalCoupons / perPage);
+
+      const coupons = await Coupon.find()
+          .skip((page - 1) * perPage)
+          .limit(perPage);
+
+      res.render('admin-coupons', { 
+          coupons, 
+          currentPage: page, 
+          totalPages 
+      });
+
   } catch (error) {
       console.error("Error fetching coupons:", error);
       res.status(500).send("Internal server error");
   }
-}
+};
+
 
 const getCouponAddPage = (req, res) => {
   res.render('add-coupon');
@@ -591,28 +693,45 @@ const getCouponAddPage = (req, res) => {
 
 const addCoupon = async (req, res) => {
   try {
-      const { code, name, offerPrice, minimumPrice, expireOn, usageLimit } = req.body;
+      const { code, name, offerPrice, minimumPrice, startDate, expireOn, usageLimit } = req.body;
 
-      // Validate required fields
-      if (!code || !name || !offerPrice || !minimumPrice || !expireOn || !usageLimit) {
-          return res.json( {success: false, message: "All fields are required."} );
+      if (!code || !name || !offerPrice || !minimumPrice || !startDate || !expireOn || !usageLimit) {
+          return res.json({ success: false, message: "All fields are required." });
       }
 
-      // Check if the coupon already exists
+      const today = new Date();
+      const start = new Date(startDate);
+      const expiry = new Date(expireOn);
+
+      if (start < today.setHours(0, 0, 0, 0)) {
+          return res.json({ success: false, message: "Start date cannot be in the past." });
+      }
+
+      if (expiry < today.setHours(0, 0, 0, 0)) {
+          return res.json({ success: false, message: "Expiry date cannot be in the past." });
+      }
+
+
+      if (expiry < start) {
+          return res.json({ success: false, message: "Expiry date cannot be before start date." });
+      }
+
+
       const existingCoupon = await Coupon.findOne({ code: code.toUpperCase() });
       if (existingCoupon) {
-          return res.json( {success: false, message: "Coupon code already exists."});
+          return res.json({ success: false, message: "Coupon code already exists." });
       }
 
-      // Create and save new coupon
       const newCoupon = new Coupon({
           code: code.toUpperCase(),
           name,
           offerPrice,
           minimumPrice,
+          startDate,
           expireOn,
           usageLimit,
-          isActive: true
+          isActive: true,
+          createdOn: new Date()
       });
 
       await newCoupon.save();
@@ -621,7 +740,8 @@ const addCoupon = async (req, res) => {
       console.error("Error adding coupon:", error);
       res.status(500).send("Internal server error.");
   }
-}
+};
+
 
 const deleteCoupon = async (req, res) => {
   try {
@@ -647,6 +767,39 @@ const deleteCoupon = async (req, res) => {
   }
 }
 
+const getEditCoupon = async (req, res) => {
+  try {
+      const coupon = await Coupon.findById(req.params.id);
+      if (!coupon) return res.redirect("/admin/coupons");
+      res.render("edit-coupon", { coupon });
+  } catch (err) {
+      console.error(err);
+      res.redirect("/admin/coupons");
+  }
+};
+
+const editCoupon = async (req, res) => {
+  try {
+      const { code, name, startDate, expireOn, offerPrice, minimumPrice, usageLimit } = req.body;
+      if (minimumPrice < offerPrice) {
+          return res.status(400).send("Minimum price cannot be lower than discount amount.");
+      }
+      await Coupon.findByIdAndUpdate(req.params.id, {
+          code,
+          name,
+          startDate,
+          expireOn,
+          offerPrice,
+          minimumPrice,
+          usageLimit
+      });
+      res.redirect("/admin/coupons");
+  } catch (err) {
+      console.error(err);
+      res.redirect("/admin/coupons");
+  }
+}
+
 module.exports = {
   getProductAddPage,
   saveImage,
@@ -669,7 +822,9 @@ module.exports = {
   getCoupons,
   getCouponAddPage,
   addCoupon,
-  deleteCoupon
+  deleteCoupon,
+  getEditCoupon,
+  editCoupon
 
 
 }

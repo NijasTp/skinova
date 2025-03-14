@@ -74,6 +74,8 @@ router.post('/orders/reject-return', productController.rejectReturn);
 router.get('/coupon', adminAuth, productController.getCoupons);
 router.get('/add-coupon', adminAuth, productController.getCouponAddPage);
 router.post('/add-coupon', adminAuth, productController.addCoupon);
+router.get("/edit-coupon/:id",adminAuth,productController.getEditCoupon)
+router.post("/edit-coupon/:id",adminAuth,productController.editCoupon)
 
 router.get("/delete-coupon/:id", productController.deleteCoupon);
 

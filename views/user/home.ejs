@@ -26,7 +26,7 @@
         }
 
         body {
-            background-color: #ffffff;
+            background-color: #e6f4f4;
             color: var(--text-color);
             line-height: 1.6;
         }
@@ -150,7 +150,7 @@
         /* Features Section */
         .features {
             padding: 100px 0;
-            background-color: #ffffff;
+            background-color: #e6f4f4;
         }
 
         .features-grid {
@@ -198,6 +198,19 @@
         .bestsellers {
             padding: 100px 0;
             background-color: var(--secondary-color);
+            position: relative;
+        }
+
+        .bestsellers::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 0;
+            border-radius: 10px;
         }
 
         .section-title {
@@ -205,52 +218,65 @@
             font-size: 2.5rem;
             color: var(--primary-color);
             margin-bottom: 50px;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 4px;
+            background: var(--accent-color);
+            margin: 10px auto 0;
+            border-radius: 5px;
         }
 
         .products-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 30px;
+            display: flex;
+            justify-content: center; /* Center align the products */
+            gap: 20px; /* Space between cards */
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
         }
 
         .product-card {
-            background: #ffffff;
+            width: 250px;
             border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
+            background-color: #ffffff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            z-index: 1;
         }
 
         .product-card:hover {
             transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
         }
 
         .product-image {
-            width: 100%;
-            padding-top: 100%;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+    height: 200px; /* Fixed height for the image container */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 10px 10px 0 0;
+    background-color: #f9f9f9; /* Optional: Add a background color */
+}
 
-        .product-image img {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: 0.5s;
-        }
-
+.product-image img {
+    height: 100%; /* Ensure the image takes the full height */
+    width: auto; /* Maintain aspect ratio */
+    max-width: 100%; /* Ensure it doesn't overflow */
+    object-fit: contain; /* Ensure the entire image is visible */
+    transition: transform 0.3s ease;
+}
         .product-card:hover .product-image img {
             transform: scale(1.1);
         }
 
         .product-info {
-            padding: 20px;
+            padding: 15px;
             text-align: center;
         }
 
@@ -267,34 +293,39 @@
         }
 
         .product-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 15px;
-        }
+    display: flex;
+    justify-content: center;
+    gap: 10px; /* Space between buttons */
+    margin-top: 15px;
+    flex-wrap: wrap; /* Allow wrapping if needed */
+}
+
 
         .action-btn {
             padding: 8px 15px;
             border: none;
-            background-color: var(--primary-color);
-            color: #ffffff;
+            background-color: transparent; /* Make background transparent */
+            color: var(--primary-color);
             border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: color 0.3s ease, transform 0.3s ease;
+            font-size: 1.5rem; /* Increase icon size */
         }
 
         .action-btn:hover {
-            background-color: #123530;
+            color: var(--accent-color);
+            transform: scale(1.1);
         }
 
         @media (max-width: 768px) {
             .products-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: 1fr !important;
             }
 
             .product-actions {
-                flex-direction: column;
-            }
+        flex-direction: row; /* Ensure buttons are in a row */
+    }
+
         }
 
         @media (max-width: 1024px) {
@@ -305,7 +336,7 @@
     </style>
 </head>
 
-<body>
+<body class="bg-e6f4f4">
     <%- include('../partials/user/header') %>
 
     <main>
@@ -360,9 +391,12 @@
                                 <p class="price">₹ <%= products[i].salePrice %>
                                 </p>
                                 <div class="product-actions">
-                                    <button class="action-btn" onclick="addToCart('<%= products[i]._id %>')">Add to
-                                        Cart</button>
-                                    <button class="action-btn" onclick="addToWishlist('<%= products[i]._id %>')">Wishlist</button>
+                                    <button class="action-btn" onclick="addToCart('<%= products[i]._id %>')">
+                                        <i class="fas fa-shopping-cart"></i>
+                                    </button>
+                                    <button class="action-btn" onclick="addToWishlist('<%= products[i]._id %>')">
+                                        <i class="fas fa-heart"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>

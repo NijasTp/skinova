@@ -3,122 +3,339 @@
 <head>
     <meta charset="utf-8">
     <title>Skinova Admin</title>
-    <link rel="icon" href="/img/favicon.jpg" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" type="image/x-icon" href="/admin-assets/img/favicon.ico">
-    <link href="/admin-assets/css/main.css" rel="stylesheet" type="text/css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10.16.6/dist/sweetalert2.min.css">
-    <script src="https://kit.fontawesome.com/16d4885483.js" crossorigin="anonymous"></script>
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.jpg">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
     <style>
+        /* CSS Reset and Base Styles */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
         :root {
             --primary-color: #000000;
-            --secondary-color: #000000;
-            --accent-color: #000000;
+            --secondary-color: #333333;
             --text-color: #ffffff;
-            --hover-color: #000000;
+            --hover-color: #1a1a1a;
+            --transition-speed: 0.3s;
+            --sidebar-width: 250px;
+            --header-height: 60px;
+            --body-bg: #f0f2f5;
+            --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
-
+        
         body {
-            background-color: #f0f2f5;
-            font-family: 'Roboto', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: var(--body-bg);
+            color: #333;
+            line-height: 1.6;
+            overflow-x: hidden;
         }
-
-        .navbar {
-            background-color: rgb(0, 0, 0);
-        }
-
-        .navbar-aside {
-            background-color: rgb(0, 0, 0);
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .menu-item a.menu-link {
+        
+        /* Header Styles */
+        .skinova-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            background-color: var(--primary-color);
             color: var(--text-color);
-            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 1000;
+            box-shadow: var(--box-shadow);
         }
-
-        .menu-item a.menu-link:hover,
-        .menu-item a.menu-link.active {
-            background-color: var(--accent-color);
+        
+        .skinova-brand {
+            font-size: 1.2rem;
+            font-weight: 600;
             color: var(--text-color);
+            text-decoration: none;
+            margin-left: 15px;
         }
-
-        .dropdown-menu {
-            background-color: var(--secondary-color);
+        
+        .skinova-hamburger {
+            background: transparent;
             border: none;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .dropdown-item {
             color: var(--text-color);
-        }
-
-        .dropdown-item:hover {
-            background-color: var(--hover-color);
-            color: var(--text-color);
-        }
-
-        .brand-wrap .logo {
-            max-height: 50px;
-        }
-
-        .btn-icon {
-            color: var(--text-color);
-        }
-
-        .main-header {
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .menu-aside .menu-item .icon {
-            color: var(--text-color);
-        }
-
-        .img-xs {
+            font-size: 1.2rem;
+            cursor: pointer;
             width: 40px;
             height: 40px;
-            object-fit: cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: background-color var(--transition-speed);
+        }
+        
+        .skinova-hamburger:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Sidebar Styles */
+        .skinova-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            z-index: 1001;
+            transform: translateX(0);
+            transition: transform var(--transition-speed) ease;
+            box-shadow: var(--box-shadow);
+            padding-top: var(--header-height);
+            overflow-y: auto;
+        }
+        
+        .skinova-sidebar.collapsed {
+            transform: translateX(calc(-1 * var(--sidebar-width)));
+        }
+        
+        .skinova-menu {
+            list-style: none;
+            padding: 10px 0;
+        }
+        
+        .skinova-menu-item {
+            margin: 5px 0;
+        }
+        
+        .skinova-menu-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: background-color var(--transition-speed);
+            border-radius: 4px;
+            margin: 0 8px;
+        }
+        
+        .skinova-menu-link:hover,
+        .skinova-menu-link.active {
+            background-color: var(--secondary-color);
+        }
+        
+        .skinova-menu-icon {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* Main Content Wrapper */
+        .skinova-main {
+            margin-left: var(--sidebar-width);
+            padding: calc(var(--header-height) + 20px) 20px 20px;
+            transition: margin-left var(--transition-speed) ease;
+            min-height: 100vh;
+        }
+        
+        .skinova-main.expanded {
+            margin-left: 0;
+        }
+        
+        /* Overlay for mobile */
+        .skinova-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity var(--transition-speed), visibility var(--transition-speed);
+        }
+        
+        .skinova-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .skinova-sidebar {
+                transform: translateX(calc(-1 * var(--sidebar-width)));
+            }
+            
+            .skinova-sidebar.expanded {
+                transform: translateX(0);
+            }
+            
+            .skinova-main {
+                margin-left: 0;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="screen-overlay"></div>
-    <aside class="navbar-aside" id="offcanvas_aside">
-        <div class="aside-top">
-            <a href="/admin" class="brand-wrap">
-               <h4 style="color: white;">Skinova</h4>
-            </a>
-            <div>
-                <button class="btn btn-icon btn-aside-minimize"> 
-                    <i class="fas fa-bars"></i>
-                </button>
-            </div>
-        </div>
+    <!-- Header -->
+    <header class="skinova-header">
+        <button id="skinova-toggle-btn" class="skinova-hamburger" aria-label="Toggle sidebar">
+            <i class="fas fa-bars"></i>
+        </button>
+        <a href="/admin" class="skinova-brand">Skinova</a>
+    </header>
+
+    <!-- Sidebar Overlay -->
+    <div id="skinova-overlay" class="skinova-overlay"></div>
+    
+    <!-- Sidebar -->
+    <aside id="skinova-sidebar" class="skinova-sidebar">
+        
         <nav>
-            <ul class="menu-aside">
-                <% const menuItems = [
-                    { link: '/admin', icon: 'fas fa-home', text: 'Dashboard' },
-                    { link: '/admin/users', icon: 'fas fa-users', text: 'Customers' },
-                    { link: '/admin/category', icon: 'fas fa-list', text: 'Category' },
-                    { link: '/admin/addProducts', icon: 'fas fa-plus-square', text: 'Add product' },
-                    { link: '/admin/products', icon: 'fas fa-box', text: 'Products' },
-                    { link: '/admin/coupon', icon: 'fas fa-ticket-alt', text: 'Coupon' },
-                    { link: '/admin/orders', icon: 'fas fa-shopping-cart', text: 'Orders' },
-                    { link: '/admin/transactions ', icon: 'fas fa-credit-card', text: 'Transactions' },
-                    { link: '/admin/logout', icon: 'fas fa-sign-out-alt', text: 'Logout' },
-                ]; %>
-                
-                <% menuItems.forEach(item => { %>
-                    <li class="menu-item">
-                        <a class="menu-link" href="<%= item.link %>">
-                            <i class="icon <%= item.icon %>"></i>
-                            <span class="text"><%= item.text %></span>
-                        </a>
-                    </li>
-                <% }); %>
+            <ul class="skinova-menu">
+                <li class="skinova-menu-item">
+                    <a href="/admin" class="skinova-menu-link">
+                        <i class="fas fa-home skinova-menu-icon"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="skinova-menu-item">
+                    <a href="/admin/users" class="skinova-menu-link">
+                        <i class="fas fa-users skinova-menu-icon"></i>
+                        <span>Customers</span>
+                    </a>
+                </li>
+                <li class="skinova-menu-item">
+                    <a href="/admin/category" class="skinova-menu-link">
+                        <i class="fas fa-list skinova-menu-icon"></i>
+                        <span>Category</span>
+                    </a>
+                </li>
+                <li class="skinova-menu-item">
+                    <a href="/admin/addProducts" class="skinova-menu-link">
+                        <i class="fas fa-plus-square skinova-menu-icon"></i>
+                        <span>Add product</span>
+                    </a>
+                </li>
+                <li class="skinova-menu-item">
+                    <a href="/admin/products" class="skinova-menu-link">
+                        <i class="fas fa-box skinova-menu-icon"></i>
+                        <span>Products</span>
+                    </a>
+                </li>
+                <li class="skinova-menu-item">
+                    <a href="/admin/coupon" class="skinova-menu-link">
+                        <i class="fas fa-ticket-alt skinova-menu-icon"></i>
+                        <span>Coupon</span>
+                    </a>
+                </li>
+                <li class="skinova-menu-item">
+                    <a href="/admin/orders" class="skinova-menu-link">
+                        <i class="fas fa-shopping-cart skinova-menu-icon"></i>
+                        <span>Orders</span>
+                    </a>
+                </li>
+                <li class="skinova-menu-item">
+                    <a href="/admin/transactions" class="skinova-menu-link">
+                        <i class="fas fa-credit-card skinova-menu-icon"></i>
+                        <span>Transactions</span>
+                    </a>
+                </li>
+                <li class="skinova-menu-item">
+                    <a href="/admin/logout" class="skinova-menu-link">
+                        <i class="fas fa-sign-out-alt skinova-menu-icon"></i>
+                        <span>Logout</span>
+                    </a>
+                </li>
             </ul>
         </nav>
     </aside>
-    <main class="main-wrap">
-       
+    
+    <!-- Main Content -->
+    <main id="skinova-main" class="skinova-main">
+    
+
+    <script>
+        (function() {
+            // DOM elements
+            const toggleBtn = document.getElementById('skinova-toggle-btn');
+            const sidebar = document.getElementById('skinova-sidebar');
+            const mainContent = document.getElementById('skinova-main');
+            const overlay = document.getElementById('skinova-overlay');
+            
+            // Check if we're on mobile
+            const isMobile = () => window.innerWidth <= 768;
+            
+            // Initialize sidebar state
+            function initSidebar() {
+                if (isMobile()) {
+                    sidebar.classList.add('collapsed');
+                    sidebar.classList.remove('expanded');
+                    mainContent.classList.add('expanded');
+                } else {
+                    sidebar.classList.remove('collapsed');
+                    mainContent.classList.remove('expanded');
+                }
+            }
+            
+            // Toggle sidebar
+            function toggleSidebar() {
+                if (isMobile()) {
+                    sidebar.classList.toggle('expanded');
+                    overlay.classList.toggle('visible');
+                } else {
+                    sidebar.classList.toggle('collapsed');
+                    mainContent.classList.toggle('expanded');
+                }
+            }
+            
+            // Close sidebar on mobile when clicking the overlay
+            function closeOnOverlay() {
+                if (isMobile()) {
+                    sidebar.classList.remove('expanded');
+                    overlay.classList.remove('visible');
+                }
+            }
+            
+            // Close sidebar on mobile when clicking a menu item
+            function setupMenuItemClicks() {
+                const menuLinks = document.querySelectorAll('.skinova-menu-link');
+                menuLinks.forEach(link => {
+                    link.addEventListener('click', () => {
+                        if (isMobile()) {
+                            closeOnOverlay();
+                        }
+                    });
+                });
+            }
+            
+            // Set active menu item based on current URL
+            function setActiveMenuItem() {
+                const currentPath = window.location.pathname;
+                const menuLinks = document.querySelectorAll('.skinova-menu-link');
+                
+                menuLinks.forEach(link => {
+                    if (link.getAttribute('href') === currentPath) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+            
+            // Add event listeners
+            toggleBtn.addEventListener('click', toggleSidebar);
+            overlay.addEventListener('click', closeOnOverlay);
+            window.addEventListener('resize', initSidebar);
+            
+            // Initialize
+            document.addEventListener('DOMContentLoaded', () => {
+                initSidebar();
+                setupMenuItemClicks();
+                setActiveMenuItem();
+            });
+        })();
+    </script>
+</body>
+</html>

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const passport = require('passport');
+const  handleBase64Image  = require('../helpers/base64Image');
 const userController = require('../controllers/user/userController');
 const profileController = require("../controllers/user/profileController")
 const productController = require("../controllers/user/productController")
@@ -16,6 +17,10 @@ const {resetPasswordMiddleware,blockLoggedInUsers, checkBlockedUser} = require("
 
 
 router.get('/pagenotfound', userController.pageNotFound);
+
+router.get('/terms', (req, res) => {
+    res.render('terms');
+})
 
 
 router.get('/signup', userController.loadSignUpPage);
@@ -57,7 +62,7 @@ router.get("/productDetails",productController.productDetails)
 
 router.get('/edit-profile',userController.loadEditProfilePage);
 router.get('/profile',userAuth, userController.loadProfilePage);
-router.post('/updateprofile', upload.single("profilePicture"), userController.updateProfile);
+router.post('/updateprofile' ,upload.single("profilePicture"), userController.updateProfile);
 router.get('/change-password',userController.loadChangePasswordPage);
 router.post('/update-password', userController.updatePassword);
 router.post("/generate-email-otp", userController.generateEmailOTP);
@@ -90,6 +95,9 @@ router.get("/coupons", userController.loadCoupons);
 router.get("/checkout",userAuth,checkoutController.loadCheckoutPage)
 
 router.post('/place-order',userAuth,checkoutController.placeOrder)
+router.get("/order-success", checkoutController.orderSuccess);
+router.get("/order-failure",checkoutController.orderFailure);
+router.post('/wallet-payment',userAuth,checkoutController.walletPayment)
 router.get('/orders',userAuth,checkoutController.getOrders)
 router.get('/order/:orderId', userAuth, orderController.orderDetails);
 router.get("/download-invoice/:orderId", orderController.downloadInvoice);
@@ -110,6 +118,8 @@ router.post('/cancel-order/:itemId', orderController.cancelOrder);
 
 //Wallet
 router.get('/wallet',userAuth,walletController.loadWallet)
+router.post("/wallet/add-money", walletController.addMoney);
+router.post("/wallet/verify-payment", walletController.verifyPayment);
 
 
 router.get('/logout', userController.logout);

@@ -78,6 +78,7 @@ const loadAboutPage = async (req, res) => {
 
 const loadContactPage = async (req, res) => {
     try {
+        const user=req.session.user
         res.render('contact')
     } catch (error) {
         console.log('Contact Page Not Found')
@@ -528,8 +529,8 @@ const loadChangePasswordPage= async (req,res)=>{
 
 const updateProfile = async (req, res) => {
     try {
-        const { firstName, lastName, phone, username } = req.body;
-        const userId = req.session.user; 
+        let { firstName, lastName, phone, username, croppedImage } = req.body; // ✅ Use let
+        const userId = req.session.user;
 
         if (!userId) {
             return res.status(401).json({ success: false, message: "Unauthorized access" });
@@ -540,41 +541,41 @@ const updateProfile = async (req, res) => {
             return res.status(404).json({ success: false, message: "User not found" });
         }
 
-
         let imagePath = user.image; 
-        if (req.file) {
-            imagePath = "uploads/" + req.file.filename;
+
+        if (Array.isArray(croppedImage)) {
+            croppedImage = croppedImage[0]; 
         }
 
-
-        if (username && username !== user.name) {
-            const existingUser = await User.findOne({ name: username });
-            if (existingUser) {
-                return res.status(400).json({ success: false, message: "Username already taken" });
-            }
+        if (croppedImage && typeof croppedImage === 'string') {     
+            const base64Data = croppedImage.replace(/^data:image\/\w+;base64,/, "");
+            const buffer = Buffer.from(base64Data, 'base64');
+            
+            const fileName = `uploads/profile_${userId}.png`; 
+            const fullPath = `public/${fileName}`; 
+            
+            fs.writeFileSync(fullPath, buffer);
+            imagePath = fileName; 
+        } else if (req.file) {
+            imagePath = req.file.path;
         }
 
     
-        const updateData = {
-            firstName: firstName || user.firstName,
-            lastName: lastName || user.lastName,
-            phone: phone || user.phone,
-            name: username || user.name,
-            image: imagePath 
-        };
 
-        await User.findByIdAndUpdate(userId, updateData, { new: true });
+        user.firstName = firstName;
+        user.lastName = lastName;
+        user.phone = phone;
+        user.username = username;
+        user.image = imagePath;
+        await user.save();
 
-        return res.json({
-            success: true,
-            message: "Profile updated successfully!",
-        });
-
+        res.json({ success: true, message: "Profile updated successfully!", image: imagePath });
     } catch (error) {
-        console.error("Error updating profile:", error);
-        return res.status(500).json({ success: false, message: "Internal Server Error" });
+        console.error(error);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 };
+
 
 
   const sendPasswordOtp = async (req, res) => {
@@ -723,6 +724,7 @@ const addToCart = async (req, res) => {
         if (!userId) {
             return res.status(401).json({ success: false, message: "Please log in first" });
         }
+    
 
         const productId = req.query.id;
         let quantity = parseInt(req.query.quantity) || 1;
@@ -730,6 +732,10 @@ const addToCart = async (req, res) => {
 
         if (!product) {
             return res.status(404).json({ success: false, message: "Product not found" });
+        }
+
+        if (product.isBlocked) {
+            return res.status(400).json({ success: false, message: "This product is not available for adding to cart" });
         }
 
         if (product.quantity === 0 || product.isBlocked) {
@@ -798,26 +804,26 @@ const loadCartPage = async (req, res) => {
 
         let cart = await Cart.findOne({ userId }).populate("items.productId");
 
+        
+
         if (!cart) {
-            return res.render("cart", { cart: null, cartTotal: 0 });
+            return res.render("cart", { cart: { items: [], cartTotal: 0, discount: 0, finalTotal: 0 } });
         }
 
-        cart.items = cart.items.filter(item => !item.productId.isBlocked);
-
-        cart.items.forEach(item => {
-            const productPrice = item.productId.salePrice || 0;
-            const categoryOffer = item.productId.category?.categoryOffer || 0;
-            const productOffer = item.productId.productOffer || 0;
-            const bestOffer = Math.max(productOffer, categoryOffer);
-            item.discount = (bestOffer / 100) * productPrice; // Calculate discount amount
+        cart.items = cart.items.filter(item => {
+            if (item.quantity > item.productId.quantity) {
+                item.quantity = item.productId.quantity;
+            }
+            return item.productId && item.productId.quantity > 0 && !item.productId.isBlocked;
         });
 
-        res.render("cart", { cart, cartTotal: cart.cartTotal });
+        res.render("cart", { cart });
     } catch (error) {
         console.error("Error loading cart:", error);
         res.status(500).send("Internal Server Error");
     }
 };
+
 
 
       const deleteFromCart = async (req, res) => {
@@ -864,11 +870,17 @@ const loadCartPage = async (req, res) => {
     
             if (!cart) return res.status(404).json({ success: false, message: "Cart not found" });
     
-            const itemIndex = cart.items.findIndex((item) => item.productId._id.equals(id));
+            const itemIndex = cart.items.findIndex((item) => item.productId && item.productId._id.equals(id));
     
-            if (itemIndex === -1) return res.status(404).json({ success: false, message: "Product not in cart" });
+            if (itemIndex === -1) return res.status(404).json({ success: false, message: "Product not in cart or removed from store" });
     
             let item = cart.items[itemIndex];
+    
+            if (!item.productId) {
+                cart.items.splice(itemIndex, 1); // Remove item if product does not exist
+                await cart.save();
+                return res.status(404).json({ success: false, message: "Product no longer exists. Removed from cart." });
+            }
     
             let newQuantity = item.quantity + changeValue;
             let productStock = item.productId.quantity;
@@ -888,7 +900,9 @@ const loadCartPage = async (req, res) => {
             item.quantity = newQuantity;
             item.totalPrice = item.quantity * item.productId.salePrice;
     
-            cart.cartTotal = cart.items.reduce((total, item) => total + item.totalPrice, 0);
+            cart.cartTotal = cart.items.reduce((total, item) => {
+                return item.productId ? total + item.totalPrice : total;
+            }, 0);
     
             if (cart.discount > 0) {
                 cart.finalTotal += changeValue * item.productId.salePrice;
@@ -1096,7 +1110,7 @@ const postEditAddress = async (req,res) => {
 const deleteAddress = async (req, res) => {
     try {
         const userId = req.session.user;  
-        const addressId = req.query.id;  // Ensure this is the address _id, NOT the document _id
+        const addressId = req.query.id;  
 
         if (!userId) {
             return res.status(401).send("Unauthorized, please log in again");
@@ -1111,10 +1125,10 @@ const deleteAddress = async (req, res) => {
 
         const objectId = new mongoose.Types.ObjectId(addressId);
 
-        // ✅ Find the address correctly
+
         const findAddress = await Address.findOne({ 
             userId: userId, 
-            "address._id": objectId  // Ensure we're looking in the array
+            "address._id": objectId  
         });
 
         console.log("Find Address Result:", findAddress);
@@ -1123,7 +1137,7 @@ const deleteAddress = async (req, res) => {
             return res.status(404).send("Address Not Found");
         }
 
-        // ✅ Remove the specific address from the array
+ 
         const updateResult = await Address.updateOne(
             { userId: userId },  
             { $pull: { address: { _id: objectId } } }
@@ -1148,23 +1162,34 @@ const loadCoupons = async (req, res) => {
     const userId = req.session.user;
   
     try {
-      const coupons = await Coupon.find({ isActive: true });
-      const userCoupons = await Coupon.find({
-        "usedBy.userId": userId,
-      });
-  
-      const usedCouponCodes = userCoupons.map(coupon => coupon.code);
-  
-      const availableCoupons = coupons.map(coupon => ({
-        ...coupon.toObject(),
-        isUsed: usedCouponCodes.includes(coupon.code),
-      }));
-  
-      res.render("coupons", { coupons: availableCoupons });
+        const today = new Date();
+        
+
+        const coupons = await Coupon.find({ 
+            isActive: true,
+            startDate: { $lte: today },  
+            expireOn: { $gte: today }    
+        });
+
+ 
+        const userCoupons = await Coupon.find({
+            "usedBy.userId": userId,
+        });
+
+        const usedCouponCodes = userCoupons.map(coupon => coupon.code);
+
+       
+        const availableCoupons = coupons.map(coupon => ({
+            ...coupon.toObject(),
+            isUsed: usedCouponCodes.includes(coupon.code),
+        }));
+
+        res.render("coupons", { coupons: availableCoupons });
+
     } catch (error) {
-      res.status(500).json({ message: "Error fetching coupons", error });
+        res.status(500).json({ message: "Error fetching coupons", error });
     }
-  }
+};
 
 
 module.exports = {

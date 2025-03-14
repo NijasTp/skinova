@@ -43,12 +43,13 @@ const cancelOrder = async (req, res) => {
                 return res.status(404).json({ error: "Wallet not found" });
             }
 
-            wallet.balance += order.finalPrice;
+            wallet.balance += order.finalPrice*order.quantity;
             wallet.transactions.push({
                 type: "credit",
-                amount: order.finalPrice,
+                amount: order.finalPrice*order.quantity,
                 date: new Date(),
-                description: `Refund due to order cancellation of ${order.product.productName}`
+                description: `Refund due to order cancellation of ${order.product.productName}`,
+                orderId:itemId
             });
 
             await wallet.save();
@@ -154,6 +155,7 @@ const orderDetails = async (req, res) => {
         const userAddresses = await Address.findOne({ userId: order.userId });
         const selectedAddress = userAddresses.address.find(addr => addr._id.toString() === order.address.toString());
 
+ 
      
         let returnEligible = false;
         let daysLeft = 0;
@@ -165,11 +167,12 @@ const orderDetails = async (req, res) => {
             const today = new Date();
             if (today <= returnExpiry) {
                 returnEligible = true;
-                daysLeft = Math.ceil((returnExpiry - today) / (1000 * 60 * 60 * 24)); // Convert ms to days
+                daysLeft = Math.ceil((returnExpiry - today) / (1000 * 60 * 60 * 24)); 
             }
         }
 
-        res.render('order-details', { order, selectedAddress, returnEligible, daysLeft });
+        res.render('order-details', { order, returnEligible, daysLeft });
+
 
     } catch (error) {
         console.error("Error fetching order:", error);
@@ -228,7 +231,12 @@ const requestReturn = async (req, res) => {
             return res.status(400).json({ success: false, message: "Invalid coupon" });
         }
 
-        if (new Date() > new Date(coupon.expireOn)) {
+        const today = new Date();
+        if (today < coupon.startDate) {
+            return res.status(400).json({ success: false, message: `Coupon can only be used after ${coupon.startDate.toLocaleDateString()}` });
+        }
+
+        if (today > coupon.expireOn) {
             return res.status(400).json({ success: false, message: "Coupon expired" });
         }
 

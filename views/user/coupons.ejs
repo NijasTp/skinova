@@ -128,6 +128,27 @@
                 margin-top: 1rem; /* Add some space above the sidebar */
             }
         }
+        .pagination {
+        margin-top: 20px;
+        text-align: center;
+    }
+    .pagination a {
+        padding: 8px 12px;
+        margin: 0 5px;
+        border: 1px solid #ddd;
+        text-decoration: none;
+        color: #007bff;
+        border-radius: 5px;
+    }
+    .pagination a.active {
+        background-color: #007bff;
+        color: white;
+        font-weight: bold;
+    }
+    .pagination a:hover {
+        background-color: #0056b3;
+        color: white;
+    }
     </style>
 </head>
 <body>
@@ -156,8 +177,8 @@
                 <div class="coupon <%= coupon.isUsed ? 'used' : '' %>">
                     <h3><%= coupon.name %></h3>
                     <p><strong>Code:</strong> <%= coupon.code %></p>
-                    <p><strong>Offer Price:</strong> $<%= coupon.offerPrice %></p>
-                    <p><strong>Minimum Price:</strong> $<%= coupon.minimumPrice %></p>
+                    <p><strong>Offer Price:</strong>    ₹<%= coupon.offerPrice %></p>
+                    <p><strong>Minimum Price:</strong> ₹<%= coupon.minimumPrice %></p>
                     <p><strong>Expires On:</strong> <%= new Date(coupon.expireOn).toLocaleDateString() %></p>
                     <% if (!coupon.isUsed) { %>
                         <button class="btn btn-success" onclick="copyCoupon('<%= coupon.code %>')">Copy Code</button>
@@ -167,7 +188,9 @@
                 </div>
             <% }); %>
         </div>
+
     </div>
+
     <%- include('../partials/user/footer') %>
 
     <script>

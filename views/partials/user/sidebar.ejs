@@ -46,8 +46,11 @@
                 <li class="mb-2"><a href="/address" class="text-black">Addresses</a></li>
                 <li class="mb-2"><a href="/wallet" class="text-black">Wallet</a></li>
                 <li class="mb-2"><a href="/coupons" class="text-black">Coupons</a></li>
+                <%if (user) {%>
                 <li class="mb-2"><a href="/logout" class="text-black">Logout</a></li>
-
+                <%} else {%>
+                <li class="mb-2"><a href="/login" class="text-black">Login</a></li>
+                <%}%>
             </ul>
         </div>
        

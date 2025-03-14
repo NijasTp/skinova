@@ -1,141 +1,42 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OTP Verification</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Nunito Sans', sans-serif;
-        }
-
         body {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #ffffff;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 400px;
-            padding: 40px 20px;
-            text-align: center;
-        }
-
-        h1 {
-            font-size: 24px;
-            color: #333;
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-
-        h2 {
-            font-size: 18px;
-            color: #666;
-            margin-bottom: 30px;
-            font-weight: 400;
-        }
-
-        .otp-container {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-
-        .otp-input {
-            width: 50px;
-            height: 50px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 24px;
-            text-align: center;
-            margin: 0 5px;
-            font-weight: 600;
-        }
-
-        .otp-input:focus {
-            border-color: #8B5CF6;
-            outline: none;
-        }
-
-        .resend-timer {
-            color: #8B5CF6;
-            font-size: 14px;
-            margin: 20px 0;
-        }
-
-        .verify-btn {
-            background-color: #8B5CF6;
-            color: white;
-            border: none;
-            padding: 12px 0;
-            width: 100%;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .verify-btn:hover {
-            background-color: #7C3AED;
-        }
-
-        .resend-link {
-            color: #666;
-            text-decoration: none;
-            font-size: 14px;
-            margin-top: 20px;
-            display: inline-block;
-        }
-
-        .resend-link:hover {
-            color: #8B5CF6;
-        }
-
-        .alert-danger {
-            background-color: #FEE2E2;
-            color: #DC2626;
-            padding: 12px;
-            border-radius: 6px;
-            margin: 20px 0;
-            font-size: 14px;
+            font-family: 'Nunito Sans', sans-serif;
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1>OTP</h1>
-        <h2>Verification Code</h2>
+<body class="min-h-screen flex items-center justify-center bg-white">
+    <div class="w-full max-w-md p-8 text-center">
+        <h1 class="text-2xl font-semibold text-gray-800 mb-2">OTP</h1>
+        <h2 class="text-lg text-gray-600 mb-6">Verification Code</h2>
 
         <form id="otpForm" action="" method="post" onsubmit="return validateOTPForm()">
-            <div class="otp-container">
-                <input type="text" class="otp-input" maxlength="1" pattern="\d*">
-                <input type="text" class="otp-input" maxlength="1" pattern="\d*">
-                <input type="text" class="otp-input" maxlength="1" pattern="\d*">
-                <input type="text" class="otp-input" maxlength="1" pattern="\d*">
-                <input type="text" class="otp-input" maxlength="1" pattern="\d*">
-                <input type="text" class="otp-input" maxlength="1" pattern="\d*">
+            <div class="flex justify-center gap-2 mb-6">
+                <input type="text" class="otp-input w-12 h-12 border-2 border-gray-300 rounded-lg text-2xl text-center font-semibold focus:border-purple-500 focus:outline-none" maxlength="1" pattern="\d*">
+                <input type="text" class="otp-input w-12 h-12 border-2 border-gray-300 rounded-lg text-2xl text-center font-semibold focus:border-purple-500 focus:outline-none" maxlength="1" pattern="\d*">
+                <input type="text" class="otp-input w-12 h-12 border-2 border-gray-300 rounded-lg text-2xl text-center font-semibold focus:border-purple-500 focus:outline-none" maxlength="1" pattern="\d*">
+                <input type="text" class="otp-input w-12 h-12 border-2 border-gray-300 rounded-lg text-2xl text-center font-semibold focus:border-purple-500 focus:outline-none" maxlength="1" pattern="\d*">
+                <input type="text" class="otp-input w-12 h-12 border-2 border-gray-300 rounded-lg text-2xl text-center font-semibold focus:border-purple-500 focus:outline-none" maxlength="1" pattern="\d*">
+                <input type="text" class="otp-input w-12 h-12 border-2 border-gray-300 rounded-lg text-2xl text-center font-semibold focus:border-purple-500 focus:outline-none" maxlength="1" pattern="\d*">
             </div>
 
-            <div class="resend-timer">
-                Resend OTP in: <span id="timerValue">60</span>sec
+            <div class="text-purple-500 text-sm mb-4">
+                Resend OTP in: <span id="timerValue">60</span> sec
             </div>
 
-            <button type="submit" class="verify-btn">Verify OTP</button>
+            <button type="submit" class="w-full bg-purple-500 text-white py-3 rounded-lg font-semibold hover:bg-purple-600 transition duration-300">Verify OTP</button>
 
             <% if (locals.message && message.length > 0) { %>
-                <div class="alert alert-danger"><%= message %></div>
+                <div class="bg-red-100 text-red-700 p-3 rounded-lg mt-4 text-sm"><%= message %></div>
             <% } %>
 
-            <a href="#" class="resend-link" onclick="resendOTP(); return false;">
+            <a href="#" class="text-gray-600 text-sm mt-4 inline-block hover:text-purple-500" onclick="resendOTP(); return false;">
                 Resend After 60 seconds
             </a>
         </form>

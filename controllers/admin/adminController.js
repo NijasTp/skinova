@@ -45,22 +45,46 @@ const loadDashboard = async (req, res) => {
     try {
         const filter = req.query.filter || 'monthly';
 
+        // Date Filtering Logic
+        let dateFilter = {};
+        if (filter === 'daily') {
+            dateFilter = { deliveredOn: { $gte: new Date(new Date().setHours(0, 0, 0, 0)) } };
+        } else if (filter === 'weekly') {
+            let startOfWeek = new Date();
+            startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay()); 
+            startOfWeek.setHours(0, 0, 0, 0);
+
+            dateFilter = { deliveredOn: { $gte: startOfWeek } };
+        } else if (filter === 'monthly') {
+            let startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+            dateFilter = { deliveredOn: { $gte: startOfMonth } };
+        } else if (filter === 'yearly') {
+            let startOfYear = new Date(new Date().getFullYear(), 0, 1);
+            dateFilter = { deliveredOn: { $gte: startOfYear } };
+        }
+
+        // Apply filtering to all queries
+        const matchCondition = { 
+            status: { $in: ['delivered', 'return rejected'] }, 
+            ...dateFilter 
+        };
+
         const totalRevenue = await Order.aggregate([
-            { $match: { status: { $in: ['delivered', 'return rejected'] } } },
+            { $match: matchCondition },
             { $group: { _id: null, total: { $sum: '$finalPrice' } } }
         ]);
 
-        const totalOrders = await Order.countDocuments();
+        const totalOrders = await Order.countDocuments(matchCondition);
 
         const totalProductsSold = await Order.aggregate([
-            { $match: { status: { $in: ['delivered', 'return rejected'] } } },
+            { $match: matchCondition },
             { $group: { _id: null, total: { $sum: '$quantity' } } }
         ]);
 
         const totalUsers = await User.countDocuments();
 
         const bestSellingProducts = await Order.aggregate([
-            { $match: { status: { $in: ['delivered', 'return rejected'] } } },
+            { $match: matchCondition },
             { $group: { _id: '$product', sales: { $sum: '$quantity' } } },
             { $sort: { sales: -1 } },
             { $limit: 10 },
@@ -77,7 +101,7 @@ const loadDashboard = async (req, res) => {
         ]);
 
         const bestSellingCategories = await Order.aggregate([
-            { $match: { status: { $in: ['delivered', 'return rejected'] } } },
+            { $match: matchCondition },
             {
                 $lookup: {
                     from: 'products',
@@ -107,14 +131,8 @@ const loadDashboard = async (req, res) => {
             { $project: { name: '$categoryDetails.name', sales: 1 } }
         ]);
 
-
         const salesData = await Order.aggregate([
-            {
-                $match: {
-                    status: { $in: ['delivered', 'return rejected'] },
-                    deliveredOn: { $ne: null }
-                }
-            },
+            { $match: matchCondition },
             {
                 $group: {
                     _id: filter === 'daily' ? { $dateToString: { format: "%Y-%m-%d", date: "$deliveredOn" } } :
@@ -127,7 +145,6 @@ const loadDashboard = async (req, res) => {
             { $sort: { '_id': 1 } }
         ]);
 
-
         const chartLabels = salesData.map(s => {
             if (filter === 'weekly') {
                 let year = new Date().getFullYear();
@@ -135,11 +152,9 @@ const loadDashboard = async (req, res) => {
                 let weekStart = new Date(firstDayOfYear.getTime() + (s._id - 1) * 7 * 24 * 60 * 60 * 1000);
                 let weekEnd = new Date(weekStart.getTime() + 6 * 24 * 60 * 60 * 1000);
 
-
                 return `${weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${weekEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
             }
             if (filter === 'monthly') {
-
                 const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
                 return monthNames[s._id - 1];
             }
@@ -149,26 +164,34 @@ const loadDashboard = async (req, res) => {
 
         const chartData = salesData.map(s => s.total);
 
-
-        const deliveredProducts = await Order.find({ status: { $in: ['delivered', 'return rejected'] } })
+        const page = parseInt(req.query.page) || 1; 
+        const limit = 5; 
+        const skip = (page - 1) * limit;
+        
+        const deliveredProducts = await Order.find(matchCondition)
             .populate({ path: 'product', select: 'productName' })
             .populate({ path: 'userId', select: 'name' })
             .select('orderId userId quantity finalPrice deliveredOn product')
+            .skip(skip)
+            .limit(limit)
+            .sort({ deliveredOn: -1 })
             .exec();
-
+        
+        const totalDeliveredCount = await Order.countDocuments(matchCondition); 
+        const totalPages = Math.ceil(totalDeliveredCount / limit);
+        
         const totalDiscountAmount = await Order.aggregate([
+            { $match: matchCondition },
             {
                 $group: {
                     _id: null,
-                    total: {
-                        $sum: { $multiply: [{ $divide: ["$discount", 100] }, "$price", "$quantity"] }
-                    }
+                    total: { $sum: "$discount" }
                 }
             }
         ]);
 
-        // Total Coupon Discount Calculation (already in amount format)
         const totalCouponDiscount = await Order.aggregate([
+            { $match: matchCondition },
             {
                 $group: {
                     _id: null,
@@ -187,6 +210,8 @@ const loadDashboard = async (req, res) => {
             chartLabels,
             chartData,
             deliveredProducts,
+            totalPages,
+            currentPage: page,
             selectedFilter: filter,
             totalDiscount: totalDiscountAmount.length ? totalDiscountAmount[0].total : 0,
             totalCouponDiscount: totalCouponDiscount.length ? totalCouponDiscount[0].total : 0,
@@ -197,6 +222,7 @@ const loadDashboard = async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 };
+
 
 
 const downloadSoldProducts = async (req, res) => {

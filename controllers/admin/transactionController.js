@@ -75,17 +75,22 @@ const getTransactions = async (req, res) => {
             }
         ]);
 
+        // Combine transactions and sort by date (latest first)
+        let transactions = [...walletTransactions, ...razorpayTransactions]
+            .sort((a, b) => new Date(b.date) - new Date(a.date));  // 🔥 Sort descending
 
-        let transactions = [...walletTransactions, ...razorpayTransactions];
-
-        // console.log(" Transactions Data:", transactions);
-
-
-  
+        // Filter by type if provided
         if (type) {
             transactions = transactions.filter(txn => txn.type.toLowerCase() === type.toLowerCase());
         }
 
+        // Search filter
+        const searchQuery = req.query.search ? req.query.search.toLowerCase() : "";
+        if (searchQuery) {
+            transactions = transactions.filter(txn => txn.user.toLowerCase().includes(searchQuery));
+        }
+
+        // Calculate total credit and debit
         const totalCredit = transactions
             .filter(txn => txn.type === "credit" || txn.type === "Wallet Credit")
             .reduce((sum, txn) => sum + txn.amount, 0);
@@ -94,7 +99,18 @@ const getTransactions = async (req, res) => {
             .filter(txn => txn.type === "debit" || txn.type === "Razorpay" || txn.type === "Wallet Debit")
             .reduce((sum, txn) => sum + txn.amount, 0);
 
-        res.render("transactions", { transactions, totalCredit, totalDebit, startDate, endDate, type });
+        // Pagination
+        const page = parseInt(req.query.page) || 1;
+        const limit = 10;
+        const totalTransactions = transactions.length;
+        const totalPages = Math.ceil(totalTransactions / limit);
+        const skip = (page - 1) * limit;
+        transactions = transactions.slice(skip, skip + limit);
+
+        res.render("transactions", { 
+            transactions, totalCredit, totalDebit, startDate, endDate, type, 
+            page, totalPages, search: req.query.search || ""
+        });
 
     } catch (error) {
         console.error("Error fetching transactions:", error);
