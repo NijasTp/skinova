@@ -30,6 +30,8 @@ const loadCheckoutPage = async (req, res) => {
             return res.redirect("/cart");
         }
 
+        const wallet = await Wallet.findOne({ userId });
+
         const addresses = await Address.findOne({ userId });
         const userAddresses = addresses ? addresses.address : [];
         const today = new Date();
@@ -58,7 +60,8 @@ const loadCheckoutPage = async (req, res) => {
                 grandTotal: 0,
                 addresses: userAddresses,
                 coupons, 
-                usedCoupons
+                usedCoupons,
+                walletBalance: wallet ? wallet.balance : 0
             });
         }
 
@@ -98,7 +101,8 @@ const loadCheckoutPage = async (req, res) => {
             grandTotal,
             addresses: userAddresses,
             coupons, 
-            usedCoupons
+            usedCoupons,
+            walletBalance: wallet ? wallet.balance : 0
         });
 
     } catch (error) {
@@ -340,21 +344,32 @@ const walletPayment = async (req, res) => {
 
 const getOrders = async (req, res) => {
     try {
-        let userId = req.session.user;
+        let user = req.session.user;
+
+        // If session stores user as an object, extract _id, otherwise, use it directly
+        let userId = user?._id ? user._id : user;
+
+        console.log("Session User ID:", userId, "Type:", typeof userId);
+
+        // Ensure userId is a valid ObjectId
+        if (typeof userId === "string" && mongoose.Types.ObjectId.isValid(userId)) {
+            userId = new mongoose.Types.ObjectId(userId);
+        }
 
         if (!mongoose.Types.ObjectId.isValid(userId)) {
+            console.log("Invalid userId:", userId);
             return res.render("orders", { orders: [], currentPage: 1, totalPages: 1 });
         }
 
-        userId = new mongoose.Types.ObjectId(userId);
+        console.log("Querying orders for userId:", userId);
 
-
-        const page = parseInt(req.query.page) || 1;  
-        const limit = 5;  
+        const page = parseInt(req.query.page) || 1;
+        const limit = 5;
         const skip = (page - 1) * limit;
 
-        const totalOrders = await Order.countDocuments({ userId }); 
-        const totalPages = Math.ceil(totalOrders / limit); 
+        // Fetch orders
+        const totalOrders = await Order.countDocuments({ userId });
+        const totalPages = Math.ceil(totalOrders / limit);
 
         const orders = await Order.find({ userId })
             .populate("product")
@@ -362,12 +377,16 @@ const getOrders = async (req, res) => {
             .skip(skip)
             .limit(limit);
 
+        console.log("Fetched Orders Count:", orders.length);
+
         res.render("orders", { orders, currentPage: page, totalPages });
+
     } catch (error) {
         console.error("Error fetching orders:", error);
         res.status(500).send("Something went wrong.");
     }
 };
+
 
 const orderSuccess = (req, res) => {
 try {

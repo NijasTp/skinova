@@ -156,7 +156,7 @@
     <main class="hero w-full">
         <div class="hero-content">
             <b>
-                < <h1 class="hero-title">COUPONS</h1>
+                 <h1 class="hero-title">COUPONS</h1>
             </b>
             <p class="hero-description">
                 <i>
@@ -187,6 +187,7 @@
                     <% } %>
                 </div>
             <% }); %>
+            <%if (coupons.length === 0) { %><p>No coupons found.</p><% } %>
         </div>
 
     </div>

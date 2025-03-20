@@ -65,7 +65,7 @@
     <%- include("../../views/partials/admin/header") %>
     <div class="container">
         <h1>Edit Coupon</h1>
-        <form action="/admin/edit-coupon/<%= coupon._id %>" method="POST">
+        <form id="edit-coupon-form" action="/admin/edit-coupon/<%= coupon._id %>" method="POST">
             <div class="form-group">
                 <label for="code">Coupon Code</label>
                 <input type="text" id="code" name="code" value="<%= coupon.code %>" required>
@@ -98,6 +98,7 @@
             <button type="submit">Update Coupon</button>
         </form>
         <script>
+            const form = document.getElementById('edit-coupon-form');
             const startDateInput = document.getElementById('startDate');
             const expireOnInput = document.getElementById('expireOn');
             const minPriceInput = document.getElementById('minimumPrice');
@@ -119,15 +120,22 @@
                 }
             });
         
-            minPriceInput.addEventListener('input', () => {
-                if (minPriceInput.value < offerPriceInput.value) {
-                    minError.textContent = 'Minimum order price cannot be lower than coupon discount amount';
-                } else {
-                    minError.textContent = '';
-                }
-            });
+            form.addEventListener('submit', (event) => {
+    const minPrice = Number(minPriceInput.value);
+    const offerPrice = Number(offerPriceInput.value);
+
+    if (minPrice <= offerPrice) {
+        console.log('minimum price', minPrice, 'offer price', offerPrice);
+        event.preventDefault();
+        minError.textContent = 'Minimum order price cannot be lower than coupon discount amount';
+    } else {
+        minError.textContent = '';
+    }
+});
+
         </script>
     </div>
     <%- include("../../views/partials/admin/footer") %>
 </body>
 </html>
+

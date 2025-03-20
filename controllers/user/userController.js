@@ -6,7 +6,7 @@ const Wishlist= require('../../models/wishlistSchema')
 const env = require('dotenv').config();
 const nodemailer = require('nodemailer');
 const mongoose= require('mongoose');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const fs=require('fs');
 const path=require('path');
 const sharp = require('sharp');
@@ -59,6 +59,9 @@ const loadHomePage = async (req, res) => {
 
 const loadSignUpPage = async (req, res) => {
     try {
+        if (req.session.user) {
+            return res.redirect('/');
+        }
         res.render('signup')
     } catch (error) {
         console.log('Sign Up Page Not Found')
@@ -294,28 +297,31 @@ const loadShoppingPage = async (req, res) => {
         const user = req.session.user;
         const userData = user ? await User.findOne({ _id: user }) : null;
 
-        // Pagination setup
         const page = parseInt(req.query.page) || 1;
         const limit = 6;
         const skip = (page - 1) * limit;
 
-        // Build query object for filtering products
         let query = {
             isBlocked: false,
             quantity: { $gt: 0 }
         };
 
-        // Add search functionality (case insensitive)
+        // Handle search query
         if (req.query.search) {
-            query.productName = { $regex: req.query.search, $options: "i" };
+            query.productName = { $regex: new RegExp(req.query.search, "i") };
         }
 
-        // Add category filter (if a category is selected)
+        // Fetch only listed categories first
+        const listedCategories = await Category.find({ isListed: true }).select("_id");
+        const listedCategoryIds = listedCategories.map(cat => cat._id);
+
+        // Apply category filter
         if (req.query.category) {
-            query.category = req.query.category;
+            query.category = { $in: [req.query.category] }; // Ensure it's an array
+        } else {
+            query.category = { $in: listedCategoryIds };
         }
 
-        // Fetch categories with product counts
         const categoriesWithCounts = await Category.aggregate([
             {
                 $match: { isListed: true }
@@ -380,7 +386,7 @@ const loadShoppingPage = async (req, res) => {
                 sort = { createdAt: -1 };
         }
 
-        // Fetch products based on query
+        // Fetch products based on updated query
         const products = await Product.find(query)
             .sort(sort)
             .skip(skip)
@@ -409,6 +415,7 @@ const loadShoppingPage = async (req, res) => {
         res.status(500).redirect("/pageNotFound");
     }
 };
+
 
 
 const filterProduct = async (req, res) => {
@@ -802,20 +809,41 @@ const loadCartPage = async (req, res) => {
         const userId = req.session.user;
         if (!userId) return res.redirect("/login");
 
-        let cart = await Cart.findOne({ userId }).populate("items.productId");
-
-        
+        let cart = await Cart.findOne({ userId }).populate({
+            path: "items.productId",
+            populate: { path: "category" }
+        });
 
         if (!cart) {
             return res.render("cart", { cart: { items: [], cartTotal: 0, discount: 0, finalTotal: 0 } });
         }
 
+        // Reset the cartTotal and finalTotal
+        cart.cartTotal = 0;
+        cart.finalTotal = 0;
+
+        // Filter out blocked, out-of-stock, or unlisted-category products
         cart.items = cart.items.filter(item => {
+            if (
+                !item.productId ||
+                item.productId.isBlocked || 
+                item.productId.quantity <= 0 || 
+                (item.productId.category && !item.productId.category.isListed)
+            ) {
+                return false;
+            }
             if (item.quantity > item.productId.quantity) {
                 item.quantity = item.productId.quantity;
             }
-            return item.productId && item.productId.quantity > 0 && !item.productId.isBlocked;
+            item.totalPrice = item.quantity * item.productId.salePrice;
+            cart.cartTotal += item.totalPrice;
+            return true;
         });
+
+        cart.finalTotal = cart.cartTotal - cart.discount;
+
+        // Save the updated cart after removing unlisted-category products
+        await cart.save();
 
         res.render("cart", { cart });
     } catch (error) {
@@ -823,8 +851,6 @@ const loadCartPage = async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 };
-
-
 
       const deleteFromCart = async (req, res) => {
         try {
@@ -950,13 +976,14 @@ const loadCartPage = async (req, res) => {
     
  const loadAddAddress = async (req,res) =>{
     try {
+        const redirectTo = req.query.redirect || '';
         const userId = req.session.user;
         if (!userId) return res.redirect("/login");
     
         // Fetch cart data
         const cart = await Cart.findOne({ userId });
     
-        res.render("add-address", { cart });
+        res.render("add-address", { cart ,redirect:redirectTo});
     } catch (error) {
         console.error("Error loading add address:", error);
         res.status(500).send("Internal Server Error");
@@ -965,7 +992,9 @@ const loadCartPage = async (req, res) => {
    
  const setPrimaryAddress = async (req, res) => {
     try {
-        const { userId, addressId } = req.body;
+        const { addressId } = req.body;
+
+        const userId = req.session.user;
 
         // Find user’s address document
         const addressDoc = await Address.findOne({ userId });
@@ -989,12 +1018,13 @@ const loadCartPage = async (req, res) => {
 };
 
  
- const postAddAddress = async (req, res) => {
+const postAddAddress = async (req, res) => {
     try {
         const userId = req.session.user;
         console.log("Session User ID:", userId);  // Debugging
+        console.log("Redirect Query:", req.query.redirect); // Debugging
 
-        const { name, country, city, state, streetAddress, pincode, phone, altPhone } = req.body;
+        const { name, country, city, state, streetAddress, pincode, phone, altPhone, redirect } = req.body;
 
         if (!userId) {
             console.error("User not logged in!");
@@ -1023,6 +1053,14 @@ const loadCartPage = async (req, res) => {
 
         await addressEntry.save();
         console.log("Address added successfully!");
+
+        // ✅ Check if the query parameter is being detected
+        if (redirect === "checkout") {
+            console.log("Redirecting to /checkout"); // Debugging
+            return res.redirect("/checkout");
+        }
+
+        console.log("Redirecting to /address"); // Debugging
         res.redirect("/address");
 
     } catch (error) {

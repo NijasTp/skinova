@@ -241,11 +241,12 @@ const requestReturn = async (req, res) => {
         }
 
         if (cart.cartTotal < coupon.minimumPrice) {
-            return res.json({
+            return res.status(400).json({   
                 success: false,
                 message: `Minimum order price should be ₹${coupon.minimumPrice}`,
             });
         }
+        
         
         let userCouponUsage = coupon.usedBy.find(entry => entry.userId.toString() === userId);
         if (userCouponUsage && userCouponUsage.timesUsed >= coupon.usageLimit) {
@@ -257,7 +258,7 @@ const requestReturn = async (req, res) => {
             discount = (coupon.offerPrice / 100) * cart.cartTotal;
         }
 
-        discount = Math.min(discount, cart.cartTotal); // Ensure discount does not exceed cart total
+        discount = Math.min(discount, cart.cartTotal);
 
         // **Proportionally Distribute Discount Across Items**
         let totalCartPrice = cart.items.reduce((sum, item) => sum + item.totalPrice, 0);

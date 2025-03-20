@@ -65,20 +65,19 @@
     <%- include("../../views/partials/admin/header") %>
     <div class="container">
         <h1>Add New Coupon</h1>
-        <form action="/admin/add-coupon" method="POST">
+        <form id="couponForm" action="/admin/add-coupon" method="POST">
             <div class="form-group">
                 <label for="code">Coupon Code</label>
                 <input type="text" id="code" name="code" placeholder="Enter coupon code" required>
             </div>
             <div class="form-group">
-                <label for="name">Coupon Name</label>
-                <input type="text" id="name" name="name" placeholder="Enter coupon name" required>
+                <label for="name">Coupon Description</label>
+                <input type="text" id="name" name="name" placeholder="Enter coupon Description" required>
             </div>
             <div class="form-group">
                 <label for="startDate">Start Date</label>
                 <input type="date" id="startDate" name="startDate" required>
             </div>
-            
             <div class="form-group">
                 <label for="expireOn">Expiry Date</label>
                 <input type="date" id="expireOn" name="expireOn" required>
@@ -104,7 +103,7 @@
             const minPriceInput = document.getElementById('minimumPrice');
             const offerPriceInput = document.getElementById('offerPrice');
             const minError = document.getElementById('min-error');
-    
+            const couponForm = document.getElementById('couponForm');
             
             const today = new Date().toISOString().split("T")[0];
             startDateInput.min = today;
@@ -121,16 +120,15 @@
                 }
             });
         
-     
-            minPriceInput.addEventListener('input', () => {
-                if (minPriceInput.value < offerPriceInput.value) {
+            couponForm.addEventListener('submit', (event) => {
+                if (parseFloat(minPriceInput.value) <= parseFloat(offerPriceInput.value)) {
+                    event.preventDefault();
                     minError.textContent = 'Minimum order price cannot be lower than coupon discount amount';
                 } else {
                     minError.textContent = '';
                 }
             });
         </script>
-        
     </div>
     <%- include("../../views/partials/admin/footer") %>
 </body>

@@ -246,43 +246,44 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
         <script>
-            function validateForm() {
-                let isValid = true;
-                const firstName = document.querySelector("input[name='firstName']");
-                const lastName = document.querySelector("input[name='lastName']");
-                const phone = document.querySelector("input[name='phone']");
-                const username = document.querySelector("input[name='username']");
+        function validateForm() {
+    let isValid = true;
+    const firstName = document.querySelector("input[name='firstName']");
+    const lastName = document.querySelector("input[name='lastName']");
+    const phone = document.querySelector("input[name='phone']");
+    const username = document.querySelector("input[name='username']");
 
-                if (!/^[a-zA-Z]+$/.test(firstName.value.trim())) {
-                    document.getElementById("firstNameError").textContent = "First name must contain only letters.";
-                    isValid = false;
-                } else {
-                    document.getElementById("firstNameError").textContent = "";
-                }
+    if (firstName.value.trim() && !/^[a-zA-Z]+$/.test(firstName.value.trim())) {
+        document.getElementById("firstNameError").textContent = "First name can only contain letters.";
+        isValid = false;
+    } else {
+        document.getElementById("firstNameError").textContent = "";
+    }
 
-                if (!/^[a-zA-Z]+$/.test(lastName.value.trim())) {
-                    document.getElementById("lastNameError").textContent = "Last name must contain only letters.";
-                    isValid = false;
-                } else {
-                    document.getElementById("lastNameError").textContent = "";
-                }
+    if (lastName.value.trim() && !/^[a-zA-Z]+$/.test(lastName.value.trim())) {
+        document.getElementById("lastNameError").textContent = "Last name can only contain letters.";
+        isValid = false;
+    } else {
+        document.getElementById("lastNameError").textContent = "";
+    }
 
-                if (!/^\d{10}$/.test(phone.value.trim())) {
-                    document.getElementById("phoneError").textContent = "Phone number must be exactly 10 digits.";
-                    isValid = false;
-                } else {
-                    document.getElementById("phoneError").textContent = "";
-                }
+    if (!/^\d{10}$/.test(phone.value.trim())) {
+        document.getElementById("phoneError").textContent = "Phone number must be exactly 10 digits.";
+        isValid = false;
+    } else {
+        document.getElementById("phoneError").textContent = "";
+    }
 
-                if (!/^[a-zA-Z0-9_]{3,15}$/.test(username.value.trim())) {
-                    document.getElementById("usernameError").textContent = "Username must be 3-15 characters long and can only contain letters, numbers, and underscores.";
-                    isValid = false;
-                } else {
-                    document.getElementById("usernameError").textContent = "";
-                }
+    if (!/^[a-zA-Z0-9]{3,15}$/.test(username.value.trim())) {
+        document.getElementById("usernameError").textContent = "Username must be 3-15 characters long and contain only letters and numbers.";
+        isValid = false;
+    } else {
+        document.getElementById("usernameError").textContent = "";
+    }
 
-                return isValid;
-            }
+    return isValid;
+}
+
 
             let cropper;
             const profilePictureInput = document.getElementById('profilePictureInput');
@@ -336,9 +337,12 @@
 
 
 
-            cancelCropButton.addEventListener('click', function () {
-                cropperModal.classList.add('hidden');
-            });
+          
+cancelCropButton.addEventListener('click', function () {
+    cropperModal.classList.add('hidden'); // Hide the cropper modal
+    profilePictureInput.value = ""; // Reset the file input
+    imagePreview.src = "/<%= user.image %>"; // Reset the image preview to the original image
+});
 
 
             document.getElementById("updateForm").addEventListener("submit", async function (event) {

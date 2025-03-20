@@ -32,6 +32,10 @@ const productSchema = new Schema({
         type: Number,
         default: 0
     },
+    validOffer:{
+        type: Number,
+        default:0
+    },
     quantity:{
         type: Number,
         required: true

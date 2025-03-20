@@ -118,8 +118,8 @@ body {
               <img src="<%= item.productId.productImage[0] %>" class="w-20 h-20 object-cover rounded" alt="Product Image">
               <div class="flex-1 ml-4">
                 <h3 class="text-lg font-semibold"><%= item.productId.productName %></h3>
-                <% if (item.discount && item.discount > 0) { %>
-                  <p class="text-sm text-green-600">Discount: <%= ((item.discount / item.price) * 100) %>% off per unit</p>
+                <% if (item.productId.validOffer && item.productId.validOffer > 0) { %>
+                  <p class="text-sm text-green-600">Discount: <%= item.productId.validOffer %>% off per unit</p>
                 <% } %>
               </div>
               <div class="flex items-center mt-4 md:mt-0">

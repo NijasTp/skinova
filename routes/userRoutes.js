@@ -10,6 +10,7 @@ const checkoutController = require("../controllers/user/checkoutController")
 const orderController = require("../controllers/user/orderController")
 const paymentController = require ('../controllers/user/paymentController.js')
 const walletController = require('../controllers/user/walletController.js')
+const reviewController = require("../controllers/user/reviewController.js")
 
 const upload = require("../helpers/user-multer");
 const { userAuth } = require('../middlewares/auth');
@@ -57,6 +58,9 @@ router.get('/filter', userController.filterProduct);
 
 
 router.get("/productDetails",productController.productDetails)
+router.get('/productDetails/reviews', productController.getProductReviews);
+router.post('/submitReview',reviewController.addReview)
+router.delete('/delete-review',reviewController.deleteReview)
 
 
 

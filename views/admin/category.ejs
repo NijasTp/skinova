@@ -29,11 +29,10 @@
       <div class="p-4">
         <form action="/admin/category/" method="get" class="flex flex-wrap gap-2">
           <input type="text" class="form-input flex-grow rounded-l-lg" placeholder="Search categories" name="search">
-          <input type="number" class="form-input flex-grow" placeholder="Min offer %" name="minOffer" min="0" max="99">
-          <input type="number" class="form-input flex-grow" placeholder="Max offer %" name="maxOffer" min="0" max="99">
           <button class="bg-blue-500 text-white px-4 py-2 rounded-r-lg" type="submit">
             <i class="fas fa-search"></i> Search
           </button>
+          <a href="/admin/category" class="bg-red-500 text-white px-4 py-2 rounded-lg">Clear</a>
         </form>
       </div>
     </div>
@@ -85,21 +84,24 @@
                         <%= category.categoryOffer  ? `${category.categoryOffer}%` : '0%' %>
                         <% if (category.categoryOffer < 1) { %>
                           <button class="bg-blue-500 text-white px-2 py-1 rounded" onclick="addOffer('<%= category._id %>')">
-                             Add Offer
+                             Add
                           </button>
                         <% } else { %>
                           <button class="bg-yellow-500 text-white px-2 py-1 rounded" onclick="editOffer('<%= category._id %>', '<%= category.categoryOffer %>')">
-                            Edit Offer
+                            Edit
                           </button>
                           <button class="bg-green-500 text-white px-2 py-1 rounded" onclick="deleteOffer('<%= category._id %>')">
-                             Remove Offer
+                             Remove
                           </button>
                         <% } %>
                       </td>
+                      
                       <td class="py-2 px-4">
-                        <button class="bg-blue-500 text-white px-2 py-1 rounded" onclick="editCategory('<%= category._id %>', '<%= category.name %>', '<%= category.description %>')">
-                          Edit
-                        </button>
+                        <button class="bg-blue-500 text-white px-2 py-1 rounded" 
+onclick="editCategory('<%= category._id %>', '<%= category.name.replace(/'/g, "\\'") %>', '<%= category.description.replace(/'/g, "\\'") %>')">
+  Edit
+</button>
+
                         <% if (category.isListed) { %>
                           <button class="bg-red-500 text-white px-2 py-1 rounded" onclick="unlistCategory('<%= category._id %>')">
                              Unlist
@@ -193,6 +195,7 @@
 
     // Edit Category Function
     function editCategory(id, name, description) {
+      console.log(id, name, description);
       Swal.fire({
         title: 'Edit Category',
         html:

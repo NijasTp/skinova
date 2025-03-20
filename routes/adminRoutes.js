@@ -8,6 +8,7 @@ const customerController = require('../controllers/admin/customerController');
 const categoryController = require('../controllers/admin/categoryController');
 const productController = require('../controllers/admin/productController');
 const transactionController = require('../controllers/admin/transactionController');
+const reviewController = require('../controllers/admin/reviewController')
 const { adminAuth } = require('../middlewares/auth');
 const multer = require("multer");
 const upload = multer();
@@ -27,11 +28,12 @@ router.get('/category', adminAuth, categoryController.categoryInfo);
 router.post('/addCategory', adminAuth, categoryController.addCategory);
 router.post('/addCategoryOffer', adminAuth, categoryController.addCategoryOffer);
 router.post('/removeCategoryOffer', adminAuth, categoryController.removeCategoryOffer);
+router.post("/editCategoryOffer", adminAuth, categoryController.editCategoryOffer)
 router.get('/listCategory', adminAuth, categoryController.getListCategory);
 router.get('/unListCategory', adminAuth, categoryController.getUnlistCategory);
 router.get('/editCategory', adminAuth, categoryController.getEditCategory);
 router.post('/editCategory/:id', adminAuth, categoryController.editCategory);
-router.post("/editCategoryOffer", adminAuth, categoryController.editCategoryOffer)
+
 router.delete("/deleteCategory/:id", adminAuth, categoryController.deleteCategory)
 
 router.get("/addProducts", adminAuth, productController.getProductAddPage);
@@ -47,6 +49,9 @@ router.post("/addProducts", adminAuth, upload.fields([
 router.get("/products",adminAuth,productController.getAllProducts);
 router.post("/addProductOffer",adminAuth,productController.addProductOffer);
 router.post("/removeProductOffer",adminAuth,productController.removeProductOffer);
+
+router.get('/reviews',adminAuth,reviewController.getReviews)
+router.post('/reviews/:id',adminAuth,reviewController.deleteReview)
 
 router.get("/blockProduct",adminAuth,productController.blockProduct);
 router.get("/unblockProduct",adminAuth,productController.unblockProduct);

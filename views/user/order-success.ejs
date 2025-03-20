@@ -1,83 +1,128 @@
 <html lang="en">
- <head>
+<head>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <title>
-   Order Successful
-  </title>
-  <script src="https://cdn.tailwindcss.com">
-  </script>
+  <title>Order Successful</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
   <style>
-   body {
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #e6f4f4;
-        }
-
-        .container {
-            text-align: center;
-        }
-
-        .success-image {
-            width: 200px;
-            height: 200px;
-            margin: 0 auto 20px;
-        }
-
-        .success-code {
-            font-size: 36px;
-            font-weight: bold;
-            margin: 20px 0;
-            color: #333;
-        }
-
-        .success-message {
-            font-size: 16px;
-            color: #666;
-            margin-bottom: 20px;
-        }
-
-        .order-link {
-            color: #2b7bb9;
-            text-decoration: none;
-        }
-
-        .order-link:hover {
-            text-decoration: underline;
-        }
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #e6f4f4;
+    }
+    .container {
+      text-align: center;
+    }
+    .success-image {
+      width: 200px;
+      height: 200px;
+      margin: 0 auto 20px;
+    }
+    .success-code {
+      font-size: 36px;
+      font-weight: bold;
+      margin: 20px 0;
+      color: #333;
+    }
+    .success-message {
+      font-size: 16px;
+      color: #666;
+      margin-bottom: 10px;
+    }
+    .order-link {
+      color: #2b7bb9;
+      text-decoration: none;
+    }
+    .order-link:hover {
+      text-decoration: underline;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      min-width: 300px;
+    }
+    .close-btn {
+      cursor: pointer;
+      color: red;
+      font-size: 18px;
+    }
   </style>
- </head>
- <body>
+</head>
+<body>
   <div class="container">
-   <div class="success-image">
-    <img alt="Illustration of a checkmark indicating success" class="success-image" height="200" src="/img/skinova cover.png" width="200"/>
-   </div>
-   <div class="success-code">
-    Thank you for your purchase!
-   </div>
-   
-   <div class="success-message">
-    Your order ID 
-    <span class="font-bold text-gray-800">
-     <%= orderId %>
-    </span>
-   </div>
-   <div>
-    <a class="order-link" href="/orders">
-     View Orders
-    </a>
-   </div>
-   <div class="mt-8">
-    <a href="/shop" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">Continue Shopping</a>
-   </div>
-  </div>
- </body>
-</html>
+    <div class="success-image">
+      <img alt="Illustration of a checkmark indicating success" class="success-image" height="200" src="/img/skinova cover.png" width="200"/>
+    </div>
+    <div class="success-code">
+      Thank you for your purchase!
+    </div>
+    
+    <div class="success-message">
+      Your order ID 
+      <span class="font-bold text-gray-800">
+        <%= orderId.split(',')[0] %> <!-- Display only the first order ID -->
+      </span>
+    </div>
 
+    <% if (orderId.includes(',')) { %> 
+      <button class="bg-gray-500 text-white px-3 py-1 rounded mt-2" id="viewMoreBtn">View More</button>
+    <% } %>
+
+    <div>
+      <a class="order-link" href="/orders">View Orders</a>
+    </div>
+    
+    <div class="mt-8">
+      <a href="/shop" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">Continue Shopping</a>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="orderModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" id="closeModal">&times;</span>
+      <h2>All Order IDs</h2>
+      <% orderId.split(',').forEach(id => { %>
+        <p><%= id %></p>
+      <% }); %>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("viewMoreBtn")?.addEventListener("click", function() {
+      document.getElementById("orderModal").style.display = "flex";
+    });
+
+    document.getElementById("closeModal").addEventListener("click", function() {
+      document.getElementById("orderModal").style.display = "none";
+    });
+
+    window.onclick = function(event) {
+      let modal = document.getElementById("orderModal");
+      if (event.target === modal) {
+        modal.style.display = "none";
+      }
+    };
+  </script>
+</body>
+</html>

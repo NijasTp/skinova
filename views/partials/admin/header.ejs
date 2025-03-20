@@ -177,11 +177,20 @@
                 margin-left: 0;
             }
         }
+        .skinova-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 20px;
+            margin-left: 20px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
     <!-- Header -->
     <header class="skinova-header">
+        
         <button id="skinova-toggle-btn" class="skinova-hamburger" aria-label="Toggle sidebar">
             <i class="fas fa-bars"></i>
         </button>
@@ -190,10 +199,9 @@
 
     <!-- Sidebar Overlay -->
     <div id="skinova-overlay" class="skinova-overlay"></div>
-    
     <!-- Sidebar -->
     <aside id="skinova-sidebar" class="skinova-sidebar">
-        
+        <b class="skinova-title">Skinova Admin</b>
         <nav>
             <ul class="skinova-menu">
                 <li class="skinova-menu-item">
@@ -245,11 +253,18 @@
                     </a>
                 </li>
                 <li class="skinova-menu-item">
+                    <a href="/admin/reviews" class="skinova-menu-link">
+                        <i class="fas fa-star skinova-menu-icon"></i>
+                        <span>Reviews</span>
+                    </a>
+                </li>
+                <li class="skinova-menu-item">
                     <a href="/admin/logout" class="skinova-menu-link">
                         <i class="fas fa-sign-out-alt skinova-menu-icon"></i>
                         <span>Logout</span>
                     </a>
                 </li>
+               
             </ul>
         </nav>
     </aside>

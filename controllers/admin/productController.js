@@ -7,6 +7,7 @@ const fs = require("fs")
 const Order = require('../../models/orderSchema')
 const Wallet = require('../../models/walletSchema')
 const Coupon = require('../../models/couponSchema')
+const User = require('../../models/userSchema')
 const getProductAddPage = async (req, res) => {
   try {
     const category = await Category.find({ isListed: true })
@@ -185,14 +186,18 @@ const getAllProducts = async (req, res) => {
 const addProductOffer = async (req, res) => {
   try {
       const { productId, percentage } = req.body;
-      const product = await Product.findById(productId);
+      const product = await Product.findById(productId).populate("category");
 
       if (!product) {
           return res.status(404).json({ status: false, message: "Product not found" });
       }
 
+      const categoryOffer = product.category ? product.category.categoryOffer || 0 : 0;
       product.productOffer = parseInt(percentage);
-      product.salePrice = Math.round(product.regularPrice * (1 - percentage / 100));
+
+      product.validOffer = Math.max(product.productOffer, categoryOffer);
+      product.salePrice = Math.round(product.regularPrice * (1 - product.validOffer / 100));
+
       await product.save();
 
       res.json({ status: true, message: "Offer added successfully" });
@@ -205,14 +210,19 @@ const addProductOffer = async (req, res) => {
 const removeProductOffer = async (req, res) => {
   try {
       const { productId } = req.body;
-      const product = await Product.findById(productId);
+      const product = await Product.findById(productId).populate("category");
 
       if (!product) {
           return res.status(404).json({ status: false, message: "Product not found" });
       }
 
       product.productOffer = 0;
-      product.salePrice = product.regularPrice;
+
+      const categoryOffer = product.category ? product.category.categoryOffer || 0 : 0;
+      product.validOffer = categoryOffer;
+
+      product.salePrice = Math.round(product.regularPrice * (1 - product.validOffer / 100));
+
       await product.save();
 
       res.json({ status: true, message: "Offer removed successfully" });
@@ -451,13 +461,47 @@ const deleteProduct = async (req, res) => {
 const getOrders = async (req, res) => {
   try {
       const page = parseInt(req.query.page) || 1;
-      const limit = 10; 
+      const limit = 10;
       const skip = (page - 1) * limit;
 
-      const totalOrders = await Order.countDocuments();
+      const searchQuery = req.query.search ? req.query.search.trim() : "";
+      let filter = {};
+
+      if (searchQuery) {
+          // Find users matching the search
+          const users = await User.find({
+              $or: [
+                  { name: { $regex: searchQuery, $options: "i" } },
+                  { email: { $regex: searchQuery, $options: "i" } },
+                  { phone: { $regex: searchQuery, $options: "i" } }
+              ]
+          }).select("_id");
+
+          // Find products matching the search
+          const products = await Product.find({
+              productName: { $regex: searchQuery, $options: "i" }
+          }).select("_id");
+
+          // Extract user and product IDs
+          const userIds = users.map(user => user._id);
+          const productIds = products.map(product => product._id);
+
+          // Apply filter using user and product IDs
+          filter = {
+              $or: [
+                  { status: { $regex: searchQuery, $options: "i" } }, // Order status search
+                  { userId: { $in: userIds } },
+                  { product: { $in: productIds } }
+              ]
+          };
+      }
+
+      // Get total orders count after filtering
+      const totalOrders = await Order.countDocuments(filter);
       const totalPages = Math.ceil(totalOrders / limit);
 
-      const orders = await Order.find()
+      // Fetch orders with pagination
+      const orders = await Order.find(filter)
           .populate({
               path: "userId",
               select: "name phone email",
@@ -475,12 +519,14 @@ const getOrders = async (req, res) => {
           title: "Order Management",
           currentPage: page,
           totalPages: totalPages,
+          searchQuery
       });
   } catch (error) {
       console.error("Error fetching orders:", error);
       res.status(500).send("Internal Server Error");
   }
 };
+
 
 
 
@@ -544,7 +590,7 @@ const updateOrderStatus = async (req, res) => {
 
 const cancelOrder = async (req, res) => {
   try {
-    const { orderId } = req.body;
+    const { orderId ,reason} = req.body;
 
     if (!orderId) {
       return res.status(400).json({ success: false, message: "Order ID is required" });
@@ -587,6 +633,7 @@ const cancelOrder = async (req, res) => {
     }
 
     order.status = "cancelled";
+    order.cancellationReason = reason + '(Admin Cancellation)';
     await order.save();
 
     res.json({ success: true, message: "Order cancelled successfully" });
@@ -661,23 +708,39 @@ const rejectReturn = async (req, res) => {
 const getCoupons = async (req, res) => {
   try {
       const today = new Date();
+
+      // Delete expired coupons
       const expiredCoupons = await Coupon.find({ expireOn: { $lt: today } });
       await Coupon.deleteMany({ _id: { $in: expiredCoupons.map(c => c._id) } });
 
-      const perPage = 5; 
-      const page = parseInt(req.query.page) || 1; 
+      const perPage = 5;
+      const page = parseInt(req.query.page) || 1;
+      const searchQuery = req.query.search || "";
 
-      const totalCoupons = await Coupon.countDocuments();
+      // Search filters (if any)
+      let query = {};
+      if (searchQuery) {
+          query = {
+              $or: [
+                  { name: { $regex: searchQuery, $options: "i" } }, 
+                  { code: { $regex: searchQuery, $options: "i" } }  
+              ]
+          };
+      }
+
+      const totalCoupons = await Coupon.countDocuments(query);
       const totalPages = Math.ceil(totalCoupons / perPage);
 
-      const coupons = await Coupon.find()
+      // Fetch paginated results based on search query
+      const coupons = await Coupon.find(query)
           .skip((page - 1) * perPage)
           .limit(perPage);
 
       res.render('admin-coupons', { 
           coupons, 
           currentPage: page, 
-          totalPages 
+          totalPages, 
+          searchQuery // Pass search query for front-end persistence
       });
 
   } catch (error) {
@@ -781,7 +844,8 @@ const getEditCoupon = async (req, res) => {
 const editCoupon = async (req, res) => {
   try {
       const { code, name, startDate, expireOn, offerPrice, minimumPrice, usageLimit } = req.body;
-      if (minimumPrice < offerPrice) {
+      console.log("req body:", req.body);
+      if (Number(minimumPrice) < Number(offerPrice)) {
           return res.status(400).send("Minimum price cannot be lower than discount amount.");
       }
       await Coupon.findByIdAndUpdate(req.params.id, {
@@ -789,14 +853,14 @@ const editCoupon = async (req, res) => {
           name,
           startDate,
           expireOn,
-          offerPrice,
-          minimumPrice,
-          usageLimit
+          offerPrice: Number(offerPrice),
+          minimumPrice: Number(minimumPrice),
+          usageLimit: Number(usageLimit),
       });
-      res.redirect("/admin/coupons");
+      res.redirect("/admin/coupon");
   } catch (err) {
       console.error(err);
-      res.redirect("/admin/coupons");
+      res.redirect("/admin/coupon");
   }
 }
 

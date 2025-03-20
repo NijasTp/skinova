@@ -2,7 +2,7 @@ const User = require('../../models/userSchema');
 const Order = require('../../models/orderSchema');
 const pdf = require('html-pdf-node');
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 
 const pageError = async (req, res) => {

@@ -47,7 +47,10 @@ const addToWishlist = async (req, res) => {
         if (product.isBlocked) {
             return res.status(400).json({ success: false, message: "This product is not available for adding to wishlist" });
         }
-
+        
+        if (product.quantity === 0) {
+            return res.status(400).json({ success: false, message: "This product is out of stock" });
+        }
        
         const cart = await Cart.findOne({ userId, "items.productId": productId });
         if (cart) {

@@ -209,15 +209,21 @@
                                             <%= coupon.code %> - ₹<%= coupon.offerPrice %> OFF
                                         </span>
                                         <span>
-                                            Min: <%= coupon.minimumPrice %>
                                         </span>
                                         <% if (isUsed) { %>
                                             <span class="text-sm font-semibold text-gray-500">
                                                 USED
                                             </span>
-                                            <% } %>
+                                            <% } else { %>
+                                        
+                                            min: <%= coupon.minimumPrice %>
+                                                <button onclick="copyCoupon('<%= coupon.code %>')" class="bg-green-500 text-white p-2 rounded-lg hover:bg-green-600" >COPY</button>
+                                                <% } %>
                                     </li>
                                     <% }) %>
+                                    <% if (coupons.length===0) { %>
+                                        <p>No coupons found.</p>
+                                        <% } %>
                         </ul>
                         <button class="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 mt-4 w-full"
                             id="close-coupons">
@@ -233,13 +239,13 @@
                 </h2>
                 <select class="border p-2 rounded-lg w-full mb-4">
                     <% addresses.forEach(addr=> { %>
-                        <option value="<%= addr._id %>">
+                        <option value="<%= addr._id %>" <%= addr.isPrimary ? 'selected' : '' %>>
                             <%= addr.name %>, <%= addr.streetAddress %>, <%= addr.city %>, <%= addr.state %> - <%=
                                                 addr.pincode %>
                         </option>
                         <% }) %>
                 </select>
-                <a class="bg-green-500 text-white p-2 px-3 rounded-lg hover:bg-green-600" href="/add-address">
+                <a class="bg-green-500 text-white p-2 px-3 rounded-lg hover:bg-green-600" href="/add-address?redirect=checkout">
                     Add New
                     Address
                 </a>
@@ -251,8 +257,13 @@
                 </h2>
                 <div class="flex items-center mb-2">
                     <input class="mr-2" id="cod" name="payment" type="radio" value="cod" />
-                    <label class="text-lg text-gray-800" for="cod">
+                    <label class="text-lg text-gray-800 block" for="cod">
                         Cash on Delivery
+                        <% if (cart.cartTotal > 1500) { %>
+                            <span class="text-sm text-red-500 block">
+                                Only for orders under 1500
+                            </span>
+                        <% } %>
                     </label>
                 </div>
                 <div class="flex items-center mb-2">
@@ -265,6 +276,15 @@
                     <input class="mr-2" id="wallet" name="payment" type="radio" value="wallet" />
                     <label class="text-lg text-gray-800" for="wallet">
                         Wallet
+                        <%if (walletBalance > cart.cartTotal - cart.discount) { %>
+                            <span class="text-sm text-green-500 block">
+                                Available Balance: ₹<%= walletBalance %>
+                            </span>
+                            <% } else { %>
+                            <span class="text-sm text-red-500 block">
+                                Insufficient Balance (₹<%= walletBalance %>) <a class="text-blue-500" href="/wallet"> Add Money?</a>
+                            </span>
+                            <% } %>
                     </label>
                 </div>
             </div>
@@ -280,6 +300,20 @@
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11">
         </script>
         <script>
+                    function copyCoupon(code) {
+            navigator.clipboard.writeText(code).then(() => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Copied!',
+                    text: 'Coupon code copied to clipboard!',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }).catch(err => {
+                console.error("Could not copy text: ", err);
+            });
+        }
+
             const showCoupons = document.getElementById('show-coupons');
             const closeCoupons = document.getElementById('close-coupons');
             const couponsModal = document.getElementById('coupons-modal');

@@ -80,7 +80,7 @@
         <div class="hero-content">
          <b>
           <h1 class="hero-title">
-           MY CART
+           ADDRESS
           </h1>
          </b>
          <p class="hero-description">
@@ -91,8 +91,14 @@
            <span>
             &gt;
            </span>
-           <a href="/cart">
-            Cart
+           <a href="/address">
+            Address
+           </a>
+           <span>
+            &gt;
+           </span>
+           <a href="/edit-address">
+            Edit Address
            </a>
           </i>
          </p>
@@ -101,15 +107,7 @@
        </main>
     <div class="flex min-h-screen">
         <!-- Sidebar -->
-        <div class="w-1/4 bg-gray-200 p-8">
-            <h2 class="text-xl font-bold mb-8">SETTINGS</h2>
-            <ul>
-                <li class="mb-4"><a href="#" class="text-black">Orders</a></li>
-                <li class="mb-4"><a href="#" class="text-black font-bold">Personal Info</a></li>
-                <li class="mb-4"><a href="#" class="text-black">Adresses</a></li>
-                <li class="mb-4"><a href="#" class="text-black">Wallet</a></li>
-            </ul>
-        </div>
+      <%- include('../partials/user/sidebar') %>
     
         <div class="w-3/4 p-8">
             <h2 class="text-2xl font-bold mb-8">EDIT ADDRESS</h2>
@@ -146,8 +144,8 @@
                     </div>
                     <div class="w-1/2 pl-2">
                         <label for="postcode" class="block text-gray-700">Postcode / ZIP *</label>
-                        <input type="text" value="<%=address.pincode%>" name="pincode" id="postcode" class="w-full border border-gray-300 p-2 mt-2" required pattern="^\d{5,6}$">
-                        <p id="postcodeError" class="text-red-500 text-sm hidden">Enter a valid 5 or 6 digit postcode.</p>
+                        <input type="text" value="<%=address.pincode%>" name="pincode" id="postcode" class="w-full border border-gray-300 p-2 mt-2" required>
+                        <p id="postcodeError" class="text-red-500 text-sm hidden">Enter a valid 6-digit postcode.</p>
                     </div>
                 </div>
             
@@ -155,12 +153,12 @@
                 <div class="flex mb-6">
                     <div class="w-1/2 pr-2">
                         <label for="phone" class="block text-gray-700">Phone</label>
-                        <input type="text" value="<%=address.phone%>" name="phone" id="phone" class="w-full border border-gray-300 p-2 mt-2" required pattern="^\d{10}$">
+                        <input type="text" value="<%=address.phone%>" name="phone" id="phone" class="w-full border border-gray-300 p-2 mt-2" required>
                         <p id="phoneError" class="text-red-500 text-sm hidden">Enter a valid 10-digit phone number.</p>
                     </div>
                     <div class="w-1/2 pl-2">
                         <label for="alt-phone" class="block text-gray-700">Alternative Phone</label>
-                        <input type="text" value="<%=address.altPhone%>" name="altPhone" id="alt-phone" class="w-full border border-gray-300 p-2 mt-2" pattern="^\d{10}$">
+                        <input type="text" value="<%=address.altPhone%>" name="altPhone" id="alt-phone" class="w-full border border-gray-300 p-2 mt-2">
                         <p id="altPhoneError" class="text-red-500 text-sm hidden">Enter a valid 10-digit phone number.</p>
                     </div>
                 </div>
@@ -189,8 +187,7 @@
             // Postcode Validation
             const postcode = document.getElementById("postcode");
             const postcodeError = document.getElementById("postcodeError");
-            const postcodePattern = /^\d{5,6}$/;
-            if (!postcodePattern.test(postcode.value)) {
+            if (postcode.value.length !== 6) {
                 postcodeError.classList.remove("hidden");
                 isValid = false;
             } else {
@@ -200,8 +197,7 @@
             // Phone Validation
             const phone = document.getElementById("phone");
             const phoneError = document.getElementById("phoneError");
-            const phonePattern = /^\d{10}$/;
-            if (!phonePattern.test(phone.value)) {
+            if (phone.value.length !== 10) {
                 phoneError.classList.remove("hidden");
                 isValid = false;
             } else {
@@ -211,7 +207,7 @@
             // Alternative Phone Validation
             const altPhone = document.getElementById("alt-phone");
             const altPhoneError = document.getElementById("altPhoneError");
-            if (altPhone.value.trim() !== "" && !phonePattern.test(altPhone.value)) {
+            if (altPhone.value.trim() !== "" && altPhone.value.length !== 10) {
                 altPhoneError.classList.remove("hidden");
                 isValid = false;
             } else {
@@ -223,3 +219,4 @@
         </script>
 </body>
 </html>
+
